@@ -14,7 +14,7 @@ app that runs the same firmware code so you can try it on your phone.
 | Download | |
 |---|---|
 | [`DubStab-Plaits-v1.0.wav`](downloads/DubStab-Plaits-v1.0.wav) | Firmware update for the module (play it into Plaits) |
-| [`DubStab-Plaits-v1.0.apk`](downloads/DubStab-Plaits-v1.0.apk) | Android app (Android 8+), with tape echo + reverb |
+| [`DubStab-Plaits-v1.0.1.apk`](downloads/DubStab-Plaits-v1.0.1.apk) | Android app (Android 8+), with tape echo + reverb |
 | [`DubStab-M4L-v1.0.zip`](downloads/DubStab-M4L-v1.0.zip) | Max for Live devices: Dub Stab MIDI, Dub Stab Synth, Dub Stab Plaits (root, four minor scales, minor chords only) |
 
 Also: [`MANUAL.md`](docs/MANUAL.md) and the raw `.bin` image for SWD / ST-Link in [`downloads/`](downloads/) (app at `0x08008000`). Beta versions for testers are on the website (password protected).
