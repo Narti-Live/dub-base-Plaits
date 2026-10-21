@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.4
+# DUB STAB PLAITS — v1.6
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -78,8 +78,15 @@ octave = one yellow LED, speed = one LED (straight green, triplets red).
 | 4 | FM | ratio | index | feedback |
 | 5 | PHASE DIST | resonance | distortion | PD ↔ resonant |
 | 6 | CHIPTUNE | duty cycle | bit crush | square ↔ triangle |
-| 7 | Plaits **CHORDS** engine | brightness | inversion | waveform |
-| 8 | Plaits **STRING MACHINE** | brightness | filter / ensemble | registration |
+| 7 | Plaits **STRING MACHINE** | brightness | filter / ensemble | registration |
+| 8 | **ACID** (mono bass) | cutoff | accent | resonance |
+
+**ACID (model 8)** plays a mono acid bass line generated with the pattern: chord roots, octaves,
+fifths and thirds, one octave below the chords, with slides and the pattern's accents. Every note
+is in the key. On ACID, **FREQUENCY sets the filter envelope amount**; decay is fixed, the wave is
+a saw and the character warm. Accents are louder and snappier, and repeated accents build up a
+"sweep". Resonance goes up to a strong squelch but never self-oscillates, and the level matches
+the chord models. (RIGHT + FREQUENCY resonance applies to the chord models only.)
 
 NEW writes 1, 2 or 4 chords per pattern, mostly held, on C minor degrees (mostly I, IV, V,
 VI, III). Off-beats get priority, so low densities give classic off-beat stabs. Some steps are accented.
@@ -88,7 +95,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.4.wav` to the end (2 min 36 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.6.wav` to the end (2 min 37 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -96,6 +103,9 @@ the same way; your calibration is kept.
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
 ## Changes
+
+**v1.6**
+- New model 8: ACID, a mono acid bass line. STRING MACHINE moves to model 7; the Plaits CHORDS engine is removed.
 
 **v1.4**
 - Cleaner, less hot output. A leveler with 6 dB of headroom keeps stacked chords and high resonance out of the clipper (distortion was up to 28 %, now under 0.5 %). OUT peaks around 10 Vpp, like other Eurorack oscillators.
@@ -105,7 +115,7 @@ the same way; your calibration is kept.
 - Both buttons 2 s = CV TUNE; 4 s = CV input calibration.
 
 **v1.2**
-- Model 7 (CHORDS): the filter now follows TIMBRE (inversion), so high inversions are no longer filtered almost silent.
+- The CHORDS engine filter follows the inversion (engine removed in v1.6).
 - The random LFO starts moving right after power-on instead of after about 8 seconds.
 
 **v1.1**

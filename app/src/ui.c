@@ -49,12 +49,12 @@ static const float JK[J_N][2] = {
     {42, 655}, {110, 655}, {178, 655}, {246, 655}, {313, 655}};
 #define JACK_R 17
 
-static const char *kModel[8] = {"DUB SAW", "VA", "WAVESHP", "FM", "PHASE D", "CHIPTUNE", "CHORDS", "STRINGS"};
+static const char *kModel[8] = {"DUB SAW", "VA", "WAVESHP", "FM", "PHASE D", "CHIPTUNE", "STRINGS", "ACID"};
 static const char *kHTM[8][3] = {
     {"detune", "saw -> pulse", "noise chuff"}, {"osc 2 interval", "pulse width", "pulse <-> saw"},
     {"asymmetry", "fold", "triangle -> saw"}, {"ratio", "index", "feedback"},
     {"resonance", "distortion", "PD <-> resonant"}, {"duty cycle", "bit crush", "square <-> triangle"},
-    {"brightness", "inversion", "waveform"}, {"brightness", "filter / ensemble", "registration"}};
+    {"brightness", "filter / ensemble", "registration"}, {"cutoff", "accent", "resonance"}};
 static const char *kSpeed[8] = {"1/2", "1/4", "1/8", "1/8T", "1/16", "1/16T", "1/32", "1/32T"};
 static const char *kRoman[7] = {"i", "ii", "III", "iv", "v", "VI", "VII"};
 static const char *kNote[12] = {"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
@@ -317,8 +317,11 @@ static void knob_popup(int k) {
     case 0:
         if (S.cv_tune) { fmt(a, 96, "CV SCALE  %.2f %%", (S.cv_scale / 6553.6f - 1.f) * 100.f); fmt(b, 128, "until C5 on your synth is exactly 2 octaves above C3"); }
         else if (hw_buttons[0]) { fmt(a, 96, "OCTAVE  %d", S.octave); fmt(b, 128, "LEFT + FREQUENCY (noon = 3)"); }
-        else if (hw_buttons[1]) { fmt(a, 96, "RESONANCE  %.2f", S.resonance); fmt(b, 128, "RIGHT + FREQUENCY  (Q %.1f, never self-oscillates)", S.q); }
-        else {
+        else if (hw_buttons[1]) { fmt(a, 96, "RESONANCE  %.2f", S.resonance); fmt(b, 128, m == 7 ? "chord models only (ACID: resonance = MORPH)" : "RIGHT + FREQUENCY  (Q %.1f, never self-oscillates)", S.q); }
+        else if (m == 7) {
+            fmt(a, 96, "ENV MOD  %.2f", S.envelope);
+            fmt(b, 128, "ACID filter envelope amount (decay fixed)");
+        } else {
             fmt(a, 96, "ENVELOPE  %.2f", S.envelope);
             fmt(b, 128, "attack %d ms   decay %.2f s   filter +%.1f oct", (int)(S.attack_s * 1000 + 0.5f), S.decay_s, S.env_oct);
         }
@@ -668,7 +671,7 @@ static float draw_how(float y) {
 static float draw_env(float y) {
     float h = 300;
     char t[128];
-    card(y, h, "4  FREQUENCY = ENVELOPE", "attack + decay + filter on one knob");
+    card(y, h, (S.model & 7) == 7 ? "4  FREQUENCY = ACID ENV MOD" : "4  FREQUENCY = ENVELOPE", (S.model & 7) == 7 ? "chord models: attack + decay + filter" : "attack + decay + filter on one knob");
     float px = 34, pw = CW - 68, py = y + 74, ph = 150;
     float span = S.attack_s + S.decay_s * 0.85f;
     if (span < 0.3f) span = 0.3f;

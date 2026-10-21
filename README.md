@@ -13,8 +13,8 @@ app that runs the same firmware code so you can try it on your phone.
 
 | Download | |
 |---|---|
-| [`DubStab-Plaits-v1.4.wav`](downloads/DubStab-Plaits-v1.4.wav) | Firmware update for the module (play it into Plaits) |
-| [`DubStab-Plaits-v1.4.2.apk`](downloads/DubStab-Plaits-v1.4.2.apk) | Android app (Android 8+), with tape echo + reverb |
+| [`DubStab-Plaits-v1.6.wav`](downloads/DubStab-Plaits-v1.6.wav) | Firmware update for the module (play it into Plaits) — v1.6 with the new ACID model |
+| [`DubStab-Plaits-v1.6.apk`](downloads/DubStab-Plaits-v1.6.apk) | Android app (Android 8+), with tape echo + reverb |
 
 Also: [`MANUAL.md`](docs/MANUAL.md) and the raw `.bin` image for SWD / ST-Link in [`downloads/`](downloads/) (app at `0x08008000`). Beta versions for testers are on the website (password protected).
 
@@ -22,7 +22,7 @@ Also: [`MANUAL.md`](docs/MANUAL.md) and the raw `.bin` image for SWD / ST-Link i
 
 1. Power off, unplug all cables from Plaits, patch your computer's headphone output into **MODEL**.
 2. Set **FREQUENCY** to 12 o'clock, hold the **LEFT** button and power on.
-3. Play `DubStab-Plaits-v1.4.wav` at about 80 % volume (no MP3, no notification sounds), or use the flasher on the website.
+3. Play `DubStab-Plaits-v1.6.wav` at about 80 % volume (no MP3, no notification sounds), or use the flasher on the website.
    The level meter (LEDs 1–4) should show both green LEDs lit, yellow at most flickering, red off. When it ends, the module restarts into DUB STAB PLAITS.
 
 All LEDs blinking red: press LEFT, nudge FREQUENCY and play the file again.
@@ -54,6 +54,9 @@ app/                    Dub Stab Plaits for Android: firmware core + touch panel
 ```
 
 ### Build the firmware
+
+The firmware source here is v1.4 (the patch series in `firmware/patches`). The v1.6 changes (ACID model) will be published together with the current beta.
+
 
 ```sh
 git clone https://github.com/pichenettes/eurorack && cd eurorack

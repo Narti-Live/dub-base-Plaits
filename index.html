@@ -37,7 +37,7 @@
     </span>
   </nav>
   <div class="hero-text">
-    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.4 — by <a href="#narti">Narti Live</a></p>
+    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.6 — by <a href="#narti">Narti Live</a></p>
     <h1 class="title" aria-label="DUB STAB PLAITS">
       <span class="line" data-text="DUB STAB">DUB STAB</span>
       <span class="line l2" data-text="PLAITS">PLAITS</span>
@@ -46,8 +46,8 @@
       No effects inside: patch your own delay and reverb after it.</p>
     <div class="cta">
       <a class="btn solid" href="#flash">Flash from this page</a>
-      <a class="btn" href="downloads/DubStab-Plaits-v1.4.wav" download>Firmware .wav</a>
-      <a class="btn" href="downloads/DubStab-Plaits-v1.4.2.apk" download>Android app .apk</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.6.wav" download>Firmware .wav</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.6.apk" download>Android app .apk</a>
       <a class="btn" href="docs/MANUAL.md">Manual</a>
     </div>
     <p class="hint">Before flashing: Plaits <b>FREQUENCY knob at 12 o’clock</b>, computer volume around <b>80 %</b>. While it plays, the level meter
@@ -94,7 +94,7 @@
       </div>
       <div class="player" id="player">
         <div class="variant one" id="variants" role="radiogroup" aria-label="Firmware version">
-          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.4.wav" checked><b>C minor</b><span>v1.4 · release</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.6.wav" checked><b>C minor</b><span>v1.6 · release</span></label>
         </div>
         <div class="meter" aria-hidden="true">
           <span class="m red"></span><span class="m yel"></span><span class="m grn"></span><span class="m grn"></span>
@@ -107,7 +107,7 @@
           <button class="btn" id="flashStop" type="button" disabled>Stop &amp; restart</button>
         </div>
         <p class="note" id="flashStatus">Ready. The file (14.8 MB) loads when you press Play.</p>
-        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.4.wav"></audio>
+        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.6.wav"></audio>
       </div>
     </div>
   </div>
@@ -169,7 +169,8 @@
   <div class="idx">03</div>
   <div class="body">
     <h2>Chord models</h2>
-    <p class="chips"><span>1 DUB SAW</span><span>2 VA</span><span>3 WAVESHAPE</span><span>4 FM</span><span>5 PHASE DIST</span><span>6 CHIPTUNE</span><span>7 Plaits CHORDS</span><span>8 STRING MACHINE</span></p>
+    <p class="chips"><span>1 DUB SAW</span><span>2 VA</span><span>3 WAVESHAPE</span><span>4 FM</span><span>5 PHASE DIST</span><span>6 CHIPTUNE</span><span>7 STRING MACHINE</span><span>8 ACID (mono)</span></p>
+    <p class="note">Model 8 <b>ACID</b> plays a mono acid bass line with the pattern — chord roots, octaves and fifths, slides and accents, always in key. On ACID, FREQUENCY sets the filter envelope amount; decay is fixed, saw wave, warm character. <a href="downloads/DubStab-Plaits-v1.6-ACID-demo.mp3">Listen to the demo</a>.</p>
     <details class="more"><summary>What HARMONICS / TIMBRE / MORPH do</summary>
     <div class="table-wrap">
     <table class="models">
@@ -181,8 +182,8 @@
         <tr><td>4</td><td>FM</td><td>ratio</td><td>index</td><td>feedback</td></tr>
         <tr><td>5</td><td>PHASE DIST</td><td>resonance</td><td>distortion</td><td>PD ↔ resonant</td></tr>
         <tr><td>6</td><td>CHIPTUNE</td><td>duty cycle</td><td>bit crush</td><td>square ↔ triangle</td></tr>
-        <tr><td>7</td><td>Plaits <b>CHORDS</b> engine</td><td>brightness</td><td>inversion</td><td>waveform</td></tr>
-        <tr><td>8</td><td>Plaits <b>STRING MACHINE</b></td><td>brightness</td><td>filter / ensemble</td><td>registration</td></tr>
+        <tr><td>7</td><td>Plaits <b>STRING MACHINE</b></td><td>brightness</td><td>filter / ensemble</td><td>registration</td></tr>
+        <tr><td>8</td><td><b>ACID</b> mono bass</td><td>cutoff</td><td>accent</td><td>resonance</td></tr>
       </tbody>
     </table>
     </div>
@@ -231,7 +232,7 @@
   <div class="body">
     <h2>Android app</h2>
     <p>The same firmware code on your phone, with a Plaits panel, a <b>tape echo</b> (synced, wow &amp; flutter) and <b>reverb</b>, and a live view of the pattern and envelope.</p>
-    <p><a class="btn solid" href="downloads/DubStab-Plaits-v1.4.2.apk" download>Download the app</a></p>
+    <p><a class="btn solid" href="downloads/DubStab-Plaits-v1.6.apk" download>Download the app</a></p>
     <details class="more"><summary>More details</summary>
       <ul class="dash">
         <li>Runs <code>ui.cc</code>, <code>voice.cc</code>, <code>dub.cc</code> and the Plaits engines, polled 4000 times a second like the module.</li>
@@ -250,19 +251,21 @@
   <div class="body">
     <h2>Downloads</h2>
     <div class="dl">
-      <a href="downloads/DubStab-Plaits-v1.4.wav" download><b>DubStab-Plaits-v1.4.wav</b><span>Firmware for the module · 14.8 MB</span></a>
-      <a href="downloads/DubStab-Plaits-v1.4.2.apk" download><b>DubStab-Plaits-v1.4.2.apk</b><span>Android app · 0.5 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.6.wav" download><b>DubStab-Plaits-v1.6.wav</b><span>Firmware for the module · 15.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.6.apk" download><b>DubStab-Plaits-v1.6.apk</b><span>Android app · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
-      <a href="downloads/DubStab-Plaits-v1.4.bin" download><b>DubStab-Plaits-v1.4.bin</b><span>Raw image for SWD / ST-Link</span></a>
+      <a href="downloads/DubStab-Plaits-v1.6-ACID-demo.mp3"><b>ACID demo .mp3</b><span>24 s: dry, then with the app’s echo + reverb</span></a>
+      <a href="downloads/DubStab-Plaits-v1.6.bin" download><b>DubStab-Plaits-v1.6.bin</b><span>Raw image for SWD / ST-Link</span></a>
     </div>
     <details class="more"><summary>Checksums, changes, source</summary>
-      <p class="note mono">wav 7f8d3930ca62526126e4e3cf895bd0689540743b352a7553d1e68d12b6b05952<br>apk d9c3ce5a5cf8d6870c583c37159e82a07d464a14835ada12311701c204148e12<br>bin 7c6d4bccb180abe93ca57b33cb669d618cd551e66615837af65d455655c8f015</p>
+      <p class="note mono">wav 407a2f50bc88d92ca9735821709a8cef21eb9c301a45f7fa22a16ac49fbb44e1<br>apk 0397a48c35d579b2d51060000d28930aaa44b793db68a60b39981da304fdb4b9<br>bin 67fd76c1178527d2e2f40c906f544dc8ef14ebe29c8f95feb705baa8f6056100</p>
       <dl class="log">
-        <dt>name</dt><dd>DUB BASE is now DUB STAB PLAITS. App 1.4.2.</dd>
+        <dt>v1.6</dt><dd>New model 8: ACID, a mono acid bass line (FREQUENCY = env mod, HARMONICS = cutoff, MORPH = resonance, TIMBRE = accent). STRING MACHINE moves to 7, the CHORDS engine is gone.</dd>
+        <dt>name</dt><dd>DUB BASE is now DUB STAB PLAITS.</dd>
         <dt>app 1.4.1</dt><dd>Tape echo and reverb.</dd>
         <dt>v1.4</dt><dd>Cleaner output: distortion was up to 28 %, now under 0.5 %.</dd>
         <dt>v1.3</dt><dd>AUX becomes a 1 V/oct root CV, with CV TUNE.</dd>
-        <dt>v1.2</dt><dd>CHORDS filter follows the inversion; LFO starts at power-on.</dd>
+        <dt>v1.2</dt><dd>LFO starts at power-on.</dd>
         <dt>v1.1</dt><dd>First version.</dd>
       </dl>
       <p>Source: the firmware patch against <a href="https://github.com/pichenettes/eurorack">pichenettes/eurorack</a>, build scripts, emulator tests and the app — see <a href="https://github.com/Narti-Live/dub-base-Plaits#readme">the README</a>.</p>
