@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.6.2
+# DUB STAB PLAITS — v1.0
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -95,36 +95,15 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.6.2.wav` to the end (2 min 37 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.0.wav` to the end (2 min 37 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
 
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
-## Changes
+## Version
 
-**v1.6.2**
-- HARMONICS, TIMBRE and MORPH CV inputs attenuated: ±5 V now moves ±15 % around the knob (before: HARMONICS ±100 %, TIMBRE/MORPH ±160 %). The Android app has no CV inputs, so it stays v1.6.1.
-
-**v1.6.1**
-- ACID plays one octave above the chords; its cutoff range moved up with it.
-
-**v1.6**
-- New model 8: ACID, a mono acid bass line. STRING MACHINE moves to model 7; the Plaits CHORDS engine is removed.
-
-**v1.4**
-- Cleaner, less hot output. A leveler with 6 dB of headroom keeps stacked chords and high resonance out of the clipper (distortion was up to 28 %, now under 0.5 %). OUT peaks around 10 Vpp, like other Eurorack oscillators.
-
-**v1.3**
-- AUX is now a 1 V/oct pitch CV of the chord root (the sub-bass and the engines' AUX signal are gone), with CV TUNE.
-- Both buttons 2 s = CV TUNE; 4 s = CV input calibration.
-
-**v1.2**
-- The CHORDS engine filter follows the inversion (engine removed in v1.6).
-- The random LFO starts moving right after power-on instead of after about 8 seconds.
-
-**v1.1**
-- First public version: fixed C minor, DUB chords, one-knob envelope, sequencer on the attenuverters.
+**v1.0** — first release.
 
 The **Dub Stab Plaits** Android app runs this same code, so you can try the module on your phone first. It adds an app-only tape echo (tempo-synced, wow and flutter, darkening repeats) and a reverb; the module itself stays dry.

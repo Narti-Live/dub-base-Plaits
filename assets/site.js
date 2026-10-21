@@ -143,7 +143,7 @@
       r._get().then(function (url) {
         if (r.checked) { a.src = url; play.disabled = false; status.textContent = 'Ready: ' + r.dataset.label + ' (beta).'; }
       }, function () { status.textContent = 'Could not decrypt the beta firmware.'; });
-    } else { a.src = r.value; play.disabled = false; status.textContent = 'Ready: C minor, release v1.4.'; }
+    } else { a.src = r.value; play.disabled = false; status.textContent = 'Ready: C minor, release v1.0.'; }
   }
   for (var k = 0; k < radios.length; k++) radios[k].addEventListener('change', onPick);
   window.dubAddFirmware = function (f, get) {
