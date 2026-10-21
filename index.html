@@ -48,6 +48,7 @@
       <a class="btn solid" href="#flash">Flash from this page</a>
       <a class="btn" href="downloads/DubStab-Plaits-v1.0.wav" download>Firmware .wav</a>
       <a class="btn" href="downloads/DubStab-Plaits-v1.0.apk" download>Android app .apk</a>
+      <a class="btn" href="#m4l">Max for Live</a>
       <a class="btn" href="docs/MANUAL.md">Manual</a>
     </div>
     <p class="hint">Before flashing: Plaits <b>FREQUENCY knob at 12 o’clock</b>, computer volume around <b>80 %</b>. While it plays, the level meter
@@ -246,14 +247,40 @@
   <figure class="shot"><img src="assets/envelope.jpg" alt="The app's envelope, LFO and output views" loading="lazy"><figcaption>Envelope, random LFO and OUT</figcaption></figure>
 </section>
 
-<section class="block" id="downloads">
+<section class="block" id="m4l">
   <div class="idx">07</div>
+  <div class="body">
+    <h2>Max for Live</h2>
+    <p>Three devices for Ableton Live, made from the firmware: the same sequencer and sound engines, synced to Live — with a <b>root note</b> (C–B), a <b>scale</b> (Natural minor, Dorian, Phrygian, Harmonic minor) and a <b>minor chords only</b> switch.</p>
+    <table class="spec compact">
+      <tr><th>Dub Stab MIDI</th><td>MIDI effect: the sequencer sends chords, the ACID line or the roots to any synth.</td></tr>
+      <tr><th>Dub Stab Synth</th><td>Instrument: the 8 sound models, played from your MIDI.</td></tr>
+      <tr><th>Dub Stab Plaits</th><td>Instrument: both together, like the module.</td></tr>
+    </table>
+    <p><a class="btn solid" href="downloads/DubStab-M4L-v1.0.zip" download>Download the devices (.zip)</a> <a class="btn" href="downloads/DubStab-M4L-v1.0-demo.mp3">Listen to the demo</a></p>
+    <details class="more"><summary>More details</summary>
+      <ul class="dash">
+        <li>Needs Live 12 Suite, or Live with Max for Live. Drag a <code>.amxd</code> onto a track and press Play: the sequencer follows Live’s transport.</li>
+        <li><b>SEQUENCER</b> switch: on, the pattern plays; off, Dub Stab Plaits plays your MIDI notes directly and Dub Stab MIDI passes MIDI through.</li>
+        <li>Voicing: DUB (root 5th 7th 3rd 5th), Triads, 7ths (any inversion) or Mixed. Density, Steps, Rate 1/2–1/32T, Octave.</li>
+        <li><b>Seed</b>: the pattern is made from a number and saved with your set. Two devices on the same seed play the same pattern — one for chords, one for the ACID line.</li>
+        <li>A played MIDI note transposes the pattern within the scale (C3 = no change), like V/OCT on the module.</li>
+        <li>Models: DUB SAW, VA, WAVESHAPE, FM, PHASE DIST, CHIPTUNE, STRINGS (own string machine with ensemble), ACID. Drift = the slow random LFO.</li>
+        <li>Dry, like the module: add Live’s Echo and Hybrid Reverb after it.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<section class="block" id="downloads">
+  <div class="idx">08</div>
   <div class="body">
     <h2>Downloads</h2>
     <div class="dl">
       <a href="downloads/DubStab-Plaits-v1.0.wav" download><b>DubStab-Plaits-v1.0.wav</b><span>Firmware for the module · 15.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.0.apk" download><b>DubStab-Plaits-v1.0.apk</b><span>Android app · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
+      <a href="downloads/DubStab-M4L-v1.0.zip" download><b>DubStab-M4L-v1.0.zip</b><span>Max for Live devices · 0.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3"><b>ACID demo .mp3</b><span>24 s: dry, then with the app’s echo + reverb</span></a>
       <a href="downloads/DubStab-Plaits-v1.0.bin" download><b>DubStab-Plaits-v1.0.bin</b><span>Raw image for SWD / ST-Link</span></a>
     </div>
@@ -261,6 +288,7 @@
       <p class="note mono">wav 0507fbfef6da90ff5c4c768d3d792ec167c95b7b66160b3ca4a55f198be6736f<br>apk 0ccc6d472024c6ac12c32441406163f7023c7bb4e6486d1e123663cc80bd09a2<br>bin 3ddb76ee990e9c958f11554f090406e3373c4da9d3a28bf8968d6b51e7a29fe1</p>
       <dl class="log">
         <dt>v1.0</dt><dd>First release. Generative dub techno stabs in key, 8 chord models (model 7 STRING MACHINE, model 8 ACID bass line one octave above the chords), 16-step sequencer on the attenuverters, clean levelled output, AUX = 1 V/oct root CV with CV TUNE, HARMO · TIMBRE · MORPH CV attenuated to ±15 %. Android app with tape echo and reverb.</dd>
+        <dt>M4L 1.0</dt><dd>Max for Live devices: Dub Stab MIDI, Dub Stab Synth, Dub Stab Plaits — root, four minor scales, minor chords only, sequencer switch.</dd>
       </dl>
       <p>Source: the firmware patch against <a href="https://github.com/pichenettes/eurorack">pichenettes/eurorack</a>, build scripts, emulator tests and the app — see <a href="https://github.com/Narti-Live/dub-base-Plaits#readme">the README</a>.</p>
     </details>
@@ -268,7 +296,7 @@
 </section>
 
 <section class="block" id="narti">
-  <div class="idx">08</div>
+  <div class="idx">09</div>
   <div class="body">
     <h2>By Narti Live</h2>
     <div class="social">
