@@ -1,0 +1,4 @@
+app/keys/
+app/build/
+firmware/build*/
+__pycache__/

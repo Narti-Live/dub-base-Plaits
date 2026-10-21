@@ -1,0 +1,7 @@
+#pragma once
+#include <math.h>
+namespace std { using ::fabsf; using ::sqrtf; using ::sinf; using ::cosf; using ::tanf; using ::floorf;
+inline float fabs(float x) { return ::fabsf(x); } inline float sqrt(float x) { return ::sqrtf(x); }
+inline float sin(float x) { return ::sinf(x); } inline float cos(float x) { return ::cosf(x); }
+inline float floor(float x) { return ::floorf(x); } inline float exp(float x) { return ::expf(x); }
+inline float log(float x) { return ::logf(x); } inline float pow(float a, float b) { return ::powf(a, b); } }

@@ -1,0 +1,2 @@
+#pragma once
+inline void* operator new(unsigned int, void* p) noexcept { return p; }

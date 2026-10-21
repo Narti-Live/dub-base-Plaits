@@ -1,0 +1,2553 @@
+From d9d30a4030803c9d617c5f750ce65bc170399f24 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 20 Oct 2026 16:24:59 +0200
+Subject: [PATCH 1/6] DUB BASE v1.2: dub-techno chord sequencer firmware for
+ Plaits
+
+TRIG-clocked C minor DUB chord sequencer, envelope on FREQUENCY,
+density/length/speed on the attenuverters, 8 chord models (6 poly
+models + Plaits CHORDS / STRING MACHINE), always-on random LFO.
+v1.2: CHORDS filter follows the inversion; LFO starts at power-on.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_0136WGYBVJqXHJBPS2niCsJ8
+---
+ plaits/dsp/chords/chord_bank.cc            |   2 +
+ plaits/dsp/chords/chord_bank.h             |  19 +-
+ plaits/dsp/engine/chord_engine.h           |   2 +
+ plaits/dsp/engine2/string_machine_engine.h |   2 +
+ plaits/dsp/voice.cc                        | 265 ++++----
+ plaits/dsp/voice.h                         |  19 +-
+ plaits/dub/dub.cc                          | 627 +++++++++++++++++++
+ plaits/dub/dub.h                           | 207 +++++++
+ plaits/plaits.cc                           |   7 +-
+ plaits/settings.cc                         |  10 +-
+ plaits/settings.h                          |  16 +-
+ plaits/ui.cc                               | 679 ++++++++++-----------
+ plaits/ui.h                                | 212 ++++---
+ 13 files changed, 1468 insertions(+), 599 deletions(-)
+ create mode 100644 plaits/dub/dub.cc
+ create mode 100644 plaits/dub/dub.h
+
+diff --git a/plaits/dsp/chords/chord_bank.cc b/plaits/dsp/chords/chord_bank.cc
+index f81733f..f224635 100644
+--- a/plaits/dsp/chords/chord_bank.cc
++++ b/plaits/dsp/chords/chord_bank.cc
+@@ -87,6 +87,8 @@ void ChordBank::Init(BufferAllocator* allocator) {
+   sorted_ratios_ = allocator->Allocate<float>(kChordNumNotes);
+ 
+   chord_index_quantizer_.Init(kChordNumChords, 0.075f, false);
++  custom_ = false;
++  custom_count_ = 0;
+ }
+ 
+ void ChordBank::Reset() {
+diff --git a/plaits/dsp/chords/chord_bank.h b/plaits/dsp/chords/chord_bank.h
+index 0f219d4..94901dd 100644
+--- a/plaits/dsp/chords/chord_bank.h
++++ b/plaits/dsp/chords/chord_bank.h
+@@ -79,23 +79,36 @@ class ChordBank {
+   }
+   
+   inline const float* ratios() const {
+-    return &ratios_[chord_index() * kChordNumNotes];
++    return custom_ ? custom_ratios_ : &ratios_[chord_index() * kChordNumNotes];
+   }
+ 
+   inline float ratio(int note) const {
+-    return ratios_[chord_index() * kChordNumNotes + note];
++    return custom_ ? custom_ratios_[note] : ratios_[chord_index() * kChordNumNotes + note];
+   }
+ 
++  // DUB BASE: play an externally supplied chord (ratios to the root).
++  inline void set_custom_chord(const float* ratios, int n) {
++    for (int i = 0; i < kChordNumNotes; ++i) {
++      custom_ratios_[i] = i < n ? ratios[i] : ratios[0] * 2.0f;
++    }
++    custom_count_ = n < kChordNumNotes ? n : kChordNumNotes;
++    custom_ = true;
++  }
++  inline void clear_custom_chord() { custom_ = false; }
++
+   inline float sorted_ratio(int note) const {
+     return sorted_ratios_[note];
+   }
+   
+   inline int num_notes() const {
+-    return note_count_[chord_index()];
++    return custom_ ? custom_count_ : note_count_[chord_index()];
+   }
+ 
+  private:
+   stmlib::HysteresisQuantizer2 chord_index_quantizer_;
++  bool custom_;
++  int custom_count_;
++  float custom_ratios_[kChordNumNotes];
+   
+   float* ratios_;
+   float* sorted_ratios_;
+diff --git a/plaits/dsp/engine/chord_engine.h b/plaits/dsp/engine/chord_engine.h
+index b4a66ee..711dee9 100644
+--- a/plaits/dsp/engine/chord_engine.h
++++ b/plaits/dsp/engine/chord_engine.h
+@@ -52,6 +52,8 @@ class ChordEngine : public Engine {
+       size_t size,
+       bool* already_enveloped);
+ 
++  ChordBank* mutable_chords() { return &chords_; }
++
+  private:
+   void ComputeRegistration(float registration, float* amplitudes);
+   int ComputeChordInversion(
+diff --git a/plaits/dsp/engine2/string_machine_engine.h b/plaits/dsp/engine2/string_machine_engine.h
+index 36bbc8d..f1e7b48 100644
+--- a/plaits/dsp/engine2/string_machine_engine.h
++++ b/plaits/dsp/engine2/string_machine_engine.h
+@@ -50,6 +50,8 @@ class StringMachineEngine : public Engine {
+       size_t size,
+       bool* already_enveloped);
+ 
++  ChordBank* mutable_chords() { return &chords_; }
++
+  private:
+   void ComputeRegistration(float registration, float* amplitudes);
+   
+diff --git a/plaits/dsp/voice.cc b/plaits/dsp/voice.cc
+index 6477111..5ccc26d 100644
+--- a/plaits/dsp/voice.cc
++++ b/plaits/dsp/voice.cc
+@@ -85,188 +85,129 @@ void Voice::Init(BufferAllocator* allocator) {
+   previous_note_ = 0.0f;
+   
+   trigger_delay_.Init(trigger_delay_line_);
++
++  chord_model_quantizer_.Init(dub::kNumChordModels, 0.05f, true);
++  sequencer_.Init();
++  poly_synth_.Init();
++  post_shaper_.Init();
++  mono_note_ = 48.0f;
++  chord_note_ = 48.0f;
++  gate_blocks_ = 0;
++  active_display_ = 0;
++  step_played_ = false;
+ }
+ 
++// Registry indices of the Plaits engines that can play sequencer chords.
++static const int kChordEngineIndex = 14;
++static const int kStringMachineIndex = 6;
++
+ void Voice::Render(
+     const Patch& patch,
+     const Modulations& modulations,
++    dub::Settings& ds,
+     Frame* frames,
+     size_t size) {
+-  // Trigger, LPG, internal envelope.
+-      
+-  // Delay trigger by 1ms to deal with sequencers or MIDI interfaces whose
+-  // CV out lags behind the GATE out.
+-  trigger_delay_.Write(modulations.trigger);
+-  float trigger_value = trigger_delay_.Read(kTriggerDelay);
+-  
+-  bool previous_trigger_state = trigger_state_;
+-  if (!previous_trigger_state) {
+-    if (trigger_value > 0.3f) {
+-      trigger_state_ = true;
+-      if (!modulations.level_patched) {
+-        lpg_envelope_.Trigger();
+-      }
+-      decay_envelope_.Trigger();
+-      engine_cv_ = modulations.engine;
++  // V/OCT picks the scale degree (C minor), so chords never leave the scale.
++  float semitones = (modulations.note + previous_note_) * 0.5f;
++  previous_note_ = modulations.note;
++  ds.transpose = dub::SemitonesToDegrees(semitones);
++
++  // ---- Sequencer: TRIG is the clock input.
++  sequencer_.ProcessLfo();
++  dub::Event event;
++  const bool fired = sequencer_.Process(
++      ds, modulations.trigger, modulations.trigger_patched, &event);
++  step_played_ = fired;
++
++  dub::Shape shape;
++  dub::ComputeShape(ds, &shape);
++
++  float compressed_level = 1.3f * modulations.level / (0.3f + fabsf(modulations.level));
++  CONSTRAIN(compressed_level, 0.0f, 1.0f);
++  const float level = modulations.level_patched ? compressed_level : 1.0f;
++
++  // Random LFO, always on (depth 15) on HARMONICS, TIMBRE, MORPH and cutoff.
++  const float depth = 0.15f * 0.5f;
++  float harmonics = patch.harmonics + modulations.harmonics + sequencer_.lfo(0) * depth;
++  CONSTRAIN(harmonics, 0.0f, 1.0f);
++  float timbre = patch.timbre + (modulations.timbre_patched ? modulations.timbre : 0.0f) + sequencer_.lfo(1) * depth;
++  CONSTRAIN(timbre, 0.0f, 1.0f);
++  float morph = patch.morph + (modulations.morph_patched ? modulations.morph : 0.0f) + sequencer_.lfo(2) * depth;
++  CONSTRAIN(morph, 0.0f, 1.0f);
++  shape.cutoff_hz *= SemitonesToRatio(sequencer_.lfo(3) * depth * 24.0f);
++
++  // ---- Chord model selection (buttons + MODEL CV).
++  const int chord_model = chord_model_quantizer_.Process(ds.chord_model, modulations.engine);
++  active_display_ = 100 + chord_model;
++  const int engine_index = chord_model == 6 ? kChordEngineIndex
++      : (chord_model == 7 ? kStringMachineIndex : -1);
++
++  if (engine_index < 0) {
++    // ---- Light polyphonic dub chord models.
++    if (previous_engine_index_ != -1 - chord_model) {
++      out_post_processor_.Reset();
++      previous_engine_index_ = -1 - chord_model;
+     }
+-  } else {
+-    if (trigger_value < 0.1f) {
+-      trigger_state_ = false;
++    if (fired) {
++      poly_synth_.NoteOn(event, shape);
+     }
+-  }
+-  if (!modulations.trigger_patched) {
+-    engine_cv_ = modulations.engine;
++    poly_synth_.Render(
++        chord_model, harmonics, timbre, morph, shape, level,
++        out_buffer_, aux_buffer_, size);
++    out_post_processor_.Process(1.0f, true, 1.0f, 1.0f, 0.0f,
++        out_buffer_, &frames->out, size, 2);
++    aux_post_processor_.Process(1.0f, true, 1.0f, 1.0f, 0.0f,
++        aux_buffer_, &frames->aux, size, 2);
++    return;
+   }
+ 
+-  // Engine selection.
+-  int engine_index = engine_quantizer_.Process(
+-      patch.engine,
+-      engine_cv_);
+-  
++  // ---- Plaits CHORDS / STRING MACHINE playing the sequencer's chord.
+   Engine* e = engines_.get(engine_index);
+-  
+-  if (engine_index != previous_engine_index_ || reload_user_data_) {
+-    UserData user_data;
+-    const uint8_t* data = user_data.ptr(engine_index);
+-    if (!data && engine_index >= 2 && engine_index <= 4) {
+-      data = fm_patches_table[engine_index - 2];
+-    }
+-    e->LoadUserData(data);
++  if (engine_index != previous_engine_index_) {
++    e->LoadUserData(NULL);
+     e->Reset();
+-
+     out_post_processor_.Reset();
++    aux_post_processor_.Reset();
+     previous_engine_index_ = engine_index;
+-    reload_user_data_ = false;
+-  }
+-  EngineParameters p;
+-
+-  bool rising_edge = trigger_state_ && !previous_trigger_state;
+-  float note = (modulations.note + previous_note_) * 0.5f;
+-  previous_note_ = modulations.note;
+-  const PostProcessingSettings& pp_s = e->post_processing_settings;
+-
+-  if (modulations.trigger_patched) {
+-    p.trigger = (rising_edge ? TRIGGER_RISING_EDGE : TRIGGER_LOW) | \
+-      (trigger_state_ ? TRIGGER_HIGH : TRIGGER_LOW);
+-  } else {
+-    p.trigger = TRIGGER_UNPATCHED;
+   }
+-  
+-  const float short_decay = (200.0f * kBlockSize) / kSampleRate *
+-      SemitonesToRatio(-96.0f * patch.decay);
+-
+-  decay_envelope_.Process(short_decay * 2.0f);
+-
+-  float compressed_level = 1.3f * modulations.level / (0.3f + fabsf(modulations.level));
+-  CONSTRAIN(compressed_level, 0.0f, 1.0f);
+-  p.accent = modulations.level_patched ? compressed_level : 0.8f;
+-
+-  bool use_internal_envelope = modulations.trigger_patched;
+-
+-  // Actual synthesis parameters.
+-  
+-  p.harmonics = patch.harmonics + modulations.harmonics;
+-  CONSTRAIN(p.harmonics, 0.0f, 1.0f);
+-
+-  float internal_envelope_amplitude = 1.0f;
+-  float internal_envelope_amplitude_timbre = 1.0f;
+-  if (engine_index == 15) {
+-    internal_envelope_amplitude = 2.0f - p.harmonics * 6.0f;
+-    CONSTRAIN(internal_envelope_amplitude, 0.0f, 1.0f);
+-    speech_engine_.set_prosody_amount(
+-        !modulations.trigger_patched || modulations.frequency_patched ?
+-            0.0f : patch.frequency_modulation_amount);
+-    speech_engine_.set_speed( 
+-        !modulations.trigger_patched || modulations.morph_patched ?
+-            0.0f : patch.morph_modulation_amount);
+-  } else if (engine_index == 7) {
+-    if (modulations.trigger_patched && !modulations.timbre_patched) {
+-      // Disable internal envelope on TIMBRE, and enable the envelope generator
+-      // built into the chiptune engine.
+-      internal_envelope_amplitude_timbre = 0.0f;
+-      chiptune_engine_.set_envelope_shape(patch.timbre_modulation_amount);
+-    } else {
+-      chiptune_engine_.set_envelope_shape(ChiptuneEngine::NO_ENVELOPE);
++  ChordBank* chords = engine_index == kChordEngineIndex
++      ? chord_engine_.mutable_chords()
++      : string_machine_engine_.mutable_chords();
++  if (fired) {
++    post_shaper_.Trigger(shape, event.accent);
++    float ratios[dub::kMaxChordNotes];
++    chord_note_ = event.notes[0];
++    for (int i = 0; i < event.num_notes; ++i) {
++      ratios[i] = SemitonesToRatio(event.notes[i] - event.notes[0]);
+     }
++    chords->set_custom_chord(ratios, event.num_notes);
+   }
+-  
+-  p.note = ApplyModulations(
+-      patch.note + note,
+-      patch.frequency_modulation_amount,
+-      modulations.frequency_patched,
+-      modulations.frequency,
+-      use_internal_envelope,
+-      internal_envelope_amplitude * \
+-          decay_envelope_.value() * decay_envelope_.value() * 48.0f,
+-      1.0f,
+-      -119.0f,
+-      120.0f);
+-
+-  p.timbre = ApplyModulations(
+-      patch.timbre,
+-      patch.timbre_modulation_amount,
+-      modulations.timbre_patched,
+-      modulations.timbre,
+-      use_internal_envelope,
+-      internal_envelope_amplitude_timbre * decay_envelope_.value(),
+-      0.0f,
+-      0.0f,
+-      1.0f);
+-
+-  p.morph = ApplyModulations(
+-      patch.morph,
+-      patch.morph_modulation_amount,
+-      modulations.morph_patched,
+-      modulations.morph,
+-      use_internal_envelope,
+-      internal_envelope_amplitude * decay_envelope_.value(),
+-      0.0f,
+-      0.0f,
+-      1.0f);
+ 
+-  bool already_enveloped = pp_s.already_enveloped;
++  EngineParameters p;
++  p.trigger = fired ? (TRIGGER_RISING_EDGE | TRIGGER_HIGH) : TRIGGER_LOW;
++  p.accent = fired && event.accent ? 1.0f : 0.8f;
++  p.harmonics = harmonics;
++  p.timbre = timbre;
++  p.morph = morph;
++  // The chord engine renders two octaves down at TIMBRE = 0 (its inversion).
++  p.note = chord_note_ + (engine_index == kChordEngineIndex ? 24.0f : 0.0f);
++
++  bool already_enveloped = e->post_processing_settings.already_enveloped;
+   e->Render(p, out_buffer_, aux_buffer_, size, &already_enveloped);
+-  
+-  bool lpg_bypass = already_enveloped || \
+-      (!modulations.level_patched && !modulations.trigger_patched);
+-  
+-  // Compute LPG parameters.
+-  if (!lpg_bypass) {
+-    const float hf = patch.lpg_colour;
+-    const float decay_tail = (20.0f * kBlockSize) / kSampleRate *
+-        SemitonesToRatio(-72.0f * patch.decay + 12.0f * hf) - short_decay;
+-    
+-    if (modulations.level_patched) {
+-      lpg_envelope_.ProcessLP(compressed_level, short_decay, decay_tail, hf);
+-    } else {
+-      const float attack = NoteToFrequency(p.note) * float(kBlockSize) * 2.0f;
+-      lpg_envelope_.ProcessPing(attack, short_decay, decay_tail, hf);
+-    }
+-  } else {
+-    lpg_envelope_.Init();
+-  }
+-  
+-  out_post_processor_.Process(
+-      pp_s.out_gain,
+-      lpg_bypass,
+-      lpg_envelope_.gain(),
+-      lpg_envelope_.frequency(),
+-      lpg_envelope_.hf_bleed(),
+-      out_buffer_,
+-      &frames->out,
+-      size,
+-      2);
+ 
+-  aux_post_processor_.Process(
+-      pp_s.aux_gain,
+-      lpg_bypass,
+-      lpg_envelope_.gain(),
+-      lpg_envelope_.frequency(),
+-      lpg_envelope_.hf_bleed(),
+-      aux_buffer_,
+-      &frames->aux,
+-      size,
+-      2);
++  // HARMONICS has no chord to choose here: it opens the filter. On the
++  // CHORDS engine, TIMBRE (inversion) moves the chord up by up to 5 octaves,
++  // so the filter follows it (otherwise high inversions were filtered away).
++  float cutoff_semitones = (harmonics - 0.5f) * 36.0f;
++  if (engine_index == kChordEngineIndex) cutoff_semitones += timbre * 48.0f;
++  post_shaper_.Process(shape, level, SemitonesToRatio(cutoff_semitones),
++      out_buffer_, aux_buffer_, size);
++
++  const PostProcessingSettings& pp_s = e->post_processing_settings;
++  out_post_processor_.Process(pp_s.out_gain, true, 1.0f, 1.0f, 0.0f,
++      out_buffer_, &frames->out, size, 2);
++  aux_post_processor_.Process(pp_s.aux_gain, true, 1.0f, 1.0f, 0.0f,
++      aux_buffer_, &frames->aux, size, 2);
+ }
+-  
++
+ }  // namespace plaits
+diff --git a/plaits/dsp/voice.h b/plaits/dsp/voice.h
+index d925d46..883b67f 100644
+--- a/plaits/dsp/voice.h
++++ b/plaits/dsp/voice.h
+@@ -64,6 +64,8 @@
+ 
+ #include "plaits/dsp/fx/low_pass_gate.h"
+ 
++#include "plaits/dub/dub.h"
++
+ namespace plaits {
+ 
+ const int kMaxEngines = 24;
+@@ -173,9 +175,14 @@ class Voice {
+   void Render(
+       const Patch& patch,
+       const Modulations& modulations,
++      dub::Settings& dub_settings,
+       Frame* frames,
+       size_t size);
+-  inline int active_engine() const { return previous_engine_index_; }
++  // 100 + chord model (chord mode only).
++  inline int active_engine() const { return active_display_; }
++  inline dub::Sequencer* mutable_sequencer() { return &sequencer_; }
++  inline bool step_played() const { return step_played_; }
++  inline bool clock_ticked() const { return sequencer_.clock_tick(); }
+     
+  private:
+   void ComputeDecayParameters(const Patch& settings);
+@@ -228,6 +235,16 @@ class Voice {
+   ChiptuneEngine chiptune_engine_;
+ 
+   stmlib::HysteresisQuantizer2 engine_quantizer_;
++  stmlib::HysteresisQuantizer2 chord_model_quantizer_;
++
++  dub::Sequencer sequencer_;
++  dub::PolySynth poly_synth_;
++  dub::PostShaper post_shaper_;
++  float mono_note_;
++  float chord_note_;
++  int gate_blocks_;
++  int active_display_;
++  bool step_played_;
+   
+   bool reload_user_data_;
+   int previous_engine_index_;
+diff --git a/plaits/dub/dub.cc b/plaits/dub/dub.cc
+new file mode 100644
+index 0000000..ba8a7f8
+--- /dev/null
++++ b/plaits/dub/dub.cc
+@@ -0,0 +1,627 @@
++// DUB BASE for Plaits — generative dub chord sequencer, clocked from TRIG.
++// Copyright 2026 Narti Live. MIT license (same terms as the Plaits sources).
++
++#include "plaits/dub/dub.h"
++
++#include <algorithm>
++
++#include "stmlib/utils/random.h"
++#include "plaits/dsp/engine/engine.h"
++
++namespace plaits {
++namespace dub {
++
++using namespace stmlib;
++
++// ------------------------------------------------------------------ helpers
++
++// 2^x, about 1e-4 relative error, for block-rate control math.
++static inline float Pow2(float x) {
++  if (x < -40.0f) x = -40.0f;
++  if (x > 40.0f) x = 40.0f;
++  float fl = static_cast<float>(static_cast<int32_t>(x + 64.0f)) - 64.0f;
++  float f = x - fl;
++  float p = 1.0f + f * (0.6931472f + f * (0.2402265f + f * (0.0555041f + f * 0.0096181f)));
++  int32_t e = static_cast<int32_t>(fl);
++  union { float f; int32_t i; } u;
++  u.i = (e + 127) << 23;
++  return p * u.f;
++}
++
++static inline float Rand() { return Random::GetFloat(); }
++static inline float RandBipolar() { return Random::GetFloat() * 2.0f - 1.0f; }
++
++// One knob for the whole envelope: fully left = short dark pluck, noon = dub
++// stab, fully right = long swell with a big filter sweep.
++void ComputeShape(const Settings& s, Shape* shape) {
++  float v = s.envelope;
++  CONSTRAIN(v, 0.0f, 1.0f);
++  shape->decay_s = 0.06f * Pow2(v * 6.6f);                  // 60 ms .. 6 s
++  float swell = v > 0.55f ? (v - 0.55f) * (1.0f / 0.45f) : 0.0f;
++  shape->attack_s = 0.0015f + swell * swell * 1.2f;         // 1.5 ms .. 1.2 s
++  shape->env_oct = 1.5f + v * 3.5f;                         // filter envelope 1.5 .. 5 octaves
++  shape->cutoff_hz = 300.0f;
++  float r = s.resonance;
++  CONSTRAIN(r, 0.0f, 1.0f);
++  shape->q = 0.6f + r * r * 2.9f;                           // max Q 3.5: never self-oscillates
++}
++
++// sin(2 pi p) for p in [0, 1)
++static inline float Sine(float p) {
++  float y = 6.2831853f * p - 3.1415927f;
++  float a = 1.2732395f * y - 0.40528473f * y * fabsf(y);
++  a = 0.225f * (a * fabsf(a) - a) + a;
++  return -a;
++}
++static inline float Frac(float x) {
++  return x - static_cast<float>(static_cast<int32_t>(x + 1024.0f) - 1024);
++}
++static inline float Blep(float t, float dt) {
++  if (t < dt) { t /= dt; return t + t - t * t - 1.0f; }
++  if (t > 1.0f - dt) { t = (t - 1.0f) / dt; return t * t + t + t + 1.0f; }
++  return 0.0f;
++}
++static inline float Saw(float t, float dt) { return 2.0f * t - 1.0f - Blep(t, dt); }
++static inline float Pulse(float t, float dt, float pw) {
++  float t2 = t + pw;
++  if (t2 >= 1.0f) t2 -= 1.0f;
++  return (Saw(t, dt) - Saw(t2, dt)) * 0.5f;
++}
++static inline void Advance(float* phase, float increment) {
++  float t = *phase + increment;
++  if (t >= 1.0f) t -= 1.0f;
++  *phase = t;
++}
++
++// ------------------------------------------------------------------ harmony
++
++static const int8_t kMinor[7] = { 0, 2, 3, 5, 7, 8, 10 };      // C minor
++static const int8_t kDubSteps[5] = { 0, 4, 6, 9, 11 };          // root 5th 7th 3rd' 5th'
++static const int kNumDubNotes = 5;
++
++static inline int FloorDiv7(int d) { return d >= 0 ? d / 7 : -((6 - d) / 7); }
++
++int BuildChord(const Settings& s, int degree, float* notes, float* root) {
++  const int n = kNumDubNotes;
++  const int base = 12 * (s.octave + 1);   // C
++  int raw[kNumDubNotes];
++  for (int i = 0; i < n; ++i) {
++    int d = degree + kDubSteps[i];
++    int o = FloorDiv7(d);
++    raw[i] = base + kMinor[d - 7 * o] + 12 * o;
++  }
++  *root = static_cast<float>(raw[0]);
++  // The DUB voicing spans more than an octave, so it only moves by whole
++  // octaves (towards the middle of the register): no doubled notes, and
++  // every note stays in C minor.
++  const int centre_sum = (base + 7 + 12 * FloorDiv7(degree)) * n;  // V/OCT octaves still move it
++  int sum = 0;
++  for (int i = 0; i < n; ++i) sum += raw[i];
++  int best_shift = 0, best = 1 << 30;
++  for (int shift = -12; shift <= 12; shift += 12) {
++    int d = sum + shift * n - centre_sum;
++    d = d < 0 ? -d : d;
++    if (d < best) { best = d; best_shift = shift; }
++  }
++  for (int i = 0; i < n; ++i) notes[i] = static_cast<float>(raw[i] + best_shift);
++  return n;
++}
++
++int SemitonesToDegrees(float semitones) {
++  int st = static_cast<int>(semitones + (semitones >= 0.0f ? 0.5f : -0.5f));
++  int o = st >= 0 ? st / 12 : -((11 - st) / 12);
++  int pc = st - 12 * o;
++  int best = 0, best_d = 99;
++  for (int i = 0; i < 7; ++i) {
++    int d = pc - kMinor[i]; d = d < 0 ? -d : d;
++    if (d < best_d) { best_d = d; best = i; }
++  }
++  return best + 7 * o;
++}
++
++void DefaultSettings(Settings* s) {
++  s->envelope = 0.5f;
++  s->resonance = 0.35f;
++  s->density = 5;
++  s->length = 16;
++  s->speed = 4;        // 1/16
++  s->octave = 3;
++  s->chord_model = 0;  // DUB SAW
++  s->transpose = 0;
++}
++
++// ------------------------------------------------------------------ sequencer
++
++static const float kRankBias[kNumSteps] = {
++  0.5f, 0.0f, 1.3f, 0.35f, 0.15f, 0.0f, 1.2f, 0.25f,
++  0.4f, 0.0f, 1.25f, 0.35f, 0.1f, 0.0f, 1.1f, 0.45f
++};
++// Steps per clock pulse = kMultiply / kDivide (the clock is taken as 16ths).
++//                                       1/2 1/4 1/8 1/8T 1/16 1/16T 1/32 1/32T
++static const int kDivide[kNumSpeeds] =   { 8,  4,  2,  4,   1,   2,    1,   1 };
++static const int kMultiply[kNumSpeeds] = { 1,  1,  1,  3,   1,   3,    2,   3 };
++
++void Sequencer::Init() {
++  step_ = -1;
++  trigger_state_ = false;
++  clock_tick_ = false;
++  clock_count_ = 0;
++  blocks_since_edge_ = 0;
++  period_ = 500;
++  pending_substeps_ = 0;
++  substep_phase_ = 0.0f;
++  substep_interval_ = 0.0f;
++  internal_phase_ = 1e9f;
++  was_patched_ = false;
++  lfo_phase_ = 0.9999f;  // pick the first LFO targets right away (v1.2)
++  for (int i = 0; i < 4; ++i) lfo_from_[i] = lfo_to_[i] = lfo_out_[i] = 0.0f;
++  Generate(&pattern_);
++}
++
++void Sequencer::MakeRanks(Pattern* p) {
++  float score[kNumSteps];
++  int index[kNumSteps];
++  for (int i = 0; i < kNumSteps; ++i) {
++    score[i] = kRankBias[i] + Rand() * 0.9f;
++    index[i] = i;
++  }
++  for (int i = 0; i < kNumSteps; ++i)
++    for (int j = i + 1; j < kNumSteps; ++j)
++      if (score[index[j]] > score[index[i]]) { int t = index[i]; index[i] = index[j]; index[j] = t; }
++  for (int r = 0; r < kNumSteps; ++r) p->rank[index[r]] = r;
++}
++
++static int PickDegree(int avoid) {
++  static const float w[7] = { 4.0f, 0.7f, 1.5f, 2.5f, 2.0f, 2.0f, 1.0f };
++  float total = 0.0f;
++  for (int i = 0; i < 7; ++i) if (i != avoid) total += w[i];
++  float r = Rand() * total;
++  for (int i = 0; i < 7; ++i) {
++    if (i == avoid) continue;
++    r -= w[i];
++    if (r <= 0.0f) return i;
++  }
++  return 0;
++}
++
++void Sequencer::Generate(Pattern* p) {
++  // Chords: 1, 2 or 4 chords per pattern, mostly held (dub style).
++  float r = Rand();
++  int segments = r < 0.35f ? 1 : (r < 0.75f ? 2 : 4);
++  int chord[4];
++  chord[0] = Rand() < 0.7f ? 0 : PickDegree(-1);
++  for (int k = 1; k < segments; ++k) chord[k] = PickDegree(chord[k - 1]);
++  for (int i = 0; i < kNumSteps; ++i) {
++    int d = chord[i * segments / kNumSteps];
++    if (Rand() < 0.06f) d = PickDegree(d);
++    p->degree[i] = d;
++  }
++  // Mono: a random walk over two octaves of the scale.
++  int n = Rand() < 0.5f ? 0 : 7;
++  for (int i = 0; i < kNumSteps; ++i) {
++    float q = Rand();
++    if (q < 0.25f) {
++    } else if (q < 0.7f) {
++      n += Rand() < 0.5f ? -1 : 1;
++    } else if (q < 0.9f) {
++      n += Rand() < 0.5f ? -2 : 2;
++    } else {
++      n = (Rand() < 0.5f ? 0 : 7) + (Rand() < 0.3f ? 4 : 0);
++    }
++    if (n < 0) n = 1;
++    if (n > 13) n = 12;
++    p->note[i] = n;
++  }
++  MakeRanks(p);
++  for (int i = 0; i < kNumSteps; ++i) {
++    p->accent[i] = Rand() < (kRankBias[i] > 1.0f ? 0.35f : 0.15f);
++  }
++}
++
++void Sequencer::New() {
++  Generate(&pattern_);
++}
++
++bool Sequencer::FireStep(const Settings& s, Event* e) {
++  clock_tick_ = true;
++  int length = s.length < 1 ? 1 : (s.length > kNumSteps ? kNumSteps : s.length);
++  step_ = (step_ + 1) % length;
++  if (pattern_.rank[step_] >= s.density) return false;
++  e->step = step_;
++  e->accent = pattern_.accent[step_];
++  e->num_notes = BuildChord(s, pattern_.degree[step_] + s.transpose, e->notes, &e->root);
++  return true;
++}
++
++bool Sequencer::Process(
++    const Settings& s, float trigger_cv, bool trigger_patched, Event* e) {
++  clock_tick_ = false;
++  bool fired = false;
++  const int ratio = s.speed < kNumSpeeds ? s.speed : 4;
++  if (trigger_patched) {
++    if (!was_patched_) {
++      pending_substeps_ = 0;
++      clock_count_ = 0;
++      trigger_state_ = false;
++      blocks_since_edge_ = 0;
++    }
++    bool edge = false;
++    if (!trigger_state_) {
++      if (trigger_cv > 0.3f) { trigger_state_ = true; edge = true; }
++    } else if (trigger_cv < 0.1f) {
++      trigger_state_ = false;
++    }
++    if (blocks_since_edge_ < 0x7fffffff) ++blocks_since_edge_;
++    if (edge) {
++      // Measure the clock period (between 1 ms and 4 s).
++      if (blocks_since_edge_ >= 4 && blocks_since_edge_ <= 16000) {
++        period_ = blocks_since_edge_;
++      }
++      blocks_since_edge_ = 0;
++      if (clock_count_ % kDivide[ratio] == 0) {
++        // A group of kDivide pulses holds kMultiply evenly spaced steps.
++        fired = FireStep(s, e);
++        pending_substeps_ = kMultiply[ratio] - 1;
++        substep_interval_ = static_cast<float>(period_ * kDivide[ratio]) / kMultiply[ratio];
++        substep_phase_ = 0.0f;
++      } else if (pending_substeps_ > 0) {
++        substep_phase_ += 1.0f;
++        if (substep_phase_ >= substep_interval_) {
++          substep_phase_ -= substep_interval_;
++          --pending_substeps_;
++          fired = FireStep(s, e);
++        }
++      }
++      clock_count_ = (clock_count_ + 1) % 840;
++    } else if (pending_substeps_ > 0) {
++      substep_phase_ += 1.0f;
++      if (substep_phase_ >= substep_interval_) {
++        substep_phase_ -= substep_interval_;
++        --pending_substeps_;
++        fired = FireStep(s, e);
++      }
++    }
++  } else {
++    // No clock patched: internal 16ths at 120 BPM.
++    float interval = 500.0f * kDivide[ratio] / kMultiply[ratio];
++    internal_phase_ += 1.0f;
++    if (internal_phase_ >= interval) {
++      internal_phase_ = internal_phase_ > 1e8f ? 0.0f : internal_phase_ - interval;
++      if (internal_phase_ > interval) internal_phase_ = 0.0f;
++      fired = FireStep(s, e);
++    }
++  }
++  was_patched_ = trigger_patched;
++  return fired;
++}
++
++void Sequencer::ProcessLfo() {
++  // Always on: random targets with a smooth slide, speed 20 (0.12 Hz).
++  const float rate = 0.05f * Pow2(6.32f * 0.20f);
++  lfo_phase_ += rate * (float(kBlockSize) / 48000.0f);
++  if (lfo_phase_ >= 1.0f) {
++    lfo_phase_ -= 1.0f;
++    for (int i = 0; i < 4; ++i) {
++      lfo_from_[i] = lfo_out_[i];
++      lfo_to_[i] = RandBipolar();
++    }
++  }
++  float x = lfo_phase_ / 0.5f;
++  if (x > 1.0f) x = 1.0f;
++  x = x * x * (3.0f - 2.0f * x);
++  for (int i = 0; i < 4; ++i) {
++    lfo_out_[i] = lfo_from_[i] + (lfo_to_[i] - lfo_from_[i]) * x;
++  }
++}
++
++// ------------------------------------------------------------------ poly synth
++
++void PolySynth::Init() {
++  for (int i = 0; i < kNumPolyVoices; ++i) {
++    Voice& v = voice_[i];
++    v.env.Init();
++    v.phase[0] = Rand(); v.phase[1] = Rand();
++    v.state = 0.0f;
++    v.delay = 0;
++    v.note = 60.0f;
++    v.increment = 0.0f;
++    v.velocity = 0.0f;
++    age_[i] = 0;
++  }
++  age_counter_ = 0;
++  filter_.Init();
++  lp_ = 0.0f;
++  filter_env_.Init();
++  chord_note_ = 60.0f;
++  accent_ = 0.0f;
++  chuff_ = 0.0f;
++  sub_phase_ = 0.0f;
++  sub_increment_ = 0.0f;
++  sub_env_.Init();
++}
++
++int PolySynth::active_voices() const {
++  int n = 0;
++  for (int i = 0; i < kNumPolyVoices; ++i) n += voice_[i].env.active() || voice_[i].delay > 0;
++  return n;
++}
++
++void PolySynth::NoteOn(const Event& e, const Shape& shape) {
++  const float transpose = 0.0f;
++  const float attack = shape.attack_s, decay = shape.decay_s;
++  const float ai = Envelope::AttackIncrement(attack), dc = Envelope::DecayCoefficient(decay);
++  for (int n = 0; n < e.num_notes; ++n) {
++    // free voice first, then the quietest decaying one
++    int best = 0;
++    float best_score = 1e9f;
++    for (int i = 0; i < kNumPolyVoices; ++i) {
++      const Voice& v = voice_[i];
++      float score;
++      if (!v.env.active() && v.delay <= 0) score = -1e6f;
++      else score = v.env.value() * v.velocity - 1e-6f * static_cast<float>(age_counter_ - age_[i]);
++      if (score < best_score) { best_score = score; best = i; }
++    }
++    Voice& v = voice_[best];
++    bool stolen = v.env.active();
++    if (!stolen) v.env.Init();
++    v.note = e.notes[n] + transpose;
++    v.increment = NoteToFrequency(v.note);
++    v.velocity = e.accent ? 1.0f : 0.72f;
++    // strum: 3 ms per note plus a little humanisation (in 0.25 ms blocks);
++    // a stolen voice restarts at once from its current level (no click)
++    v.delay = stolen ? 0 : (n * 3 + static_cast<int>(Random::GetWord() >> 30)) * 4;
++    v.env.TriggerWith(ai, dc);
++    age_[best] = ++age_counter_;
++  }
++  chord_note_ = e.root + transpose;
++  accent_ = e.accent ? 1.0f : 0.0f;
++  chuff_ = 1.0f;
++  filter_env_.TriggerWith(ai, dc);
++  sub_increment_ = NoteToFrequency(e.root + transpose - 12.0f);
++  sub_env_.Trigger(attack, decay * 1.3f);
++}
++
++struct VoiceConsts {
++  float d0, d1, pw, harmonics, timbre, morph, fold, idx, fb, pd, res, levels;
++  float saw_gain, pulse_gain;
++  int duty;
++};
++
++// One oscillator sample. All state is passed by reference to locals so the
++// compiler keeps it in registers (no aliasing with the output buffer).
++template<int MODEL>
++static inline float Osc(float& p0, float& p1, float& st, const float dt, const VoiceConsts& k) {
++  float x;
++  if (MODEL == 0) {         // DUB SAW: H detune, T saw > pulse (noise chuff is per chord)
++    float t2 = p0 + k.pw; if (t2 >= 1.0f) t2 -= 1.0f;
++    float u2 = p1 + k.pw; if (u2 >= 1.0f) u2 -= 1.0f;
++    x = (Saw(p0, k.d0) + Saw(p1, k.d1)) * k.saw_gain - (Saw(t2, k.d0) + Saw(u2, k.d1)) * k.pulse_gain;
++    Advance(&p0, k.d0);
++    Advance(&p1, k.d1);
++  } else if (MODEL == 1) {  // VA: H interval of osc 2, T pulse width, M mix
++    float t2 = p0 + k.pw; if (t2 >= 1.0f) t2 -= 1.0f;
++    float a = (Saw(p0, dt) - Saw(t2, dt)) * 0.7f;
++    x = a * k.saw_gain + Saw(p1, k.d1) * k.pulse_gain;
++    Advance(&p0, dt);
++    Advance(&p1, k.d1);
++  } else if (MODEL == 2) {  // WAVESHAPE: H asymmetry, T fold, M triangle > saw
++    float tri = 4.0f * fabsf(p0 - 0.5f) - 1.0f;
++    float base = tri + (Saw(p0, dt) - tri) * k.morph;
++    x = Sine(Frac(base * k.fold + k.harmonics)) * 0.8f;
++    Advance(&p0, dt);
++  } else if (MODEL == 3) {  // FM: H ratio, T index, M feedback
++    float m = Sine(Frac(p1 + k.fb * st));
++    st = m;
++    x = Sine(Frac(p0 + k.idx * m)) * 0.8f;
++    Advance(&p0, dt);
++    Advance(&p1, k.d1);
++  } else if (MODEL == 4) {  // PHASE DIST: H resonance ratio, T distortion, M blend
++    float t = p0;
++    float p = t < k.pd ? t * k.d0 : 0.5f + (t - k.pd) * k.d1;
++    float a = Sine(Frac(p + 0.25f));
++    float b = Sine(Frac(t * k.res + 0.25f)) * (1.0f - t);
++    x = (a + (b - a) * k.morph) * 0.8f;
++    Advance(&p0, dt);
++  } else {                  // CHIPTUNE: H duty, T crush, M triangle
++    float t2 = p0 + k.pw; if (t2 >= 1.0f) t2 -= 1.0f;
++    float sq = (Saw(p0, dt) - Saw(t2, dt)) * 0.7f;
++    float tri = static_cast<float>(static_cast<int>((1.0f - 2.0f * fabsf(2.0f * p0 - 1.0f)) * 7.5f + 8.0f)) * (1.0f / 7.5f) - 1.0f;
++    float o = sq + (tri - sq) * k.morph;
++    if (k.duty) o = static_cast<float>(static_cast<int>(o * k.levels + 64.5f) - 64) * k.d1;
++    x = o * 0.6f;
++    Advance(&p0, dt);
++  }
++  return x;
++}
++
++// True when a band-limited saw at phase p (increment d) has no discontinuity
++// and needs no polyBLEP correction for the next n samples.
++static inline bool Smooth(float p, float d, size_t n) {
++  return p >= d && p + static_cast<float>(n + 1) * d < 1.0f - d;
++}
++
++template<int MODEL>
++static void RenderVoiceT(float* phase, float* state, float dt, const VoiceConsts& kref,
++                         Envelope* env, float gain, float* out, size_t size) {
++  const VoiceConsts k = kref;
++  float p0 = phase[0], p1 = phase[1], st = *state;
++  float ev, ai, dc;
++  int es;
++  env->Load(&ev, &es, &ai, &dc);
++  if (MODEL == 0 || MODEL == 1) {
++    // Fast path: when no saw edge falls inside this block, every oscillator is
++    // a straight line, so the mix is a linear ramp.
++    float p0b = p0 + k.pw; if (p0b >= 1.0f) p0b -= 1.0f;
++    float p1b = p1 + k.pw; if (p1b >= 1.0f) p1b -= 1.0f;
++    const float d0 = MODEL == 0 ? k.d0 : dt;
++    bool smooth = Smooth(p0, d0, size) && Smooth(p1, k.d1, size) &&
++        Smooth(p0b, d0, size) && (MODEL == 1 || Smooth(p1b, k.d1, size));
++    if (smooth) {
++      float x, slope;
++      if (MODEL == 0) {
++        x = (2.0f * (p0 + p1) - 2.0f) * k.saw_gain - (2.0f * (p0b + p1b) - 2.0f) * k.pulse_gain;
++        slope = 2.0f * (d0 + k.d1) * (k.saw_gain - k.pulse_gain);
++      } else {
++        float pulse = 2.0f * (p0 - p0b) * 0.7f;
++        x = pulse * k.saw_gain + (2.0f * p1 - 1.0f) * k.pulse_gain;
++        slope = 2.0f * k.d1 * k.pulse_gain;
++      }
++      x *= gain; slope *= gain;
++      for (size_t n = 0; n < size; ++n) {
++        if (es == 1) { ev += ai; if (ev >= 1.0f) { ev = 1.0f; es = 2; } }
++        else { ev *= dc; }
++        out[n] += x * ev;
++        x += slope;
++      }
++      if (es == 2 && ev < 0.0002f) { ev = 0.0f; es = 0; }
++      env->Store(ev, es);
++      phase[0] = p0 + d0 * static_cast<float>(size);
++      phase[1] = p1 + k.d1 * static_cast<float>(size);
++      return;
++    }
++  }
++  for (size_t n = 0; n < size; ++n) {
++    float x = Osc<MODEL>(p0, p1, st, dt, k);
++    if (es == 1) { ev += ai; if (ev >= 1.0f) { ev = 1.0f; es = 2; } }
++    else { ev *= dc; }
++    out[n] += x * ev * gain;
++  }
++  if (es == 2 && ev < 0.0002f) { ev = 0.0f; es = 0; }
++  env->Store(ev, es);
++  phase[0] = p0; phase[1] = p1; *state = st;
++}
++
++void PolySynth::Render(
++    int model,
++    float harmonics, float timbre, float morph,
++    const Shape& shape, float level,
++    float* out, float* aux, size_t size) {
++  std::fill(&out[0], &out[size], 0.0f);
++  static const float fm_ratios[12] = {
++    0.5f, 1.0f, 1.0f, 1.5f, 2.0f, 2.0f, 3.0f, 3.5f, 4.0f, 5.0f, 6.0f, 7.0f };
++  static const float duty[4] = { 0.125f, 0.25f, 0.5f, 0.75f };
++
++  VoiceConsts k;
++  k.harmonics = harmonics; k.timbre = timbre; k.morph = morph;
++  k.fold = 0.25f * (1.0f + 5.0f * timbre);
++  k.idx = timbre * timbre * 4.0f;
++  k.fb = morph * 0.45f;
++  k.pd = 0.5f - timbre * 0.47f;
++  k.res = 1.0f + harmonics * 7.0f;
++  k.levels = 2.0f + (1.0f - timbre) * (1.0f - timbre) * 30.0f;
++  k.duty = timbre > 0.03f;
++  k.saw_gain = 1.0f; k.pulse_gain = 0.0f;
++  k.pw = 0.5f;
++  switch (model) {
++    case 0:
++      // saw + pulse mix: saw(t)*(1-T) + (saw(t) - saw(t+pw)) * 0.8 * T
++      k.pw = 0.5f + 0.35f * timbre;
++      k.saw_gain = 0.5f * ((1.0f - timbre) + 0.8f * timbre);
++      k.pulse_gain = 0.5f * 0.8f * timbre;
++      break;
++    case 1:
++      k.pw = 0.5f + 0.42f * timbre;
++      k.saw_gain = 1.0f - morph * 0.7f;
++      k.pulse_gain = 0.3f + morph * 0.7f;
++      break;
++    case 2:
++      k.harmonics = harmonics * 0.25f + 0.25f;
++      break;
++    case 5:
++      k.pw = duty[static_cast<int>(harmonics * 3.99f)];
++      break;
++  }
++
++  // Shared chord filter.
++  const float keytrack = Pow2(0.025f * (chord_note_ - 60.0f));
++  float fc = shape.cutoff_hz * keytrack *
++      Pow2((shape.env_oct + accent_) * filter_env_.value());
++  float f = fc * (1.0f / 48000.0f);
++  if (f > 0.4f) f = 0.4f;
++  filter_.set_f_q<FREQUENCY_FAST>(f, shape.q);
++  float g1 = f * 6.2831853f; if (g1 > 0.9f) g1 = 0.9f;
++  for (size_t n = 0; n < size; ++n) filter_env_.Next();
++
++  const float det = 1.0f + harmonics * 0.0175f, inv_det = 1.0f / det;
++  const float va_ratio = Pow2(harmonics * 19.0f * (1.0f / 12.0f)) * 1.002f;
++  const float fm_ratio = fm_ratios[static_cast<int>(harmonics * 11.99f)];
++
++  for (int i = 0; i < kNumPolyVoices; ++i) {
++    Voice& v = voice_[i];
++    if (v.delay > 0) { --v.delay; continue; }
++    if (!v.env.active()) continue;
++    float dt = v.increment;
++    float gain = 0.5f * v.velocity;
++    switch (model) {
++      case 0:
++        k.d0 = dt * inv_det; k.d1 = dt * det;
++        RenderVoiceT<0>(v.phase, &v.state, dt, k, &v.env, gain, out, size);
++        break;
++      case 1:
++        k.d1 = dt * va_ratio;
++        RenderVoiceT<1>(v.phase, &v.state, dt, k, &v.env, gain, out, size);
++        break;
++      case 2:
++        RenderVoiceT<2>(v.phase, &v.state, dt, k, &v.env, gain, out, size);
++        break;
++      case 3:
++        k.d1 = dt * fm_ratio;
++        RenderVoiceT<3>(v.phase, &v.state, dt, k, &v.env, gain, out, size);
++        break;
++      case 4:
++        k.d0 = 0.5f / k.pd; k.d1 = 0.5f / (1.0f - k.pd);
++        RenderVoiceT<4>(v.phase, &v.state, dt, k, &v.env, gain, out, size);
++        break;
++      default:
++        k.d1 = 1.0f / k.levels;
++        RenderVoiceT<5>(v.phase, &v.state, dt, k, &v.env, gain, out, size);
++        break;
++    }
++  }
++
++  // Noise "chuff" at each chord onset (DUB SAW: MORPH), then the filter.
++  const float chuff_amount = model == 0 ? morph * 0.35f : 0.0f;
++  for (size_t n = 0; n < size; ++n) {
++    float x = out[n];
++    if (chuff_amount > 0.0f) {
++      x += RandBipolar() * (chuff_ + 0.03f) * chuff_amount * filter_env_.value();
++      chuff_ *= 0.986f;
++    }
++    float y = filter_.Process<FILTER_MODE_LOW_PASS>(x);
++    lp_ += g1 * (y - lp_);
++    out[n] = SoftClip(lp_ * level);
++    float e = sub_env_.Next();
++    aux[n] = Sine(sub_phase_) * e * 0.55f * level;
++    Advance(&sub_phase_, sub_increment_);
++  }
++}
++
++// ------------------------------------------------------------------ post shaper
++
++void PostShaper::Process(const Shape& shape, float level, float cutoff_ratio,
++                         float* out, float* aux, size_t size) {
++  float fc = shape.cutoff_hz * cutoff_ratio * Pow2((shape.env_oct + accent_) * env_.value());
++  float f = fc * (1.0f / 48000.0f);
++  if (f > 0.4f) f = 0.4f;
++  f_[0].set_f_q<FREQUENCY_FAST>(f, shape.q);
++  float g1 = f * 6.2831853f; if (g1 > 0.9f) g1 = 0.9f;
++  float ev, ai, dc;
++  int es;
++  env_.Load(&ev, &es, &ai, &dc);
++  float lp = lp_[0];
++  for (size_t n = 0; n < size; ++n) {
++    if (es == 1) { ev += ai; if (ev >= 1.0f) { ev = 1.0f; es = 2; } }
++    else if (es == 2) { ev *= dc; }
++    float e = ev * level;
++    float a = f_[0].Process<FILTER_MODE_LOW_PASS>(out[n]);
++    lp += g1 * (a - lp);
++    out[n] = SoftClip(lp * e);   // the resonant filter can push loud engines over
++    aux[n] = SoftClip(aux[n] * e);
++  }
++  if (es == 2 && ev < 0.0002f) { ev = 0.0f; es = 0; }
++  env_.Store(ev, es);
++  lp_[0] = lp;
++}
++
++}  // namespace dub
++}  // namespace plaits
+diff --git a/plaits/dub/dub.h b/plaits/dub/dub.h
+new file mode 100644
+index 0000000..20faf7c
+--- /dev/null
++++ b/plaits/dub/dub.h
+@@ -0,0 +1,207 @@
++// DUB BASE for Plaits — generative dub chord sequencer, clocked from TRIG.
++// Copyright 2026 Narti Live. MIT license (same terms as the Plaits sources).
++
++#ifndef PLAITS_DUB_DUB_H_
++#define PLAITS_DUB_DUB_H_
++
++#include "stmlib/stmlib.h"
++#include "stmlib/dsp/dsp.h"
++#include "stmlib/dsp/filter.h"
++
++namespace plaits {
++namespace dub {
++
++const int kNumSteps = 16;
++const int kNumChordModels = 8;   // 0..5 poly models, 6 = Plaits CHORDS, 7 = STRING MACHINE
++const int kNumPolyModels = 6;
++const int kNumSpeeds = 8;        // 1/2 1/4 1/8 1/8T 1/16 1/16T 1/32 1/32T
++const int kMaxChordNotes = 5;
++const int kNumPolyVoices = 6;
++
++// Fixed: C minor, DUB chords (root, 5th, 7th, 3rd and 5th an octave up).
++// Everything the panel can set (edited by the UI, read by the audio code).
++struct Settings {
++  float envelope;       // FREQUENCY knob: attack + decay + filter envelope together
++  float resonance;      // RIGHT + FREQUENCY (capped below self-oscillation)
++  uint8_t density;      // TIMBRE attenuverter, 1..16
++  uint8_t length;       // FM attenuverter, 1..16
++  uint8_t speed;        // MORPH attenuverter, 0..7
++  uint8_t octave;       // LEFT + FREQUENCY, 1..5
++  uint8_t chord_model;  // buttons, 0..7
++  int8_t transpose;     // V/OCT, in scale degrees (set by the voice)
++};
++
++void DefaultSettings(Settings* s);
++
++// What the envelope knob and resonance turn into.
++struct Shape {
++  float attack_s, decay_s, cutoff_hz, env_oct, q;
++};
++void ComputeShape(const Settings& s, Shape* shape);
++
++struct Pattern {
++  int8_t degree[kNumSteps];  // chord mode: scale degree 0..6
++  int8_t note[kNumSteps];    // mono mode: scale step 0..13
++  uint8_t rank[kNumSteps];   // a step plays when rank < density
++  uint8_t accent[kNumSteps];
++};
++
++struct Event {
++  int num_notes;
++  float notes[kMaxChordNotes];   // MIDI-style note numbers, ascending
++  float root;                    // chord root (lowest scale degree note)
++  bool accent;
++  int step;
++};
++
++// Builds a C minor DUB chord on a scale degree. Every note is in C minor.
++int BuildChord(const Settings& s, int degree, float* notes, float* root);
++// Nearest C minor scale degree for a pitch offset in semitones (V/OCT).
++int SemitonesToDegrees(float semitones);
++
++class Sequencer {
++ public:
++  Sequencer() { }
++  void Init();
++  // Once per audio block. Returns true when a step plays and fills *e.
++  bool Process(
++      const Settings& s, float trigger_cv, bool trigger_patched, Event* e);
++
++  void New();
++
++  inline const Pattern& pattern() const { return pattern_; }
++  inline void set_pattern(const Pattern& p) { pattern_ = p; }
++  inline int step() const { return step_; }
++  inline bool clock_tick() const { return clock_tick_; }
++  inline float lfo(int i) const { return lfo_out_[i]; }
++
++  // random LFO (always on), once per block: HARMONICS, TIMBRE, MORPH, cutoff
++  void ProcessLfo();
++
++ private:
++  bool FireStep(const Settings& s, Event* e);
++  void Generate(Pattern* p);
++  void MakeRanks(Pattern* p);
++
++  Pattern pattern_;
++
++  int step_;
++  bool trigger_state_;
++  bool clock_tick_;
++  int clock_count_;
++  int32_t blocks_since_edge_;
++  int32_t period_;               // measured clock period, in blocks
++  int pending_substeps_;
++  float substep_phase_;
++  float substep_interval_;
++  float internal_phase_;
++  bool was_patched_;
++
++  float lfo_phase_;
++  float lfo_from_[4];
++  float lfo_to_[4];
++  float lfo_out_[4];
++
++  DISALLOW_COPY_AND_ASSIGN(Sequencer);
++};
++
++// AD envelope, exponential decay, retriggers from its current level.
++class Envelope {
++ public:
++  void Init() { value_ = 0.0f; stage_ = 0; }
++  // Precomputed coefficients (one division each, shared by a whole chord).
++  static inline float AttackIncrement(float seconds) { return 1.0f / (seconds * 48000.0f); }
++  static inline float DecayCoefficient(float seconds) {
++    float c = 1.0f - 6.9f / (seconds * 48000.0f);
++    return c < 0.0f ? 0.0f : c;
++  }
++  inline void TriggerWith(float attack_increment, float decay_coefficient) {
++    attack_inc_ = attack_increment;
++    decay_coef_ = decay_coefficient;
++    stage_ = 1;
++  }
++  void Trigger(float attack_seconds, float decay_seconds) {
++    attack_inc_ = 1.0f / (attack_seconds * 48000.0f);
++    decay_coef_ = 1.0f - 6.9f / (decay_seconds * 48000.0f);
++    if (decay_coef_ < 0.0f) decay_coef_ = 0.0f;
++    stage_ = 1;
++  }
++  inline float Next() {
++    if (stage_ == 1) {
++      value_ += attack_inc_;
++      if (value_ >= 1.0f) { value_ = 1.0f; stage_ = 2; }
++    } else if (stage_ == 2) {
++      value_ *= decay_coef_;
++      if (value_ < 0.0002f) { value_ = 0.0f; stage_ = 0; }
++    }
++    return value_;
++  }
++  inline float value() const { return value_; }
++  inline bool active() const { return stage_ != 0; }
++  // Raw access so inner loops can keep the envelope in registers.
++  inline void Load(float* v, int* st, float* ai, float* dc) const {
++    *v = value_; *st = stage_; *ai = attack_inc_; *dc = decay_coef_;
++  }
++  inline void Store(float v, int st) { value_ = v; stage_ = st; }
++ private:
++  float value_, attack_inc_, decay_coef_;
++  int stage_;
++};
++
++
++// Six light polyphonic chord models with per-voice envelope + filter,
++// and a sub-bass sine on AUX that follows the chord root.
++class PolySynth {
++ public:
++  PolySynth() { }
++  void Init();
++  void NoteOn(const Event& e, const Shape& shape);
++  void Render(
++      int model,
++      float harmonics, float timbre, float morph,
++      const Shape& shape, float level,
++      float* out, float* aux, size_t size);
++  int active_voices() const;
++ private:
++  struct Voice {
++    float note, increment, phase[2], state, velocity;
++    Envelope env;
++    int delay;
++  };
++  Voice voice_[kNumPolyVoices];
++  uint32_t age_[kNumPolyVoices];
++  uint32_t age_counter_;
++  // One filter for the whole chord, with its own envelope (paraphonic).
++  stmlib::Svf filter_;
++  float lp_;
++  Envelope filter_env_;
++  float chord_note_;
++  float accent_;
++  float chuff_;
++  float sub_phase_, sub_increment_;
++  Envelope sub_env_;
++  DISALLOW_COPY_AND_ASSIGN(PolySynth);
++};
++
++// Envelope + low-pass applied after a Plaits engine (replaces the LPG).
++class PostShaper {
++ public:
++  void Init() { env_.Init(); f_[0].Init(); f_[1].Init(); lp_[0] = lp_[1] = 0.0f; }
++  void Trigger(const Shape& shape, bool accent) {
++    env_.Trigger(shape.attack_s, shape.decay_s);
++    accent_ = accent ? 1.0f : 0.0f;
++  }
++  void Process(const Shape& shape, float level, float cutoff_ratio,
++               float* out, float* aux, size_t size);
++  inline float envelope() const { return env_.value(); }
++ private:
++  Envelope env_;
++  stmlib::Svf f_[2];
++  float lp_[2];
++  float accent_;
++};
++
++}  // namespace dub
++}  // namespace plaits
++
++#endif  // PLAITS_DUB_DUB_H_
+diff --git a/plaits/plaits.cc b/plaits/plaits.cc
+index d64f327..c089e2d 100755
+--- a/plaits/plaits.cc
++++ b/plaits/plaits.cc
+@@ -52,6 +52,7 @@ Ui ui;
+ UserData user_data;
+ UserDataReceiver user_data_receiver;
+ Voice voice;
++dub::Settings dub_settings;
+ 
+ char shared_buffer[16384];
+ uint32_t test_ramp;
+@@ -119,8 +120,7 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
+         ui.DisplayDataTransferProgress(-1.0f);
+       }
+     }
+-    voice.Render(patch, modulations, (Voice::Frame*)(output), size);
+-    ui.set_active_engine(voice.active_engine());
++    voice.Render(patch, modulations, dub_settings, (Voice::Frame*)(output), size);
+   }
+   
+   if (debug_port.readable()) {
+@@ -158,7 +158,8 @@ void Init() {
+   }
+ #endif  // PROFILE_INTERRUPT
+ 
+-  ui.Init(&patch, &modulations, &settings);
++  dub::DefaultSettings(&dub_settings);
++  ui.Init(&patch, &modulations, &settings, &dub_settings, &voice);
+   
+   audio_dac.Init(48000, kBlockSize);
+ 
+diff --git a/plaits/settings.cc b/plaits/settings.cc
+index 5dccec8..ec1ce97 100644
+--- a/plaits/settings.cc
++++ b/plaits/settings.cc
+@@ -29,6 +29,7 @@
+ #include "plaits/settings.h"
+ 
+ #include <algorithm>
++#include <cstring>
+ 
+ #include "stmlib/system/storage.h"
+ 
+@@ -70,17 +71,10 @@ bool Settings::Init() {
+   c[CV_ADC_CHANNEL_LEVEL].scale = -0.6f;
+   c[CV_ADC_CHANNEL_LEVEL].normalization_detection_threshold = 21403;
+   
+-  state_.engine = 8;
+-  state_.lpg_colour = 0;
+-  state_.decay = 128;
+-  state_.octave = 255;
+-  state_.color_blind = 0;
+-  state_.enable_alt_navigation = 0;
+-  state_.fine_tune = 128;
++  memset(&state_, 0, sizeof(state_));
+   
+   bool success = chunk_storage_.Init(&persistent_data_, &state_);
+   
+-  CONSTRAIN(state_.engine, 0, 23);
+ 
+   return success;
+ }
+diff --git a/plaits/settings.h b/plaits/settings.h
+index 4f98dfc..42e4a94 100644
+--- a/plaits/settings.h
++++ b/plaits/settings.h
+@@ -51,16 +51,16 @@ struct PersistentData {
+   enum { tag = 0x494C4143 };  // CALI
+ };
+ 
++// DUB BASE state: chord model, octave, resonance + the current pattern (packed).
+ struct State {
+-  uint8_t engine;
+-  uint8_t lpg_colour;
+-  uint8_t decay;
+-  uint8_t octave;
++  uint8_t chord_model;
+   uint8_t color_blind;
+-  uint8_t fine_tune;
+-  uint8_t enable_alt_navigation;
+-  uint8_t padding[1];
+-  enum { tag = 0x54415453 };  // STAT
++  uint8_t octave;       // 0 = not saved yet
++  uint8_t resonance;
++  uint8_t has_pattern;
++  uint8_t padding[3];
++  uint16_t steps[16];  // degree | rank << 7 | accent << 11
++  enum { tag = 0x32425544 };  // DUB2
+ };
+ 
+ class Settings {
+diff --git a/plaits/ui.cc b/plaits/ui.cc
+index 31098d1..0cf67c3 100644
+--- a/plaits/ui.cc
++++ b/plaits/ui.cc
+@@ -1,30 +1,16 @@
+-// Copyright 2016 Emilie Gillet.
++// Copyright 2016 Emilie Gillet. DUB BASE changes 2026 Narti Live.
++// MIT license, see the original Plaits sources.
+ //
+-// Author: Emilie Gillet (emilie.o.gillet@gmail.com)
+-//
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-// 
+-// The above copyright notice and this permission notice shall be included in
+-// all copies or substantial portions of the Software.
+-// 
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-// THE SOFTWARE.
+-// 
+-// See http://creativecommons.org/licenses/MIT/ for more information.
+-//
+-// -----------------------------------------------------------------------------
+-//
+-// UI and CV processing ("controller" and "view")
++// DUB BASE panel:
++//   FREQUENCY            envelope (attack + decay + filter envelope amount)
++//   LEFT  + FREQUENCY    octave
++//   RIGHT + FREQUENCY    resonance
++//   HARMONICS / TIMBRE / MORPH   chord model parameters
++//   TIMBRE / FM / MORPH attenuverters   density / length / speed
++//   tap LEFT / RIGHT     previous / next chord model
++//   hold LEFT 1 s        NEW pattern
++//   hold RIGHT 1 s       RANDOM sound
++//   hold both 2 s        CV calibration (original Plaits procedure)
+ 
+ #include "plaits/ui.h"
+ 
+@@ -32,18 +18,27 @@
+ 
+ #include "stmlib/dsp/dsp.h"
+ #include "stmlib/system/system_clock.h"
++#include "stmlib/utils/random.h"
+ 
+ namespace plaits {
+-  
++
+ using namespace std;
+ using namespace stmlib;
+ 
+-static const int32_t kLongPressTime = 2000;
++static const int kTapTime = 600;          // ms: shorter press = previous / next
++static const int kHoldTime = 1000;        // ms: longer press = NEW / RANDOM
++static const int kCalibrationTime = 2000; // ms: both held = calibration
++static const int kSaveDelay = 2000;       // ms after the last change
++static const int kFlashTime = 450;
++static const int kShowTime = 1000;
+ 
+-void Ui::Init(Patch* patch, Modulations* modulations, Settings* settings) {
++void Ui::Init(Patch* patch, Modulations* modulations, Settings* settings,
++              dub::Settings* dub_settings, Voice* voice) {
+   patch_ = patch;
+   modulations_ = modulations;
+   settings_ = settings;
++  dub_ = dub_settings;
++  voice_ = voice;
+ 
+   cv_adc_.Init();
+   pots_adc_.Init();
+@@ -52,155 +47,315 @@ void Ui::Init(Patch* patch, Modulations* modulations, Settings* settings) {
+ 
+   ui_task_ = 0;
+   mode_ = UI_MODE_NORMAL;
+-  
+-  octave_quantizer_.Init(9, 0.01f, false);
+-  
++
++  for (int i = 0; i < POTS_ADC_CHANNEL_LAST; ++i) {
++    pots_[i].Init(i <= POTS_ADC_CHANNEL_HARMONICS_POT ? 0.005f : 0.01f);
++  }
++  density_quantizer_.Init(16, 0.25f, true);
++  length_quantizer_.Init(16, 0.25f, true);
++
+   LoadState();
+-  
++
+   if (switches_.pressed_immediate(SWITCH_ROW_2)) {
+     State* state = settings_->mutable_state();
+-    if (state->color_blind == 1) {
+-      state->color_blind = 0; 
+-    } else {
+-      state->color_blind = 1; 
+-    }
++    state->color_blind = state->color_blind == 1 ? 0 : 1;
+     settings_->SaveState();
+     ignore_release_[0] = ignore_release_[1] = true;
+   }
+-  
+-  // Bind pots to parameters.
+-  pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].Init(
+-      &transposition_, &fine_tune_, 0.005f, 2.0f, -1.0f);
+-  pots_[POTS_ADC_CHANNEL_HARMONICS_POT].Init(
+-      &patch->harmonics, &octave_, 0.005f, 1.0f, 0.0f);
+-  pots_[POTS_ADC_CHANNEL_TIMBRE_POT].Init(
+-      &patch->timbre, &patch->lpg_colour, 0.01f, 1.0f, 0.0f);
+-  pots_[POTS_ADC_CHANNEL_MORPH_POT].Init(
+-      &patch->morph, &patch->decay, 0.01f, 1.0f, 0.0f);
+-  pots_[POTS_ADC_CHANNEL_TIMBRE_ATTENUVERTER].Init(
+-      &patch->timbre_modulation_amount, NULL, 0.005f, 2.0f, -1.0f);
+-  pots_[POTS_ADC_CHANNEL_FM_ATTENUVERTER].Init(
+-      &patch->frequency_modulation_amount, NULL, 0.005f, 2.0f, -1.0f);
+-  pots_[POTS_ADC_CHANNEL_MORPH_ATTENUVERTER].Init(
+-      &patch->morph_modulation_amount, NULL, 0.005f, 2.0f, -1.0f);
+-  
+-  // Keep track of the agreement between the random sequence sent to the 
+-  // switch and the value read by the ADC.
++
+   normalization_detection_count_ = 0;
+   normalization_probe_state_ = 0;
+   normalization_probe_.Init();
+-  fill(
+-      &normalization_detection_mismatches_[0],
+-      &normalization_detection_mismatches_[5],
+-      0);
+-  
++  fill(&normalization_detection_mismatches_[0],
++       &normalization_detection_mismatches_[kNumNormalizedChannels], 0);
++
+   pwm_counter_ = 0;
+   fill(&press_time_[0], &press_time_[SWITCH_LAST], 0);
+   fill(&ignore_release_[0], &ignore_release_[SWITCH_LAST], false);
+-  
+-  active_engine_ = 0;
++  fill(&edited_while_pressed_[0], &edited_while_pressed_[SWITCH_LAST], false);
++  both_pressed_time_ = 0;
++  flash_ = FLASH_NONE;
++  flash_time_ = 0;
++  shown_ = SHOW_NONE;
++  shown_time_ = kShowTime;
++  step_flash_ = 0;
++  dirty_time_ = 0;
++  last_envelope_ = -1.0f;
+   cv_c1_ = 0.0f;
+   pitch_lp_ = 0.0f;
+   pitch_lp_calibration_ = 0.0f;
+   data_transfer_progress_ = 0.0f;
+ }
+ 
++static inline float U8(uint8_t v) { return static_cast<float>(v) / 255.0f; }
++static inline uint8_t ToU8(float v) { CONSTRAIN(v, 0.0f, 1.0f); return static_cast<uint8_t>(v * 255.0f + 0.5f); }
++
+ void Ui::LoadState() {
+-  const State& state = settings_->state();
+-  patch_->engine = state.engine;
+-  patch_->lpg_colour = static_cast<float>(state.lpg_colour) / 256.0f;
+-  patch_->decay = static_cast<float>(state.decay) / 256.0f;
+-  octave_ = static_cast<float>(state.octave) / 256.0f;
+-  fine_tune_ = static_cast<float>(state.fine_tune) / 256.0f;
+-  enable_alt_navigation_ = state.engine < 8 || state.enable_alt_navigation;
++  const State& st = settings_->state();
++  dub::DefaultSettings(dub_);
++  if (st.octave >= 1 && st.octave <= 5) {   // a saved DUB BASE state exists
++    dub_->chord_model = st.chord_model % dub::kNumChordModels;
++    dub_->octave = st.octave;
++    dub_->resonance = U8(st.resonance);
++    if (st.has_pattern) {
++      dub::Pattern p = voice_->mutable_sequencer()->pattern();
++      for (int i = 0; i < dub::kNumSteps; ++i) {
++        uint16_t w = st.steps[i];
++        p.degree[i] = (w & 7) % 7;
++        p.rank[i] = (w >> 7) & 15;
++        p.accent[i] = (w >> 11) & 1;
++      }
++      voice_->mutable_sequencer()->set_pattern(p);
++    }
++  }
++  pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].set_hidden(0, (dub_->octave - 1) / 4.0f);
++  pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].set_hidden(1, dub_->resonance);
+ }
+ 
+ void Ui::SaveState() {
+-  State* state = settings_->mutable_state();
+-  state->engine = patch_->engine;
+-  state->lpg_colour = static_cast<uint8_t>(patch_->lpg_colour * 256.0f);
+-  state->decay = static_cast<uint8_t>(patch_->decay * 256.0f);
+-  state->octave = static_cast<uint8_t>(octave_ * 256.0f);
+-  state->fine_tune = static_cast<uint8_t>(fine_tune_ * 256.0f);
+-  state->enable_alt_navigation = enable_alt_navigation_;
++  State* st = settings_->mutable_state();
++  st->chord_model = dub_->chord_model;
++  st->octave = dub_->octave;
++  st->resonance = ToU8(dub_->resonance);
++  const dub::Pattern& p = voice_->mutable_sequencer()->pattern();
++  for (int i = 0; i < dub::kNumSteps; ++i) {
++    st->steps[i] = (p.degree[i] & 7) | ((p.rank[i] & 15) << 7) | ((p.accent[i] & 1) << 11);
++  }
++  st->has_pattern = 1;
+   settings_->SaveState();
+ }
+ 
+-uint32_t Ui::BankToColor(int bank, bool color_blind, int pwm_counter) {
+-  // pwm_counter is between 0 and 15
+-  if (color_blind) {
+-    return pwm_counter < (16 >> (2 * bank)) ? LED_COLOR_YELLOW : LED_COLOR_OFF;
+-  } else {
+-    uint32_t colors[3] = { LED_COLOR_YELLOW, LED_COLOR_GREEN, LED_COLOR_RED };
+-    return colors[bank];
++// ------------------------------------------------------------------ knobs
++
++void Ui::ProcessPots() {
++  const bool left = switches_.pressed(SWITCH_ROW_1);
++  const bool right = switches_.pressed(SWITCH_ROW_2);
++  int layer = -1;
++  if (left && !right) layer = 0;
++  if (right && !left) layer = 1;
++  // Only FREQUENCY has a second function (with a button held).
++  DubPot& f = pots_[POTS_ADC_CHANNEL_FREQUENCY_POT];
++  if (f.ProcessUiRate(layer)) {
++    if (layer == 0) {
++      dub_->octave = 1 + static_cast<uint8_t>(f.hidden(0) * 4.999f);
++      Show(SHOW_OCTAVE);
++    } else {
++      dub_->resonance = f.hidden(1);
++      Show(SHOW_RESONANCE);
++    }
++    edited_while_pressed_[layer] = true;
++    dirty_time_ = kSaveDelay;
++  }
++  for (int i = POTS_ADC_CHANNEL_HARMONICS_POT; i < POTS_ADC_CHANNEL_LAST; ++i) {
++    pots_[i].ProcessUiRate(-1);
++  }
++}
++
++// ------------------------------------------------------------------ buttons
++
++void Ui::Navigate(int direction) {
++  dub_->chord_model = (dub_->chord_model + dub::kNumChordModels + direction) % dub::kNumChordModels;
++  dirty_time_ = kSaveDelay;
++}
++
++void Ui::ReadSwitches() {
++  switches_.Debounce();
++
++  switch (mode_) {
++    case UI_MODE_NORMAL:
++      {
++        for (int i = 0; i < SWITCH_LAST; ++i) {
++          if (switches_.just_pressed(Switch(i))) {
++            press_time_[i] = 0;
++            ignore_release_[i] = false;
++            edited_while_pressed_[i] = false;
++            if (switches_.pressed_immediate(Switch(1 - i))) {
++              // Both buttons: only the 2 s calibration gesture exists.
++              ignore_release_[0] = ignore_release_[1] = true;
++            }
++          }
++          if (switches_.pressed(Switch(i))) ++press_time_[i];
++        }
++        const bool both = switches_.pressed_immediate(SWITCH_ROW_1) &&
++            switches_.pressed_immediate(SWITCH_ROW_2);
++        if (both) {
++          ignore_release_[0] = ignore_release_[1] = true;
++          if (++both_pressed_time_ >= kCalibrationTime) {
++            both_pressed_time_ = 0;
++            StartCalibration();
++            break;
++          }
++        } else {
++          both_pressed_time_ = 0;
++        }
++        for (int i = 0; i < SWITCH_LAST; ++i) {
++          if (!switches_.released(Switch(i))) continue;
++          if (ignore_release_[i] || edited_while_pressed_[i]) continue;
++          const int held = press_time_[i];
++          if (held < kTapTime) {
++            Navigate(i == 0 ? -1 : +1);
++          } else if (held >= kHoldTime) {
++            if (i == 0) {
++              voice_->mutable_sequencer()->New();
++              Flash(FLASH_NEW);
++              dirty_time_ = kSaveDelay;
++            } else {
++              pots_[POTS_ADC_CHANNEL_HARMONICS_POT].Override(Random::GetFloat());
++              pots_[POTS_ADC_CHANNEL_TIMBRE_POT].Override(Random::GetFloat());
++              pots_[POTS_ADC_CHANNEL_MORPH_POT].Override(Random::GetFloat());
++              Flash(FLASH_RANDOM);
++            }
++          }
++        }
++      }
++      break;
++
++    case UI_MODE_DISPLAY_DATA_TRANSFER_PROGRESS:
++      break;
++
++    case UI_MODE_CALIBRATION_C1:
++      for (int i = 0; i < SWITCH_LAST; ++i) {
++        if (switches_.just_pressed(Switch(i))) {
++          press_time_[i] = 0;
++          ignore_release_[i] = true;
++          CalibrateC1();
++          break;
++        }
++      }
++      break;
++
++    case UI_MODE_CALIBRATION_C3:
++      for (int i = 0; i < SWITCH_LAST; ++i) {
++        if (switches_.just_pressed(Switch(i))) {
++          press_time_[i] = 0;
++          ignore_release_[i] = true;
++          CalibrateC3();
++          break;
++        }
++      }
++      break;
++
++    case UI_MODE_TEST:
++    case UI_MODE_ERROR:
++      for (int i = 0; i < SWITCH_LAST; ++i) {
++        if (switches_.just_pressed(Switch(i))) {
++          press_time_[i] = 0;
++          ignore_release_[i] = true;
++          mode_ = UI_MODE_NORMAL;
++        }
++      }
++      break;
++  }
++}
++
++// ------------------------------------------------------------------ LEDs
++
++static void Bar(Leds* leds, float v, int pwm, uint32_t color) {
++  v = v * 8.0f - 0.001f;
++  for (int i = 0; i < kNumLEDs; ++i) {
++    float a = v - static_cast<float>(i);
++    leds->set(i, a >= 1.0f || a * 16.0f > pwm ? color : LED_COLOR_OFF);
++  }
++}
++
++static void Bar16(Leds* leds, int n, int pwm, uint32_t color) {
++  for (int i = 0; i < kNumLEDs; ++i) {
++    int lit = n - 2 * i;   // 2 = full, 1 = half
++    leds->set(i, lit >= 2 || (lit == 1 && pwm < 4) ? color : LED_COLOR_OFF);
++  }
++}
++
++void Ui::DrawValue(int pwm) {
++  const dub::Settings& d = *dub_;
++  switch (shown_) {
++    case SHOW_ENVELOPE: Bar(&leds_, d.envelope, pwm, LED_COLOR_YELLOW); break;
++    case SHOW_OCTAVE: leds_.set(d.octave - 1, LED_COLOR_YELLOW); break;
++    case SHOW_RESONANCE: Bar(&leds_, d.resonance, pwm, LED_COLOR_RED); break;
++    case SHOW_DENSITY: Bar16(&leds_, d.density, pwm, LED_COLOR_GREEN); break;
++    case SHOW_LENGTH: Bar16(&leds_, d.length, pwm, LED_COLOR_YELLOW); break;
++    case SHOW_SPEED:
++      // straight values green, triplets red
++      leds_.set(d.speed, (d.speed == 3 || d.speed == 5 || d.speed == 7) ? LED_COLOR_RED : LED_COLOR_GREEN);
++      break;
++    default: break;
+   }
+ }
+ 
+ void Ui::UpdateLEDs() {
+   leds_.Clear();
+   ++pwm_counter_;
+-  
++
+   int pwm_counter = pwm_counter_ & 15;
+   int triangle = (pwm_counter_ >> 4) & 31;
+   triangle = triangle < 16 ? triangle : 31 - triangle;
+ 
++  if (dirty_time_ > 0 && --dirty_time_ == 0) {
++    SaveState();
++  }
++  if (step_flash_ > 0) --step_flash_;
++  if (shown_time_ < kShowTime) ++shown_time_;
++
+   switch (mode_) {
+     case UI_MODE_NORMAL:
+       {
+-        const bool color_blind = settings_->state().color_blind == 1;
+-
+-        // Selected with the buttons
+-        const int selected_row = patch_->engine % 8;
+-        const int selected_bank = patch_->engine / 8;
+-        uint32_t selected_color = pwm_counter < triangle
+-            ? BankToColor(selected_bank, color_blind, pwm_counter)
+-            : LED_COLOR_OFF;
+-
+-        // With the CV modulation applied
+-        const int active_row = active_engine_ % 8;
+-        const int active_bank = active_engine_ / 8;
+-        uint32_t active_color = BankToColor(
+-            active_bank, color_blind, pwm_counter);
+-
+-        leds_.set(active_row, active_color);
+-        leds_.mask(selected_row, selected_color);
+-      }
+-      break;
+-    
+-    case UI_MODE_DISPLAY_ALTERNATE_PARAMETERS:
+-      {
+-        for (int parameter = 0; parameter < 2; ++parameter) {
+-          float value = parameter == 0
+-              ? patch_->lpg_colour
+-              : patch_->decay;
+-          value -= 0.001f;
+-          for (int i = 0; i < 4; ++i) {
+-            leds_.set(
+-                parameter * 4 + 3 - i,
+-                value * 64.0f > pwm_counter ? LED_COLOR_YELLOW : LED_COLOR_OFF);
+-            value -= 0.25f;
++        const bool left = switches_.pressed(SWITCH_ROW_1);
++        const bool right = switches_.pressed(SWITCH_ROW_2);
++        if (flash_ != FLASH_NONE && flash_time_ < kFlashTime) {
++          ++flash_time_;
++          int pos = flash_time_ * 8 / kFlashTime;
++          for (int i = 0; i < kNumLEDs; ++i) {
++            uint32_t c = flash_ == FLASH_NEW
++                ? (i <= pos ? LED_COLOR_GREEN : LED_COLOR_OFF)
++                : (((i * 3 + pos) & 1) ? LED_COLOR_YELLOW : LED_COLOR_OFF);
++            leds_.set(i, c);
++          }
++          break;
++        }
++        flash_ = FLASH_NONE;
++        if (shown_ != SHOW_NONE && shown_time_ < kShowTime) {
++          DrawValue(pwm_counter);
++          break;
++        }
++        shown_ = SHOW_NONE;
++        // Armed: one button held long enough for NEW (green) / RANDOM (yellow).
++        if (left != right) {
++          int b = left ? 0 : 1;
++          if (press_time_[b] >= kHoldTime && !edited_while_pressed_[b] && !ignore_release_[b]) {
++            uint32_t c = b == 0 ? LED_COLOR_GREEN : LED_COLOR_YELLOW;
++            for (int i = 0; i < kNumLEDs; ++i) {
++              leds_.set(i, pwm_counter < triangle ? c : LED_COLOR_OFF);
++            }
++            break;
+           }
+         }
++        // The chord model on a yellow LED, the rest glowing green; the model
++        // LED blinks off on every step that plays.
++        const int model = voice_->active_engine() - 100;
++        if (voice_->step_played()) step_flash_ = 35;
++        const bool color_blind = settings_->state().color_blind == 1;
++        for (int i = 0; i < kNumLEDs; ++i) {
++          leds_.set(i, !color_blind && pwm_counter == 0 ? LED_COLOR_GREEN : LED_COLOR_OFF);
++        }
++        if (model >= 0 && model < kNumLEDs) {
++          leds_.set(model, step_flash_ ? LED_COLOR_OFF : LED_COLOR_YELLOW);
++        }
+       }
+       break;
+-      
++
+     case UI_MODE_DISPLAY_DATA_TRANSFER_PROGRESS:
+       {
+         if (data_transfer_progress_ == 1.0f) {
+           for (int i = 0; i < 8; ++i) {
+-            leds_.set(
+-                i, i == (triangle >> 1) ? LED_COLOR_OFF : LED_COLOR_GREEN);
++            leds_.set(i, i == (triangle >> 1) ? LED_COLOR_OFF : LED_COLOR_GREEN);
+           }
+         } else if (data_transfer_progress_ < 0.0f) {
+           for (int i = 0; i < 8; ++i) {
+-            leds_.set(
+-                i, pwm_counter < triangle ? LED_COLOR_RED : LED_COLOR_OFF);
++            leds_.set(i, pwm_counter < triangle ? LED_COLOR_RED : LED_COLOR_OFF);
+           }
+         } else {
+           float value = data_transfer_progress_ - 0.001f;
+           for (int i = 0; i < 8; ++i) {
+-            leds_.set(i, value * 128.0f > pwm_counter
+-                ? LED_COLOR_GREEN : LED_COLOR_OFF);
++            leds_.set(i, value * 128.0f > pwm_counter ? LED_COLOR_GREEN : LED_COLOR_OFF);
+             value -= 0.125f;
+           }
+         }
+@@ -209,28 +364,7 @@ void Ui::UpdateLEDs() {
+         mode_ = UI_MODE_NORMAL;
+       }
+       break;
+-    
+-    case UI_MODE_DISPLAY_OCTAVE:
+-      {
+-        int octave = static_cast<float>(octave_ * 11.0f);
+-        for (int i = 0; i < 8; ++i) {
+-          LedColor color = LED_COLOR_OFF;
+-          if (octave == 0) {
+-            color = i == (triangle >> 1) ? LED_COLOR_OFF : LED_COLOR_YELLOW;
+-          } else if (octave == 10) {
+-            color = LED_COLOR_YELLOW;
+-          } else if (octave == 9) {
+-            color = (i & 1) == ((triangle >> 3) & 1)
+-                ? LED_COLOR_OFF
+-                : LED_COLOR_YELLOW;
+-          } else {
+-            color = (octave - 1) == i ? LED_COLOR_YELLOW : LED_COLOR_OFF;
+-          }
+-          leds_.set(7 - i, color);
+-        }
+-      }
+-      break;
+-      
++
+     case UI_MODE_CALIBRATION_C1:
+       if (pwm_counter < triangle) {
+         leds_.set(0, LED_COLOR_GREEN);
+@@ -242,7 +376,7 @@ void Ui::UpdateLEDs() {
+         leds_.set(0, LED_COLOR_YELLOW);
+       }
+       break;
+-    
++
+     case UI_MODE_ERROR:
+       if (pwm_counter < triangle) {
+         for (int i = 0; i < kNumLEDs; ++i) {
+@@ -264,154 +398,11 @@ void Ui::UpdateLEDs() {
+         }
+       }
+       break;
+-      
+   }
+   leds_.Write();
+ }
+ 
+-void Ui::Navigate(int button) {
+-  ignore_release_[0] = ignore_release_[1] = true;
+-  RealignPots();
+-  if (enable_alt_navigation_) {
+-    uint8_t increment = button == 0 ? 23 : 1;
+-    patch_->engine = (patch_->engine + increment) % 24;
+-  } else {
+-    int new_bank = button + 1;
+-    int current_bank = patch_->engine / 8;
+-    int engine = patch_->engine % 8;
+-    int cycle = new_bank == current_bank ? 1 : 0;
+-    patch_->engine = new_bank * 8 + (engine + cycle) % 8;
+-  }
+-  
+-  SaveState();
+-}
+-
+-void Ui::ReadSwitches() {
+-  switches_.Debounce();
+-  
+-  switch (mode_) {
+-    case UI_MODE_NORMAL:
+-      {
+-        for (int i = 0; i < SWITCH_LAST; ++i) {
+-          if (switches_.just_pressed(Switch(i))) {
+-            press_time_[i] = 0;
+-            ignore_release_[i] = false;
+-          }
+-          if (switches_.pressed(Switch(i))) {
+-            ++press_time_[i];
+-          } else {
+-            press_time_[i] = 0;
+-          }
+-        }
+-        
+-        if (switches_.just_pressed(Switch(0))) {
+-          pots_[POTS_ADC_CHANNEL_TIMBRE_POT].Lock();
+-          pots_[POTS_ADC_CHANNEL_MORPH_POT].Lock();
+-        }
+-        if (switches_.just_pressed(Switch(1))) {
+-          pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].Lock();
+-          pots_[POTS_ADC_CHANNEL_HARMONICS_POT].Lock();
+-        }
+-        
+-        if (pots_[POTS_ADC_CHANNEL_MORPH_POT].editing_hidden_parameter() ||
+-            pots_[POTS_ADC_CHANNEL_TIMBRE_POT].editing_hidden_parameter()) {
+-          mode_ = UI_MODE_DISPLAY_ALTERNATE_PARAMETERS;
+-        }
+-        
+-        if (pots_[POTS_ADC_CHANNEL_HARMONICS_POT].editing_hidden_parameter() ||
+-            pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].editing_hidden_parameter()) {
+-          mode_ = UI_MODE_DISPLAY_OCTAVE;
+-        }
+-        
+-        // Long, double press: enter calibration mode.
+-        if (press_time_[0] >= kLongPressTime &&
+-            press_time_[1] >= kLongPressTime) {
+-          press_time_[0] = press_time_[1] = 0;
+-          RealignPots();
+-          StartCalibration();
+-        }
+-        
+-        // Long press or actually editing any hidden parameter: display value
+-        // of hidden parameters.
+-        if (press_time_[0] >= kLongPressTime && !press_time_[1]) {
+-          press_time_[0] = press_time_[1] = 0;
+-          mode_ = UI_MODE_DISPLAY_ALTERNATE_PARAMETERS;
+-        }
+-        if (press_time_[1] >= kLongPressTime && !press_time_[0]) {
+-          press_time_[0] = press_time_[1] = 0;
+-          mode_ = UI_MODE_DISPLAY_OCTAVE;
+-        }
+-        
+-        if ((switches_.released(Switch(0)) && !ignore_release_[0] && press_time_[1] > 0) || (switches_.released(Switch(1)) && !ignore_release_[1] && press_time_[0] > 0)) {
+-          ignore_release_[0] = ignore_release_[1] = true;
+-          RealignPots();
+-          enable_alt_navigation_ = !enable_alt_navigation_;
+-          SaveState();
+-        } else if (switches_.released(Switch(0)) && !ignore_release_[0]) {
+-          Navigate(0);
+-        } else if (switches_.released(Switch(1)) && !ignore_release_[1]) {
+-          Navigate(1);
+-        }
+-      }
+-      break;
+-      
+-    case UI_MODE_DISPLAY_ALTERNATE_PARAMETERS:
+-    case UI_MODE_DISPLAY_OCTAVE:
+-      for (int i = 0; i < SWITCH_LAST; ++i) {
+-        if (switches_.released(Switch(i))) {
+-          pots_[POTS_ADC_CHANNEL_TIMBRE_POT].Unlock();
+-          pots_[POTS_ADC_CHANNEL_MORPH_POT].Unlock();
+-          pots_[POTS_ADC_CHANNEL_HARMONICS_POT].Unlock();
+-          pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].Unlock();
+-          press_time_[i] = 0;
+-          mode_ = UI_MODE_NORMAL;
+-        }
+-      }
+-      break;
+-    
+-    case UI_MODE_DISPLAY_DATA_TRANSFER_PROGRESS:
+-      break;
+-    
+-    case UI_MODE_CALIBRATION_C1:
+-      for (int i = 0; i < SWITCH_LAST; ++i) {
+-        if (switches_.just_pressed(Switch(i))) {
+-          press_time_[i] = 0;
+-          ignore_release_[i] = true;
+-          CalibrateC1();
+-          break;
+-        }
+-      }
+-      break;
+-      
+-    case UI_MODE_CALIBRATION_C3:
+-      for (int i = 0; i < SWITCH_LAST; ++i) {
+-        if (switches_.just_pressed(Switch(i))) {
+-          press_time_[i] = 0;
+-          ignore_release_[i] = true;
+-          CalibrateC3();
+-          break;
+-        }
+-      }
+-      break;
+-
+-    case UI_MODE_TEST:
+-    case UI_MODE_ERROR:
+-      for (int i = 0; i < SWITCH_LAST; ++i) {
+-        if (switches_.just_pressed(Switch(i))) {
+-          press_time_[i] = 0;
+-          ignore_release_[i] = true;
+-          mode_ = UI_MODE_NORMAL;
+-        }
+-      }
+-      break;
+-  }
+-}
+-
+-void Ui::ProcessPotsHiddenParameters() {
+-  for (int i = 0; i < POTS_ADC_CHANNEL_LAST; ++i) {
+-    pots_[i].ProcessUIRate();
+-  }
+-}
++// ------------------------------------------------------------------ CV
+ 
+ /* static */
+ const CvAdcChannel Ui::normalized_channels_[] = {
+@@ -432,7 +423,7 @@ void Ui::DetectNormalization() {
+       ++normalization_detection_mismatches_[i];
+     }
+   }
+-  
++
+   ++normalization_detection_count_;
+   if (normalization_detection_count_ == kProbeSequenceDuration) {
+     normalization_detection_count_ = 0;
+@@ -451,62 +442,77 @@ void Ui::Poll() {
+   for (int i = 0; i < POTS_ADC_CHANNEL_LAST; ++i) {
+     pots_[i].ProcessControlRate(pots_adc_.float_value(PotsAdcChannel(i)));
+   }
+-  
++
+   float* destination = &modulations_->engine;
+   for (int i = 0; i < CV_ADC_CHANNEL_LAST; ++i) {
+     destination[i] = settings_->calibration_data(i).Transform(
+         cv_adc_.float_value(CvAdcChannel(i)));
+   }
+-  
++
+   ONE_POLE(pitch_lp_, modulations_->note, 0.7f);
+   modulations_->note = pitch_lp_;
+-  
++
+   ONE_POLE(
+       pitch_lp_calibration_, cv_adc_.float_value(CV_ADC_CHANNEL_V_OCT), 0.1f);
+-  
++
+   ui_task_ = (ui_task_ + 1) % 4;
+   switch (ui_task_) {
+     case 0:
+       UpdateLEDs();
+       break;
+-    
+     case 1:
+       ReadSwitches();
+       break;
+-    
+     case 2:
+-      ProcessPotsHiddenParameters();
++      ProcessPots();
+       break;
+-      
+     case 3:
+       DetectNormalization();
+       break;
+   }
+-  
++
+   cv_adc_.Convert();
+   pots_adc_.Convert();
+ 
+-  const int octave = static_cast<int>(octave_ * 11.0f);
+-  if (octave == 0) {
+-    patch_->note = -48.37f + transposition_ * 60.0f;
+-  } else if (octave == 9) {
+-    patch_->note = 53.0f + fine_tune_ * 14.0f + 12.0f * static_cast<float>(
+-        octave_quantizer_.Process(0.5f * transposition_ + 0.5f) - 4);
+-  } else if (octave == 10) {
+-    patch_->note = 60.0f + transposition_ * 48.0f;
+-  } else {
+-    const float fine = transposition_ * 7.0f;
+-    patch_->note = fine + static_cast<float>(octave) * 12.0f;
++  // Main knob layer.
++  patch_->harmonics = pots_[POTS_ADC_CHANNEL_HARMONICS_POT].main();
++  patch_->timbre = pots_[POTS_ADC_CHANNEL_TIMBRE_POT].main();
++  patch_->morph = pots_[POTS_ADC_CHANNEL_MORPH_POT].main();
++  patch_->note = 0.0f;
++
++  float env = pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].main();
++  dub_->envelope = env;
++  if (last_envelope_ < 0.0f) last_envelope_ = env;
++  if (fabsf(env - last_envelope_) > 0.02f) {
++    last_envelope_ = env;
++    Show(SHOW_ENVELOPE);
+   }
++
++  // The three attenuverters run the sequencer.
++  int density = 1 + density_quantizer_.Process(pots_[POTS_ADC_CHANNEL_TIMBRE_ATTENUVERTER].main());
++  int length = 1 + length_quantizer_.Process(pots_[POTS_ADC_CHANNEL_FM_ATTENUVERTER].main());
++  // Speed: 1/16 owns a wide zone around the centre detent.
++  static const float kSpeedEdges[dub::kNumSpeeds - 1] = { 0.1f, 0.2f, 0.3f, 0.42f, 0.58f, 0.7f, 0.82f };
++  float sv = pots_[POTS_ADC_CHANNEL_MORPH_ATTENUVERTER].main();
++  int speed = dub_->speed;
++  for (int k = 0; k < dub::kNumSpeeds; ++k) {
++    float lo = k == 0 ? -1.0f : kSpeedEdges[k - 1] - (k <= speed ? 0.015f : -0.015f);
++    float hi = k == dub::kNumSpeeds - 1 ? 2.0f : kSpeedEdges[k] + (k >= speed ? 0.015f : -0.015f);
++    if (sv >= lo && sv < hi) { speed = k; break; }
++  }
++  if (density != dub_->density) { if (pwm_counter_ > 500) Show(SHOW_DENSITY); dub_->density = density; }
++  if (length != dub_->length) { if (pwm_counter_ > 500) Show(SHOW_LENGTH); dub_->length = length; }
++  if (speed != dub_->speed) { if (pwm_counter_ > 500) Show(SHOW_SPEED); dub_->speed = speed; }
+ }
+ 
++// ------------------------------------------------------------------ calibration
++
+ void Ui::StartCalibration() {
+   mode_ = UI_MODE_CALIBRATION_C1;
+   normalization_probe_.Disable();
+ }
+ 
+ void Ui::CalibrateC1() {
+-  // Acquire offsets for all channels.
+   for (int i = 0; i < CV_ADC_CHANNEL_LAST; ++i) {
+     if (i != CV_ADC_CHANNEL_V_OCT) {
+       ChannelCalibrationData* c = settings_->mutable_calibration_data(i);
+@@ -518,13 +524,10 @@ void Ui::CalibrateC1() {
+ }
+ 
+ void Ui::CalibrateC3() {
+-  // (-33/100.0*1 + -33/140.0 * -10.0) / 3.3 * 2.0 - 1 = 0.228
+   float c1 = cv_c1_;
+-
+-  // (-33/100.0*1 + -33/140.0 * -10.0) / 3.3 * 2.0 - 1 = -0.171
+   float c3 = pitch_lp_calibration_;
+   float delta = c3 - c1;
+-  
++
+   if (delta > -0.6f && delta < -0.2f) {
+     ChannelCalibrationData* c = settings_->mutable_calibration_data(
+         CV_ADC_CHANNEL_V_OCT);
+@@ -546,44 +549,30 @@ uint8_t Ui::HandleFactoryTestingRequest(uint8_t command) {
+     case FACTORY_TESTING_READ_POT:
+       reply = pots_adc_.value(PotsAdcChannel(argument)) >> 8;
+       break;
+-      
+     case FACTORY_TESTING_READ_CV:
+       reply = (cv_adc_.value(CvAdcChannel(argument)) + 32768) >> 8;
+       break;
+-    
+     case FACTORY_TESTING_READ_NORMALIZATION:
+       reply = (&modulations_->frequency_patched)[argument] ? 0 : 255;
+-      break;      
+-    
++      break;
+     case FACTORY_TESTING_READ_GATE:
+       reply = switches_.pressed(Switch(argument));
+       break;
+-      
+     case FACTORY_TESTING_GENERATE_TEST_SIGNAL:
+-      if (argument) {
+-        mode_ = UI_MODE_TEST;
+-      } else {
+-        mode_ = UI_MODE_NORMAL;
+-      }
++      mode_ = argument ? UI_MODE_TEST : UI_MODE_NORMAL;
+       break;
+-      
+     case FACTORY_TESTING_CALIBRATE:
+-      {
+-        switch (argument) {
+-          case 0:
+-            patch_->engine = 0;
+-            StartCalibration();
+-            break;
+-          
+-          case 1:
+-            CalibrateC1();
+-            break;
+-          
+-          case 2:
+-            CalibrateC3();
+-            SaveState();
+-            break;
+-        }
++      switch (argument) {
++        case 0:
++          StartCalibration();
++          break;
++        case 1:
++          CalibrateC1();
++          break;
++        case 2:
++          CalibrateC3();
++          SaveState();
++          break;
+       }
+       break;
+   }
+diff --git a/plaits/ui.h b/plaits/ui.h
+index ad8ebe0..cd8fc2b 100644
+--- a/plaits/ui.h
++++ b/plaits/ui.h
+@@ -1,30 +1,8 @@
+-// Copyright 2016 Emilie Gillet.
++// Copyright 2016 Emilie Gillet. DUB BASE changes 2026 Narti Live.
++// MIT license, see the original Plaits sources.
+ //
+-// Author: Emilie Gillet (emilie.o.gillet@gmail.com)
+-//
+-// Permission is hereby granted, free of charge, to any person obtaining a copy
+-// of this software and associated documentation files (the "Software"), to deal
+-// in the Software without restriction, including without limitation the rights
+-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+-// copies of the Software, and to permit persons to whom the Software is
+-// furnished to do so, subject to the following conditions:
+-// 
+-// The above copyright notice and this permission notice shall be included in
+-// all copies or substantial portions of the Software.
+-// 
+-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+-// THE SOFTWARE.
+-// 
+-// See http://creativecommons.org/licenses/MIT/ for more information.
+-//
+-// -----------------------------------------------------------------------------
+-//
+-// UI and CV processing ("controller" and "view")
++// User interface: two hidden knob layers (hold LEFT = sound, hold RIGHT =
++// sequence), button gestures for NEW / MUTATE / BACK / RANDOM / EVOLVE.
+ 
+ #ifndef PLAITS_UI_H_
+ #define PLAITS_UI_H_
+@@ -39,7 +17,7 @@
+ #include "plaits/drivers/pots_adc.h"
+ #include "plaits/drivers/switches.h"
+ #include "plaits/dsp/voice.h"
+-#include "plaits/pot_controller.h"
++#include "plaits/dub/dub.h"
+ #include "plaits/settings.h"
+ 
+ namespace plaits {
+@@ -49,8 +27,6 @@ const int kProbeSequenceDuration = 32;
+ 
+ enum UiMode {
+   UI_MODE_NORMAL,
+-  UI_MODE_DISPLAY_ALTERNATE_PARAMETERS,
+-  UI_MODE_DISPLAY_OCTAVE,
+   UI_MODE_DISPLAY_DATA_TRANSFER_PROGRESS,
+   UI_MODE_CALIBRATION_C1,
+   UI_MODE_CALIBRATION_C3,
+@@ -67,77 +43,168 @@ enum FactoryTestingCommand {
+   FACTORY_TESTING_READ_NORMALIZATION,
+ };
+ 
++// What the LEDs are showing for a moment after a control moves.
++enum DubShow {
++  SHOW_NONE,
++  SHOW_ENVELOPE,
++  SHOW_OCTAVE,
++  SHOW_RESONANCE,
++  SHOW_DENSITY,
++  SHOW_LENGTH,
++  SHOW_SPEED,
++};
++
++enum DubFlash {
++  FLASH_NONE,
++  FLASH_NEW,
++  FLASH_RANDOM,
++};
++
++// A knob with one main and two hidden parameters (one per button).
++class DubPot {
++ public:
++  void Init(float lp) {
++    lp_ = lp;
++    value_ = previous_ = stored_ = 0.0f;
++    locked_ = false;
++    editing_ = false;
++    catching_up_ = false;
++    main_ = 0.0f;
++    hidden_[0] = hidden_[1] = 0.0f;
++    edited_layer_ = -1;
++    primed_ = false;
++  }
++  inline void ProcessControlRate(float adc) {
++    if (!primed_) { value_ = previous_ = adc; primed_ = true; }
++    value_ += lp_ * (adc - value_);
++    if (!locked_ && !catching_up_) main_ = value_;
++  }
++  // layer: -1 none held, 0 or 1 = hidden layer of the held button
++  inline bool ProcessUiRate(int layer) {
++    bool changed = false;
++    if (layer >= 0) {
++      if (!locked_) {
++        locked_ = true;
++        editing_ = false;
++        stored_ = main_;
++        previous_ = value_;
++      }
++      if (!editing_ && fabsf(value_ - previous_) > 0.03f) {
++        editing_ = true;
++        edited_layer_ = layer;
++      }
++      if (editing_) {
++        hidden_[layer] = value_;
++        changed = true;
++      }
++    } else {
++      if (locked_) {
++        locked_ = false;
++        if (editing_) {
++          catching_up_ = true;
++          main_ = stored_;
++        }
++        editing_ = false;
++        previous_ = value_;
++      }
++      if (catching_up_) {
++        if (fabsf(value_ - previous_) > 0.005f) {
++          float delta = value_ - previous_;
++          float skew = delta > 0.0f
++              ? (1.001f - stored_) / (1.001f - previous_)
++              : (0.001f + stored_) / (0.001f + previous_);
++          CONSTRAIN(skew, 0.1f, 10.0f);
++          stored_ += skew * delta;
++          CONSTRAIN(stored_, 0.0f, 1.0f);
++          if (fabsf(stored_ - value_) < 0.005f) catching_up_ = false;
++          previous_ = value_;
++          main_ = stored_;
++        }
++      } else {
++        previous_ = value_;
++      }
++    }
++    return changed;
++  }
++  // Jump the main parameter (RANDOM); the knob catches up when moved.
++  inline void Override(float v) {
++    stored_ = main_ = v;
++    previous_ = value_;
++    catching_up_ = true;
++  }
++  inline void Realign() { catching_up_ = false; locked_ = false; editing_ = false; }
++  inline float main() const { return main_; }
++  inline float hidden(int layer) const { return hidden_[layer]; }
++  inline float value() const { return value_; }
++  inline bool editing() const { return editing_; }
++  inline int edited_layer() const { return edited_layer_; }
++  inline void set_hidden(int layer, float v) { hidden_[layer] = v; }
++ private:
++  float lp_, value_, previous_, stored_, main_;
++  float hidden_[2];
++  bool locked_, editing_, catching_up_, primed_;
++  int edited_layer_;
++};
++
+ class Ui {
+  public:
+   Ui() { }
+   ~Ui() { }
+-  
+-  void Init(Patch* patch, Modulations* modulations, Settings* settings);
+-  
++
++  void Init(Patch* patch, Modulations* modulations, Settings* settings,
++            dub::Settings* dub_settings, Voice* voice);
++
+   void Poll();
+-  
+-  void set_active_engine(int active_engine) {
+-    active_engine_ = active_engine;
+-  }
+-  
++
+   void DisplayDataTransferProgress(float progress) {
+     mode_ = UI_MODE_DISPLAY_DATA_TRANSFER_PROGRESS;
+     data_transfer_progress_ = progress;
+-    // Cut in half the animation time when the transfer is over or to report
+-    // an error.
+     pwm_counter_ = progress == 1.0f || progress < 0.0f ? 1500 : 0;
+   }
+-  
++
+   inline bool test_mode() const {
+     return mode_ == UI_MODE_TEST;
+   }
+ 
+   uint8_t HandleFactoryTestingRequest(uint8_t command);
+-  
++
+  private:
+   void UpdateLEDs();
+   void ReadSwitches();
+-  void ProcessPotsHiddenParameters();
++  void ProcessPots();
+   void LoadState();
+   void SaveState();
+   void DetectNormalization();
++  void Navigate(int direction);
++  void Flash(DubFlash f) { flash_ = f; flash_time_ = 0; }
++  void Show(DubShow s) { shown_ = s; shown_time_ = 0; }
++  void DrawValue(int pwm);
+ 
+-  void Navigate(int button);
+-  uint32_t BankToColor(int bank, bool color_blind, int pwm_counter);
+-  
+   void StartCalibration();
+   void CalibrateC1();
+   void CalibrateC3();
+ 
+-  void RealignPots() {
+-    for (int i = POTS_ADC_CHANNEL_FREQUENCY_POT;
+-         i <= POTS_ADC_CHANNEL_MORPH_POT; ++i) {
+-      pots_[i].Realign();
+-    }
+-  }
+-  
+   UiMode mode_;
+-  
++
+   CvAdc cv_adc_;
+   PotsAdc pots_adc_;
+   Leds leds_;
+   Switches switches_;
+-  
++
+   int ui_task_;
+-  
++
+   float data_transfer_progress_;
+-  float fine_tune_;
+-  float transposition_;
+-  float octave_;
+   Patch* patch_;
+   Modulations* modulations_;
++  dub::Settings* dub_;
++  Voice* voice_;
+   NormalizationProbe normalization_probe_;
+-  PotController pots_[POTS_ADC_CHANNEL_LAST];
++  DubPot pots_[POTS_ADC_CHANNEL_LAST];
+   float pitch_lp_;
+   float pitch_lp_calibration_;
+-  
++
+   Settings* settings_;
+-  
++
+   int normalization_detection_count_;
+   int normalization_detection_mismatches_[kNumNormalizedChannels];
+   uint32_t normalization_probe_state_;
+@@ -145,16 +212,23 @@ class Ui {
+   int pwm_counter_;
+   int press_time_[SWITCH_LAST];
+   bool ignore_release_[SWITCH_LAST];
+-  
+-  int active_engine_;
+-  bool enable_alt_navigation_;
+-  
++  bool edited_while_pressed_[SWITCH_LAST];
++  int both_pressed_time_;
++
++  DubFlash flash_;
++  int flash_time_;
++  DubShow shown_;
++  int shown_time_;
++  int step_flash_;
++  int dirty_time_;
++  float last_envelope_;
++  stmlib::HysteresisQuantizer2 density_quantizer_;
++  stmlib::HysteresisQuantizer2 length_quantizer_;
++
+   float cv_c1_;  // For calibration
+-  
+-  stmlib::HysteresisQuantizer2 octave_quantizer_;
+-  
++
+   static const CvAdcChannel normalized_channels_[kNumNormalizedChannels];
+-    
++
+   DISALLOW_COPY_AND_ASSIGN(Ui);
+ };
+ 
+-- 
+2.43.0
+

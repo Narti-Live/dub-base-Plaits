@@ -1,0 +1,120 @@
+From a027b0c54e276de8bbdeff2543bc1661ca089666 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 20 Oct 2026 19:33:23 +0200
+Subject: [PATCH 4/6] DUB BASE v1.4: output leveler, no more distortion
+
+6 dB headroom + peak limiter before a clean-below-half-scale knee
+clipper. Soft-clip distortion was up to 28 % with long envelopes and
+high resonance; now under 0.5 % on every model.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_0136WGYBVJqXHJBPS2niCsJ8
+---
+ plaits/dub/dub.cc |  8 +++++---
+ plaits/dub/dub.h  | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 34 insertions(+), 4 deletions(-)
+
+diff --git a/plaits/dub/dub.cc b/plaits/dub/dub.cc
+index af3351a..67441f6 100644
+--- a/plaits/dub/dub.cc
++++ b/plaits/dub/dub.cc
+@@ -33,6 +33,8 @@ static inline float RandBipolar() { return Random::GetFloat() * 2.0f - 1.0f; }
+ 
+ // One knob for the whole envelope: fully left = short dark pluck, noon = dub
+ // stab, fully right = long swell with a big filter sweep.
++const float Leveler::kCeiling = 0.5f;
++
+ void ComputeShape(const Settings& s, Shape* shape) {
+   float v = s.envelope;
+   CONSTRAIN(v, 0.0f, 1.0f);
+@@ -319,6 +321,7 @@ void Sequencer::ProcessLfo() {
+ // ------------------------------------------------------------------ poly synth
+ 
+ void PolySynth::Init() {
++  leveler_.Init();
+   for (int i = 0; i < kNumPolyVoices; ++i) {
+     Voice& v = voice_[i];
+     v.env.Init();
+@@ -591,7 +594,7 @@ void PolySynth::Render(
+     }
+     float y = filter_.Process<FILTER_MODE_LOW_PASS>(x);
+     lp_ += g1 * (y - lp_);
+-    out[n] = SoftClip(lp_ * level);
++    out[n] = leveler_.Process(lp_) * level;
+     float e = sub_env_.Next();
+     aux[n] = Sine(sub_phase_) * e * 0.55f * level;
+     Advance(&sub_phase_, sub_increment_);
+@@ -617,8 +620,7 @@ void PostShaper::Process(const Shape& shape, float level, float cutoff_ratio,
+     float e = ev * level;
+     float a = f_[0].Process<FILTER_MODE_LOW_PASS>(out[n]);
+     lp += g1 * (a - lp);
+-    out[n] = SoftClip(lp * e);   // the resonant filter can push loud engines over
+-    aux[n] = SoftClip(aux[n] * e);
++    out[n] = leveler_.Process(lp * e);   // the resonant filter can push loud engines over
+   }
+   if (es == 2 && ev < 0.0002f) { ev = 0.0f; es = 0; }
+   env_.Store(ev, es);
+diff --git a/plaits/dub/dub.h b/plaits/dub/dub.h
+index 2b07240..c662e28 100644
+--- a/plaits/dub/dub.h
++++ b/plaits/dub/dub.h
+@@ -154,6 +154,32 @@ class Envelope {
+ };
+ 
+ 
++// Output leveler (v1.4): 6 dB of headroom, then a peak limiter (fast attack,
++// ~0.7 s release) keeps stacked chords and resonance out of the soft clipper,
++// which used to distort them.
++class Leveler {
++ public:
++  void Init() { peak_ = 0.0f; }
++  inline float Process(float x) {
++    x *= 0.5f;
++    const float a = x < 0.0f ? -x : x;
++    if (a > peak_) peak_ += (a - peak_) * 0.25f;
++    else peak_ *= 0.99996f;
++    if (peak_ > kCeiling) x *= kCeiling / peak_;
++    return Knee(x);
++  }
++  // Clean (linear) up to half scale, then a smooth knee up to full scale.
++  static inline float Knee(float x) {
++    const float a = x < 0.0f ? -x : x;
++    if (a <= 0.5f) return x;
++    const float y = 0.5f + 0.5f * stmlib::SoftClip((a - 0.5f) * 2.0f);
++    return x < 0.0f ? -y : y;
++  }
++ private:
++  static const float kCeiling;
++  float peak_;
++};
++
+ // Six light polyphonic chord models with per-voice envelope + filter,
+ // and a sub-bass sine on AUX that follows the chord root.
+ class PolySynth {
+@@ -185,13 +211,14 @@ class PolySynth {
+   float chuff_;
+   float sub_phase_, sub_increment_;
+   Envelope sub_env_;
++  Leveler leveler_;
+   DISALLOW_COPY_AND_ASSIGN(PolySynth);
+ };
+ 
+ // Envelope + low-pass applied after a Plaits engine (replaces the LPG).
+ class PostShaper {
+  public:
+-  void Init() { env_.Init(); f_[0].Init(); f_[1].Init(); lp_[0] = lp_[1] = 0.0f; }
++  void Init() { env_.Init(); f_[0].Init(); f_[1].Init(); lp_[0] = lp_[1] = 0.0f; leveler_.Init(); }
+   void Trigger(const Shape& shape, bool accent) {
+     env_.Trigger(shape.attack_s, shape.decay_s);
+     accent_ = accent ? 1.0f : 0.0f;
+@@ -204,6 +231,7 @@ class PostShaper {
+   stmlib::Svf f_[2];
+   float lp_[2];
+   float accent_;
++  Leveler leveler_;
+ };
+ 
+ }  // namespace dub
+-- 
+2.43.0
+

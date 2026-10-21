@@ -1,0 +1,374 @@
+From e92ac6f3e8ea5ccc6cd582082c81392ab8b52ed6 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 20 Oct 2026 16:51:16 +0200
+Subject: [PATCH 3/6] DUB BASE v1.3: AUX = 1 V/oct pitch CV of the chord root,
+ CV TUNE
+
+AUX now holds the root note of each chord (C3 = 0 V). Both buttons 2 s
+enter CV TUNE (AUX alternates 0 V / +2 V, FREQUENCY trims the scale,
+tap saves it with the calibration data); 4 s = CV input calibration.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_0136WGYBVJqXHJBPS2niCsJ8
+---
+ plaits/dsp/voice.cc | 35 +++++++++++++++---
+ plaits/dsp/voice.h  |  5 +++
+ plaits/dub/dub.cc   |  2 ++
+ plaits/dub/dub.h    |  5 +++
+ plaits/settings.h   | 16 +++++++++
+ plaits/ui.cc        | 87 +++++++++++++++++++++++++++++++++++++++++++--
+ plaits/ui.h         |  8 ++++-
+ 7 files changed, 151 insertions(+), 7 deletions(-)
+
+diff --git a/plaits/dsp/voice.cc b/plaits/dsp/voice.cc
+index 5ccc26d..9ae7d85 100644
+--- a/plaits/dsp/voice.cc
++++ b/plaits/dsp/voice.cc
+@@ -27,6 +27,7 @@
+ // Main synthesis voice.
+ 
+ #include "plaits/dsp/voice.h"
++#include "plaits/dsp/oscillator/sine_oscillator.h"
+ #include "plaits/user_data.h"
+ 
+ namespace plaits {
+@@ -92,11 +93,23 @@ void Voice::Init(BufferAllocator* allocator) {
+   post_shaper_.Init();
+   mono_note_ = 48.0f;
+   chord_note_ = 48.0f;
++  cv_note_ = dub::kCvZeroNote;
++  tune_phase_ = 0.0f;
+   gate_blocks_ = 0;
+   active_display_ = 0;
+   step_played_ = false;
+ }
+ 
++// AUX is a 1 V/oct pitch CV of the chord root (C3 = 0 V), held between chords.
++void Voice::WriteCv(const dub::Settings& ds, float note, Frame* frames, size_t size) {
++  float volts = (note - dub::kCvZeroNote) * (1.0f / 12.0f);
++  // Negative codes give positive volts (the output stage inverts, see
++  // ChannelPostProcessor's -32767 gain).
++  int32_t code = static_cast<int32_t>(-volts * ds.cv_scale + (volts > 0.0f ? -0.5f : 0.5f));
++  short s = static_cast<short>(stmlib::Clip16(code));
++  for (size_t i = 0; i < size; ++i) frames[i].aux = s;
++}
++
+ // Registry indices of the Plaits engines that can play sequencer chords.
+ static const int kChordEngineIndex = 14;
+ static const int kStringMachineIndex = 6;
+@@ -118,6 +131,21 @@ void Voice::Render(
+   const bool fired = sequencer_.Process(
+       ds, modulations.trigger, modulations.trigger_patched, &event);
+   step_played_ = fired;
++  if (fired) cv_note_ = event.root;
++
++  // CV TUNE: AUX alternates 0 V / +2 V, OUT plays the same notes as a sine.
++  if (ds.cv_tune) {
++    const float note = ds.cv_tune == 1 ? dub::kCvZeroNote : dub::kCvZeroNote + 24.0f;
++    const float f = NoteToFrequency(note);
++    for (size_t i = 0; i < size; ++i) {
++      tune_phase_ += f;
++      if (tune_phase_ >= 1.0f) tune_phase_ -= 1.0f;
++      frames[i].out = static_cast<short>(stmlib::Clip16(static_cast<int32_t>(
++          -SineNoWrap(tune_phase_) * 12000.0f)));
++    }
++    WriteCv(ds, note, frames, size);
++    return;
++  }
+ 
+   dub::Shape shape;
+   dub::ComputeShape(ds, &shape);
+@@ -156,8 +184,7 @@ void Voice::Render(
+         out_buffer_, aux_buffer_, size);
+     out_post_processor_.Process(1.0f, true, 1.0f, 1.0f, 0.0f,
+         out_buffer_, &frames->out, size, 2);
+-    aux_post_processor_.Process(1.0f, true, 1.0f, 1.0f, 0.0f,
+-        aux_buffer_, &frames->aux, size, 2);
++    WriteCv(ds, cv_note_, frames, size);
+     return;
+   }
+ 
+@@ -206,8 +233,8 @@ void Voice::Render(
+   const PostProcessingSettings& pp_s = e->post_processing_settings;
+   out_post_processor_.Process(pp_s.out_gain, true, 1.0f, 1.0f, 0.0f,
+       out_buffer_, &frames->out, size, 2);
+-  aux_post_processor_.Process(pp_s.aux_gain, true, 1.0f, 1.0f, 0.0f,
+-      aux_buffer_, &frames->aux, size, 2);
++  (void)pp_s;
++  WriteCv(ds, cv_note_, frames, size);
+ }
+ 
+ }  // namespace plaits
+diff --git a/plaits/dsp/voice.h b/plaits/dsp/voice.h
+index 883b67f..ed4f31c 100644
+--- a/plaits/dsp/voice.h
++++ b/plaits/dsp/voice.h
+@@ -183,6 +183,8 @@ class Voice {
+   inline dub::Sequencer* mutable_sequencer() { return &sequencer_; }
+   inline bool step_played() const { return step_played_; }
+   inline bool clock_ticked() const { return sequencer_.clock_tick(); }
++  // Root note of the last chord, as sent to AUX (1 V/oct, C3 = 0 V).
++  inline float cv_note() const { return cv_note_; }
+     
+  private:
+   void ComputeDecayParameters(const Patch& settings);
+@@ -240,8 +242,11 @@ class Voice {
+   dub::Sequencer sequencer_;
+   dub::PolySynth poly_synth_;
+   dub::PostShaper post_shaper_;
++  void WriteCv(const dub::Settings& ds, float note, Frame* frames, size_t size);
+   float mono_note_;
+   float chord_note_;
++  float cv_note_;
++  float tune_phase_;
+   int gate_blocks_;
+   int active_display_;
+   bool step_played_;
+diff --git a/plaits/dub/dub.cc b/plaits/dub/dub.cc
+index ba8a7f8..af3351a 100644
+--- a/plaits/dub/dub.cc
++++ b/plaits/dub/dub.cc
+@@ -128,6 +128,8 @@ void DefaultSettings(Settings* s) {
+   s->octave = 3;
+   s->chord_model = 0;  // DUB SAW
+   s->transpose = 0;
++  s->cv_tune = 0;
++  s->cv_scale = kDefaultCvScale;
+ }
+ 
+ // ------------------------------------------------------------------ sequencer
+diff --git a/plaits/dub/dub.h b/plaits/dub/dub.h
+index 20faf7c..2b07240 100644
+--- a/plaits/dub/dub.h
++++ b/plaits/dub/dub.h
+@@ -29,8 +29,13 @@ struct Settings {
+   uint8_t octave;       // LEFT + FREQUENCY, 1..5
+   uint8_t chord_model;  // buttons, 0..7
+   int8_t transpose;     // V/OCT, in scale degrees (set by the voice)
++  uint8_t cv_tune;      // CV TUNE mode: 0 off, 1 = AUX at 0 V (C3), 2 = AUX at +2 V (C5)
++  float cv_scale;       // AUX pitch CV: DAC counts per volt (set in CV TUNE)
+ };
+ 
++const float kDefaultCvScale = 6553.6f;   // assumes +/-5 V full scale; CV TUNE trims it
++const float kCvZeroNote = 48.0f;         // C3 = 0 V on AUX
++
+ void DefaultSettings(Settings* s);
+ 
+ // What the envelope knob and resonance turn into.
+diff --git a/plaits/settings.h b/plaits/settings.h
+index 42e4a94..164c75c 100644
+--- a/plaits/settings.h
++++ b/plaits/settings.h
+@@ -30,6 +30,8 @@
+ #define PLAITS_SETTINGS_H_
+ 
+ #include "stmlib/stmlib.h"
++
++#include <cstring>
+ #include "stmlib/system/storage.h"
+ 
+ #include "plaits/drivers/cv_adc.h"
+@@ -81,6 +83,20 @@ class Settings {
+     return &persistent_data_.channel_calibration_data[channel];
+   }
+ 
++  // AUX pitch CV scale (CV TUNE), stored in the calibration data padding.
++  inline bool cv_scale(float* scale) const {
++    uint32_t tag;
++    memcpy(&tag, &persistent_data_.padding[4], 4);
++    if (tag != 0x43534356) return false;  // 'VCSC'
++    memcpy(scale, &persistent_data_.padding[0], 4);
++    return *scale > 1000.0f && *scale < 30000.0f;
++  }
++  inline void set_cv_scale(float scale) {
++    uint32_t tag = 0x43534356;
++    memcpy(&persistent_data_.padding[0], &scale, 4);
++    memcpy(&persistent_data_.padding[4], &tag, 4);
++  }
++
+   inline const State& state() const {
+     return state_;
+   }
+diff --git a/plaits/ui.cc b/plaits/ui.cc
+index 0cf67c3..af93787 100644
+--- a/plaits/ui.cc
++++ b/plaits/ui.cc
+@@ -17,6 +17,7 @@
+ #include <algorithm>
+ 
+ #include "stmlib/dsp/dsp.h"
++#include "stmlib/dsp/units.h"
+ #include "stmlib/system/system_clock.h"
+ #include "stmlib/utils/random.h"
+ 
+@@ -27,7 +28,8 @@ using namespace stmlib;
+ 
+ static const int kTapTime = 600;          // ms: shorter press = previous / next
+ static const int kHoldTime = 1000;        // ms: longer press = NEW / RANDOM
+-static const int kCalibrationTime = 2000; // ms: both held = calibration
++static const int kCalibrationTime = 2000; // ms: both held = CV TUNE (again: input calibration)
++static const int kTunePhase = 2000;       // ms per reference note in CV TUNE
+ static const int kSaveDelay = 2000;       // ms after the last change
+ static const int kFlashTime = 450;
+ static const int kShowTime = 1000;
+@@ -55,6 +57,10 @@ void Ui::Init(Patch* patch, Modulations* modulations, Settings* settings,
+   length_quantizer_.Init(16, 0.25f, true);
+ 
+   LoadState();
++  float scale;
++  if (settings_->cv_scale(&scale)) dub_->cv_scale = scale;
++  tune_time_ = 0;
++  tune_moved_ = false;
+ 
+   if (switches_.pressed_immediate(SWITCH_ROW_2)) {
+     State* state = settings_->mutable_state();
+@@ -182,7 +188,7 @@ void Ui::ReadSwitches() {
+           ignore_release_[0] = ignore_release_[1] = true;
+           if (++both_pressed_time_ >= kCalibrationTime) {
+             both_pressed_time_ = 0;
+-            StartCalibration();
++            StartCvTune();
+             break;
+           }
+         } else {
+@@ -213,6 +219,43 @@ void Ui::ReadSwitches() {
+     case UI_MODE_DISPLAY_DATA_TRANSFER_PROGRESS:
+       break;
+ 
++    case UI_MODE_CV_TUNE:
++      {
++        // Both held 2 s more: the original CV input calibration.
++        const bool both = switches_.pressed_immediate(SWITCH_ROW_1) &&
++            switches_.pressed_immediate(SWITCH_ROW_2);
++        if (both) {
++          if (++both_pressed_time_ >= kCalibrationTime) {
++            both_pressed_time_ = 0;
++            EndCvTune();
++            StartCalibration();
++            break;
++          }
++        } else {
++          both_pressed_time_ = 0;
++        }
++        for (int i = 0; i < SWITCH_LAST; ++i) {
++          if (switches_.just_pressed(Switch(i))) {
++            ignore_release_[i] = false;
++            press_time_[i] = 0;
++          }
++          if (switches_.pressed(Switch(i))) ++press_time_[i];
++          if (switches_.released(Switch(i)) && !ignore_release_[i] && !both) {
++            // A tap saves the scale and goes back to playing.
++            EndCvTune();
++            settings_->set_cv_scale(dub_->cv_scale);
++            settings_->SavePersistentData();
++            ignore_release_[0] = ignore_release_[1] = true;
++            break;
++          }
++        }
++        if (mode_ != UI_MODE_CV_TUNE) break;   // just saved and left
++        // Reference notes alternate: AUX 0 V (C3) and +2 V (C5).
++        tune_time_ = (tune_time_ + 1) % (2 * kTunePhase);
++        dub_->cv_tune = tune_time_ < kTunePhase ? 1 : 2;
++      }
++      break;
++
+     case UI_MODE_CALIBRATION_C1:
+       for (int i = 0; i < SWITCH_LAST; ++i) {
+         if (switches_.just_pressed(Switch(i))) {
+@@ -365,6 +408,19 @@ void Ui::UpdateLEDs() {
+       }
+       break;
+ 
++    case UI_MODE_CV_TUNE:
++      {
++        // LEDs 1-4 = low note (0 V), LEDs 5-8 = high note (+2 V); the
++        // red LED shows how far the scale is trimmed from the default.
++        const int first = dub_->cv_tune == 1 ? 0 : 4;
++        for (int i = 0; i < 4; ++i) leds_.set(first + i, LED_COLOR_GREEN);
++        float trim = dub_->cv_scale / dub::kDefaultCvScale;
++        int pos = static_cast<int>(3.5f + (trim - 1.0f) * 10.0f + 0.5f);
++        CONSTRAIN(pos, 0, 7);
++        if (pwm_counter < 8) leds_.set(pos, LED_COLOR_RED);
++      }
++      break;
++
+     case UI_MODE_CALIBRATION_C1:
+       if (pwm_counter < triangle) {
+         leds_.set(0, LED_COLOR_GREEN);
+@@ -480,6 +536,15 @@ void Ui::Poll() {
+   patch_->morph = pots_[POTS_ADC_CHANNEL_MORPH_POT].main();
+   patch_->note = 0.0f;
+ 
++  if (mode_ == UI_MODE_CV_TUNE) {
++    // FREQUENCY trims the CV scale (relative to where the knob was).
++    float v = pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].value();
++    if (!tune_moved_ && fabsf(v - tune_knob_) > 0.02f) tune_moved_ = true;
++    if (tune_moved_) {
++      dub_->cv_scale = tune_scale_ * stmlib::SemitonesToRatio((v - tune_knob_) * 18.0f);
++    }
++    return;
++  }
+   float env = pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].main();
+   dub_->envelope = env;
+   if (last_envelope_ < 0.0f) last_envelope_ = env;
+@@ -507,6 +572,24 @@ void Ui::Poll() {
+ 
+ // ------------------------------------------------------------------ calibration
+ 
++void Ui::StartCvTune() {
++  mode_ = UI_MODE_CV_TUNE;
++  tune_time_ = 0;
++  tune_moved_ = false;
++  tune_knob_ = pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].value();
++  tune_scale_ = dub_->cv_scale;
++  tune_envelope_ = dub_->envelope;
++  dub_->cv_tune = 1;
++  ignore_release_[0] = ignore_release_[1] = true;
++}
++
++void Ui::EndCvTune() {
++  mode_ = UI_MODE_NORMAL;
++  dub_->cv_tune = 0;
++  // The envelope stays where it was; the knob picks it up when turned.
++  pots_[POTS_ADC_CHANNEL_FREQUENCY_POT].Override(tune_envelope_);
++}
++
+ void Ui::StartCalibration() {
+   mode_ = UI_MODE_CALIBRATION_C1;
+   normalization_probe_.Disable();
+diff --git a/plaits/ui.h b/plaits/ui.h
+index cd8fc2b..07025f5 100644
+--- a/plaits/ui.h
++++ b/plaits/ui.h
+@@ -31,7 +31,8 @@ enum UiMode {
+   UI_MODE_CALIBRATION_C1,
+   UI_MODE_CALIBRATION_C3,
+   UI_MODE_TEST,
+-  UI_MODE_ERROR
++  UI_MODE_ERROR,
++  UI_MODE_CV_TUNE
+ };
+ 
+ enum FactoryTestingCommand {
+@@ -180,6 +181,8 @@ class Ui {
+   void Show(DubShow s) { shown_ = s; shown_time_ = 0; }
+   void DrawValue(int pwm);
+ 
++  void StartCvTune();
++  void EndCvTune();
+   void StartCalibration();
+   void CalibrateC1();
+   void CalibrateC3();
+@@ -226,6 +229,9 @@ class Ui {
+   stmlib::HysteresisQuantizer2 length_quantizer_;
+ 
+   float cv_c1_;  // For calibration
++  int tune_time_;
++  float tune_knob_, tune_scale_, tune_envelope_;
++  bool tune_moved_;
+ 
+   static const CvAdcChannel normalized_channels_[kNumNormalizedChannels];
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,30 @@
+From 99fde2bfdb66c2c9fa6f78fe14157e987b33b45e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 20 Oct 2026 16:34:54 +0200
+Subject: [PATCH 2/6] Pin stmlib and stm_audio_bootloader to the versions DUB
+ BASE v1.2 is built with
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_0136WGYBVJqXHJBPS2niCsJ8
+---
+ stm_audio_bootloader | 2 +-
+ stmlib               | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/stm_audio_bootloader b/stm_audio_bootloader
+index 1ec7d63..b376bd6 160000
+--- a/stm_audio_bootloader
++++ b/stm_audio_bootloader
+@@ -1 +1 @@
+-Subproject commit 1ec7d6374e2d305cb710170eb80de9b66e795792
++Subproject commit b376bd644871edc06f9ee75fb95be516a10ab394
+diff --git a/stmlib b/stmlib
+index e3bd7c9..d18def8 160000
+--- a/stmlib
++++ b/stmlib
+@@ -1 +1 @@
+-Subproject commit e3bd7c9cc00e4364166f9905c0509b6ffd0535ec
++Subproject commit d18def816c51d1da0c108236928b2bbd25c17481
+-- 
+2.43.0
+
