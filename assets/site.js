@@ -191,30 +191,55 @@
   });
 })();
 
-// Beta testing: files are AES-GCM encrypted (key from the password via
-// PBKDF2-SHA256, 600k rounds) and only decrypted in the browser.
+// Beta testing: files are AES-256-GCM encrypted. The key comes from the
+// password through PBKDF2-SHA256 with 2,000,000 rounds (deliberately slow),
+// is derived once per unlock and kept only in memory, never stored.
+// After 2 wrong passwords the form locks for 2 minutes (doubling each time).
 (function () {
   var form = document.getElementById('betaLock');
   if (!form || !window.crypto || !crypto.subtle) return;
-  var pwEl = document.getElementById('betaPw'), msg = document.getElementById('betaMsg');
+  var pwEl = document.getElementById('betaPw'), go = document.getElementById('betaGo'), msg = document.getElementById('betaMsg');
   var wrap = document.getElementById('betaWrap'), open = document.getElementById('betaOpen');
   var list = document.getElementById('betaList'), note = document.getElementById('betaNote');
-  var pw = null, cache = {};
-  async function decrypt(buf, password) {
-    var b = new Uint8Array(buf), salt = b.slice(0, 16), iv = b.slice(16, 28), data = b.slice(28);
+  var key = null, cache = {}, busy = false, timer = null;
+  var LS = 'dubBetaGuard';
+  function guard() { try { return JSON.parse(localStorage.getItem(LS)) || { fails: 0, locks: 0, until: 0 }; } catch (e) { return { fails: 0, locks: 0, until: 0 }; } }
+  function save(g) { try { localStorage.setItem(LS, JSON.stringify(g)); } catch (e) {} }
+  function header(b) {
+    if (b[0] !== 68 || b[1] !== 66 || b[2] !== 50) throw new Error('format');      // "DB2"
+    var it = b[3] | (b[4] << 8) | (b[5] << 16) | (b[6] << 24);
+    return { iter: it >>> 0, salt: b.slice(7, 23), iv: b.slice(23, 35), data: b.slice(35) };
+  }
+  async function deriveKey(password, h) {
     var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
-    var key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salt, iterations: 600000, hash: 'SHA-256' },
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: h.salt, iterations: h.iter, hash: 'SHA-256' },
       base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, data);
+  }
+  async function decrypt(buf) {
+    var h = header(new Uint8Array(buf));
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: h.iv }, key, h.data);
   }
   async function blobUrl(f) {
     if (cache[f.file]) return cache[f.file];
     var r = await fetch('beta/' + f.file);
-    var plain = await decrypt(await r.arrayBuffer(), pw);
+    var plain = await decrypt(await r.arrayBuffer());
     var type = f.kind === 'wav' ? 'audio/wav' : (f.kind === 'apk' ? 'application/vnd.android.package-archive' : 'application/octet-stream');
     return (cache[f.file] = URL.createObjectURL(new Blob([plain], { type: type })));
   }
   function mb(n) { return n > 1e6 ? (n / 1e6).toFixed(1) + ' MB' : Math.round(n / 1e3) + ' KB'; }
+  function lockedFor() { return Math.max(0, guard().until - Date.now()); }
+  function tick() {
+    var ms = lockedFor();
+    if (ms > 0) {
+      var s = Math.ceil(ms / 1000);
+      pwEl.disabled = go.disabled = true;
+      msg.textContent = 'Too many attempts — wait ' + Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);
+      clearTimeout(timer); timer = setTimeout(tick, 500);
+    } else {
+      pwEl.disabled = go.disabled = false;
+      if (/Too many/.test(msg.textContent)) msg.textContent = '';
+    }
+  }
   function show(man) {
     wrap.classList.add('unlocked');
     form.hidden = true; open.hidden = false;
@@ -241,19 +266,28 @@
   }
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    var p = pwEl.value.trim();
+    if (busy || lockedFor() > 0) { tick(); return; }
+    var p = pwEl.value;
     if (!p) return;
-    msg.textContent = 'Checking…';
+    busy = true; go.disabled = true; msg.textContent = 'Checking…';
     try {
-      var r = await fetch('beta/m.bin');
-      var man = JSON.parse(new TextDecoder().decode(await decrypt(await r.arrayBuffer(), p)));
-      pw = p; msg.textContent = '';
-      try { sessionStorage.setItem('dubBeta', p); } catch (x) {}
+      var buf = await (await fetch('beta/m.bin')).arrayBuffer();
+      key = await deriveKey(p, header(new Uint8Array(buf)));
+      var man = JSON.parse(new TextDecoder().decode(await decrypt(buf)));
+      pwEl.value = ''; msg.textContent = '';
+      save({ fails: 0, locks: 0, until: 0 });
       show(man);
     } catch (err) {
-      msg.textContent = 'Wrong password';
+      key = null;
+      var g = guard(); g.fails++;
+      if (g.fails >= 2) { g.until = Date.now() + 120000 * Math.pow(2, Math.min(g.locks, 6)); g.locks++; g.fails = 0; }
+      save(g);
+      pwEl.value = '';
+      msg.textContent = g.until > Date.now() ? '' : 'Wrong password — 1 try left before a 2 minute wait';
       form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
+      tick();
     }
+    busy = false; if (lockedFor() === 0) go.disabled = false;
   });
-  try { var saved = sessionStorage.getItem('dubBeta'); if (saved) { pwEl.value = saved; form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit')); } } catch (x) {}
+  tick();
 })();
