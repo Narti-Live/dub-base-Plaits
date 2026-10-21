@@ -29,7 +29,6 @@
     <span class="mark">DUB BASE PLAITS</span>
     <span class="links">
       <a href="#flash">Flash</a>
-      <a href="#install">Install</a>
       <a href="#panel">Panel</a>
       <a href="#cv">CV</a>
       <a href="#app">App</a>
@@ -74,18 +73,25 @@
   <div class="idx">00</div>
   <div class="body">
     <h2>Flash from this page</h2>
-    <p class="lede-s">This page plays the firmware into your Plaits. Nothing is installed on your computer; the update travels as audio.</p>
-    <div class="warn"><b>Use at your own risk.</b> Unofficial firmware. You can always go back by playing the official Plaits WAV the same way.</div>
+    <p class="lede-s">The update travels as audio — this page plays it into your Plaits. <span class="risk-inline">Unofficial firmware, use at your own risk.</span></p>
     <div class="cols2">
-      <ol class="steps tight check">
-        <li>Power off the case. Unplug <b>all</b> cables from Plaits.</li>
-        <li>Patch your headphone output into Plaits <b>MODEL</b> (3.5 mm stereo → mono cable).</li>
-        <li>Set Plaits <b>FREQUENCY to 12 o’clock</b> — in update mode it is the input level.</li>
-        <li>Hold the <b>LEFT</b> button and power on. Let go when the LEDs show update mode.</li>
-        <li>Computer volume around <b>80 %</b>, no Bluetooth, notifications off (Do Not Disturb). Keep this tab open in front.</li>
-        <li>Press <b>Play</b>. Watch LEDs 1–4: the <b>two green</b> ones lit is right, yellow may flicker, <b>red should stay off</b>. Too few: raise the volume. Red: lower it. Adjust in the first seconds, then don’t touch anything.</li>
-        <li>After 2 min 36 s the module restarts into DUB BASE. All LEDs blinking red: press LEFT, nudge FREQUENCY and play again.</li>
-      </ol>
+      <div>
+        <ol class="steps tight check">
+          <li>Unplug all cables. Headphone out → Plaits <b>MODEL</b>.</li>
+          <li><b>FREQUENCY at 12 o’clock</b>. Hold <b>LEFT</b> and power on.</li>
+          <li>Volume <b>~80 %</b>, press <b>Play</b>: the <b>two green</b> LEDs lit, red off.</li>
+          <li>Wait 2:36 — the module restarts into DUB BASE.</li>
+        </ol>
+        <details class="more"><summary>More details</summary>
+          <ul class="dash">
+            <li>Use a 3.5 mm stereo → mono cable (or an adapter plus a patch cable).</li>
+            <li>In update mode FREQUENCY is the input level. Let go of LEFT when the LEDs show update mode.</li>
+            <li>No Bluetooth, notifications off (Do Not Disturb), keep this tab in front.</li>
+            <li>LEDs 1–4 are the level meter: too few lit → raise the volume, red → lower it. Adjust in the first seconds, then don’t touch anything.</li>
+            <li>All LEDs blinking red: press LEFT, nudge FREQUENCY and play again. Going back: play the official Plaits WAV the same way.</li>
+          </ul>
+        </details>
+      </div>
       <div class="player" id="player">
         <div class="variant one" id="variants" role="radiogroup" aria-label="Firmware version">
           <label><input type="radio" name="fw" value="downloads/DubBase-Plaits-v1.4.wav" checked><b>C minor</b><span>v1.4 · release</span></label>
@@ -112,10 +118,10 @@
   <div class="body">
     <h2>What it is</h2>
     <div class="cols4">
-      <div><h3>Dub chords</h3><p>Every chord is a C minor <em>DUB</em> voicing: root, 5th, 7th, then the 3rd and 5th an octave up. No note ever leaves the scale.</p></div>
-      <div><h3>TRIG is the clock</h3><p>16th-note pulses into TRIG drive a 16-step generative sequencer. Unpatched, it runs at an internal 120&nbsp;BPM.</p></div>
-      <div><h3>One-knob envelope</h3><p>FREQUENCY sets attack, decay and filter envelope together: short dark pluck, dub stab at noon, long swell on the right.</p></div>
-      <div><h3>Root CV out</h3><p>AUX sends the root of every chord as 1&nbsp;V/oct, so a second synth can follow the progression.</p></div>
+      <div><h3>Dub chords</h3><p>C minor DUB voicings: root, 5th, 7th, 3rd and 5th up. Never out of key.</p></div>
+      <div><h3>TRIG = clock</h3><p>16th pulses drive a 16-step generative sequencer. Unpatched: 120 BPM.</p></div>
+      <div><h3>One-knob envelope</h3><p>FREQUENCY: pluck → dub stab → long swell, filter included.</p></div>
+      <div><h3>Root CV out</h3><p>AUX: the chord root as 1 V/oct for a second synth.</p></div>
     </div>
   </div>
 </section>
@@ -124,45 +130,47 @@
   <div class="idx">02</div>
   <div class="body">
     <h2>The panel</h2>
-    <table class="spec">
-      <tr><th>FREQUENCY</th><td><b>Envelope</b> — attack, decay and filter envelope on one knob.</td></tr>
-      <tr><th>LEFT held + FREQUENCY</th><td><b>Octave</b> 1–5 (noon = 3).</td></tr>
-      <tr><th>RIGHT held + FREQUENCY</th><td><b>Resonance</b>, limited: it never self-oscillates.</td></tr>
-      <tr><th>HARMONICS / TIMBRE / MORPH</th><td>Sound of the chord model (table below).</td></tr>
-      <tr><th>TIMBRE attenuverter</th><td><b>Density</b>: how many of the 16 steps play.</td></tr>
-      <tr><th>FM attenuverter</th><td><b>Length</b> of the pattern, 1–16 steps.</td></tr>
-      <tr><th>MORPH attenuverter</th><td><b>Speed</b>: 1/2 · 1/4 · 1/8 · 1/8T · <b>1/16</b> (centre) · 1/16T · 1/32 · 1/32T.</td></tr>
-      <tr><th>Tap LEFT / RIGHT</th><td>Previous / next chord model.</td></tr>
-      <tr><th>Hold LEFT 1 s</th><td><b>NEW</b> pattern — LEDs pulse green, then sweep.</td></tr>
-      <tr><th>Hold RIGHT 1 s</th><td><b>RANDOM</b> sound — new HARMONICS / TIMBRE / MORPH. The knobs pick up again when you turn them.</td></tr>
-      <tr><th>Both buttons 2 s</th><td><b>CV TUNE</b> for the AUX pitch CV. 4 s: the original CV input calibration.</td></tr>
-    </table>
-    <p class="note">A slow random LFO is always on (speed 20, depth 15). It drifts HARMONICS, TIMBRE, MORPH and the filter.</p>
+    <ul class="kv">
+      <li><b>FREQUENCY</b> envelope · <b>+LEFT</b> octave · <b>+RIGHT</b> resonance</li>
+      <li><b>Attenuverters</b> density · length · speed (with triplets)</li>
+      <li><b>Tap L / R</b> chord model · <b>hold L</b> NEW · <b>hold R</b> RANDOM</li>
+      <li><b>LEDs</b> yellow = model, blinks on each step</li>
+    </ul>
+    <details class="more"><summary>More details</summary>
+      <table class="spec">
+        <tr><th>FREQUENCY</th><td>Attack, decay and filter envelope on one knob. Left = short dark pluck, noon = dub stab, right = long swell with a big filter sweep.</td></tr>
+        <tr><th>LEFT + FREQUENCY</th><td>Octave 1–5 (noon = 3).</td></tr>
+        <tr><th>RIGHT + FREQUENCY</th><td>Resonance, limited: it never self-oscillates.</td></tr>
+        <tr><th>TIMBRE attenuverter</th><td>Density: how many of the 16 steps play.</td></tr>
+        <tr><th>FM attenuverter</th><td>Length of the pattern, 1–16 steps.</td></tr>
+        <tr><th>MORPH attenuverter</th><td>Speed: 1/2 · 1/4 · 1/8 · 1/8T · 1/16 (centre) · 1/16T · 1/32 · 1/32T.</td></tr>
+        <tr><th>Hold LEFT 1 s</th><td>NEW pattern — LEDs pulse green, then sweep.</td></tr>
+        <tr><th>Hold RIGHT 1 s</th><td>RANDOM sound — new HARMONICS / TIMBRE / MORPH; the knobs pick up again when turned.</td></tr>
+        <tr><th>Both buttons</th><td>2 s: CV TUNE. 4 s: the original CV input calibration.</td></tr>
+        <tr><th>LEDs</th><td>Moving a control shows its value for a second: envelope = yellow bar, resonance = red bar, density = green bar, length = yellow bar, octave = one yellow LED, speed = one LED (red for triplets).</td></tr>
+        <tr><th>Random LFO</th><td>Always on (speed 20, depth 15): drifts HARMONICS, TIMBRE, MORPH and the filter.</td></tr>
+      </table>
+      <h3>Jacks</h3>
+      <table class="spec">
+        <tr><th>TRIG</th><td>Clock in, counted as 16ths. Unpatched: internal 120 BPM.</td></tr>
+        <tr><th>V/OCT</th><td>Moves the progression by scale degrees (D = ii, Eb = III …), snapped to C minor.</td></tr>
+        <tr><th>MODEL</th><td>Selects the chord model.</td></tr>
+        <tr><th>HARMO · TIMBRE · MORPH</th><td>CV for those parameters (TIMBRE and MORPH at full strength).</td></tr>
+        <tr><th>LEVEL</th><td>VCA on OUT.</td></tr>
+        <tr><th>FM</th><td>Not used.</td></tr>
+        <tr><th>OUT / AUX</th><td>The chords / the chord root as 1 V/oct, C3 = 0 V, held until the next chord.</td></tr>
+      </table>
+    </details>
   </div>
-  <figure class="shot tall"><img src="assets/panel.jpg" alt="The Plaits panel as drawn by the Dub Plaits app" loading="lazy"><figcaption>Panel, as drawn by the Android app</figcaption></figure>
-</section>
-
-<section class="block" id="jacks">
-  <div class="idx">03</div>
-  <div class="body">
-    <h2>Jacks</h2>
-    <div class="grid-jacks">
-      <div><b>TRIG</b><span>Clock in, counted as 16ths. Unpatched: internal 120 BPM.</span></div>
-      <div><b>V/OCT</b><span>Moves the progression by scale degrees (D = ii, Eb = III …), snapped to C minor.</span></div>
-      <div><b>MODEL</b><span>Selects the chord model.</span></div>
-      <div><b>HARMONICS · TIMBRE · MORPH</b><span>CV for those parameters (TIMBRE and MORPH at full strength).</span></div>
-      <div><b>LEVEL</b><span>VCA on OUT.</span></div>
-      <div><b>FM</b><span>Not used.</span></div>
-      <div class="hi"><b>OUT</b><span>The chords.</span></div>
-      <div class="hi"><b>AUX</b><span>Pitch CV out: the root of each chord, 1 V/oct, C3 = 0 V, held until the next chord.</span></div>
-    </div>
-  </div>
+  <figure class="shot panelfig"><div class="anno"><img src="assets/panel.jpg" alt="The Plaits panel with DUB BASE functions" loading="lazy"><span class="tag" style="left:50.1%;top:2.9%">both buttons 2 s = CV TUNE</span><span class="tag" style="left:80.3%;top:35.4%">sound of the model</span><span class="tag" style="left:19.7%;top:47.8%">sound</span><span class="tag" style="left:80.3%;top:47.8%">sound</span><span class="tag" style="left:11.8%;top:81.8%">model CV</span><span class="tag" style="left:31.0%;top:81.8%">timbre CV</span><span class="tag" style="left:50.1%;top:81.8%">not used</span><span class="tag" style="left:69.3%;top:81.8%">morph CV</span><span class="tag" style="left:88.2%;top:81.8%">harm. CV</span><span class="tag" style="left:31.0%;top:94.2%">VCA</span><span class="tag" style="left:50.1%;top:94.2%">transpose</span><span class="tag hi" style="left:69.3%;top:94.2%">chords</span><span class="tag hi" style="left:88.2%;top:96.9%">root CV 1 V/oct</span></div><figcaption>Panel, as drawn by the Android app</figcaption></figure>
 </section>
 
 <section class="block" id="models">
-  <div class="idx">04</div>
+  <div class="idx">03</div>
   <div class="body">
     <h2>Chord models</h2>
+    <p class="chips"><span>1 DUB SAW</span><span>2 VA</span><span>3 WAVESHAPE</span><span>4 FM</span><span>5 PHASE DIST</span><span>6 CHIPTUNE</span><span>7 Plaits CHORDS</span><span>8 STRING MACHINE</span></p>
+    <details class="more"><summary>What HARMONICS / TIMBRE / MORPH do</summary>
     <div class="table-wrap">
     <table class="models">
       <thead><tr><th>#</th><th>Model</th><th>HARMONICS</th><th>TIMBRE</th><th>MORPH</th></tr></thead>
@@ -178,151 +186,93 @@
       </tbody>
     </table>
     </div>
+    </details>
   </div>
 </section>
 
-<section class="block split rev" id="sequence">
-  <div class="idx">05</div>
+<section class="block split" id="sequence">
+  <div class="idx">04</div>
   <div class="body">
     <h2>How a pattern is made</h2>
-    <ol class="steps">
-      <li><b>Chords.</b> 1, 2 or 4 per pattern (35 / 40 / 25 %). The first is the tonic 70 % of the time; the next are weighted towards iv, v, VI and III, never the same twice in a row.</li>
-      <li><b>Sections.</b> Each step takes the chord of its part of the bar; 6 % of steps get a passing chord.</li>
-      <li><b>Ranks.</b> Every step gets a rank: off-beat bonus plus chance. The third 16th of each beat plays first — the classic dub off-beat stab.</li>
-      <li><b>Density.</b> Steps with a rank below DENSITY play. Turn it up and steps join in rank order, so the groove grows without changing.</li>
-      <li><b>Accents.</b> 35 % on the strong off-beats, 15 % elsewhere. An accent opens the filter further.</li>
-      <li><b>Length and speed.</b> LENGTH loops the first N steps; SPEED turns each TRIG pulse into 1/2 … 1/32T steps.</li>
-    </ol>
-    <p class="note">Chord model, octave, resonance and the pattern are saved 2 s after a change.</p>
+    <p>NEW picks 1, 2 or 4 chords, gives every step a rank (off-beats first) and some accents. <b>DENSITY</b> plays the steps ranked below it, so the groove grows without changing.</p>
+    <details class="more"><summary>More details</summary>
+      <ol class="steps tight">
+        <li><b>Chords.</b> 1, 2 or 4 per pattern (35 / 40 / 25 %). The first is the tonic 70 % of the time; the next are weighted towards iv, v, VI and III, never the same twice in a row.</li>
+        <li><b>Sections.</b> Each step takes the chord of its part of the bar; 6 % get a passing chord.</li>
+        <li><b>Ranks.</b> Off-beat bonus plus chance. The third 16th of each beat plays first — the classic dub stab.</li>
+        <li><b>Accents.</b> 35 % on the strong off-beats, 15 % elsewhere; an accent opens the filter further.</li>
+        <li><b>Length and speed.</b> LENGTH loops the first N steps; SPEED turns each TRIG pulse into 1/2 … 1/32T steps.</li>
+      </ol>
+      <p class="note">Chord model, octave, resonance and the pattern are saved 2 s after a change.</p>
+    </details>
   </div>
-  <figure class="shot"><img src="assets/sequence.jpg" alt="The app's view of a generated pattern: chord sections, rank bars and the density line" loading="lazy"><figcaption>Rank bars and the density line, from the app</figcaption></figure>
-</section>
-
-<section class="block" id="install">
-  <div class="idx">06</div>
-  <div class="body">
-    <h2>Install</h2>
-    <div class="warn"><b>Use at your own risk.</b> DUB BASE is unofficial firmware. It has been tested in an emulator and on a Plaits clone, but not on every hardware revision or clone. The audio updater can always reinstall the official Plaits firmware, but the author accepts no responsibility for damage, data loss or a module that stops working.</div>
-    <p class="lede-s">Plaits updates over audio. You play a WAV file into the module — from this page (see <a href="#flash">Flash</a>), a Mac, a PC or a phone.</p>
-    <div class="cols2">
-      <div>
-        <h3>You need</h3>
-        <ul class="dash">
-          <li><a href="downloads/DubBase-Plaits-v1.4.wav" download>DubBase-Plaits-v1.4.wav</a> (14.8 MB, 2 min 36 s). Don’t convert it to MP3.</li>
-          <li>A cable from your headphone output to a Eurorack jack (3.5 mm TRS → TS, or an adapter plus a patch cable).</li>
-        </ul>
-        <h3>Prepare the computer</h3>
-        <ul class="dash">
-          <li>Output to the headphone jack; no Bluetooth device connected.</li>
-          <li>Do Not Disturb on, chat and mail closed — an alert sound breaks the transfer.</li>
-          <li>Volume around 80 %, no EQ or sound enhancers.</li>
-        </ul>
-      </div>
-      <div>
-        <h3>On the module</h3>
-        <ol class="steps tight">
-          <li>Power off. Unplug <b>all</b> cables from Plaits.</li>
-          <li>Patch the audio cable into <b>MODEL</b>.</li>
-          <li>Set <b>FREQUENCY</b> to 12 o’clock — in update mode it sets the input level.</li>
-          <li>Hold the <b>LEFT</b> button and power on.</li>
-          <li>Play the WAV. LEDs 1–4 are a level meter: the <b>two green</b> ones lit is right, yellow may flicker, red should stay off.</li>
-          <li>Let it play to the end. The module restarts by itself and plays DUB BASE.</li>
-        </ol>
-        <p class="note">All LEDs blinking red: press LEFT, nudge FREQUENCY (usually a little lower) and play the file again. To go back, install the official Plaits WAV the same way — your calibration is kept.</p>
-      </div>
-    </div>
-  </div>
+  <figure class="shot"><img src="assets/sequence.jpg" alt="Rank bars and the density line" loading="lazy"><figcaption>Rank bars and the density line</figcaption></figure>
 </section>
 
 <section class="block" id="cv">
-  <div class="idx">07</div>
+  <div class="idx">05</div>
   <div class="body">
-    <h2>Root CV &amp; CV TUNE</h2>
-    <div class="cols2">
-      <div>
-        <p>AUX sends the <b>root note</b> of every chord that plays — 1&nbsp;V/oct, C3&nbsp;=&nbsp;0&nbsp;V, about −2&nbsp;V to +3&nbsp;V — and holds it until the next chord. Patch it to another synth’s V/OCT and clock that synth’s envelope from the same clock you send to TRIG.</p>
-        <p class="note">Output levels differ a little between modules, so tune the CV once. If a held note slowly sinks back to 0 V, that module’s output stage is AC-coupled and the CV can’t work on it.</p>
-      </div>
+    <h2>Root CV</h2>
+    <p>AUX sends each chord’s root — <b>1 V/oct, C3 = 0 V</b> — held until the next chord. Tune it once: <b>hold both buttons 2 s</b>, match two octaves with FREQUENCY, tap to save.</p>
+    <details class="more"><summary>CV TUNE step by step</summary>
       <ol class="steps tight">
-        <li>Patch AUX to your synth’s V/OCT. Hold <b>both buttons 2 s</b>.</li>
-        <li>AUX alternates every 2 s: <b>C3 (0 V)</b>, LEDs 1–4 green, and <b>C5 (+2 V)</b>, LEDs 5–8 green. OUT plays the same notes as a sine.</li>
-        <li>Tune your synth so the low note is a C, then turn <b>FREQUENCY</b> until the high note is exactly two octaves above it. The red LED shows the trim.</li>
-        <li><b>Tap a button</b> to save and go back to playing.</li>
+        <li>Patch AUX to your synth’s V/OCT. Hold both buttons 2 s.</li>
+        <li>AUX alternates every 2 s: C3 (0 V, LEDs 1–4 green) and C5 (+2 V, LEDs 5–8 green). OUT plays the same notes as a sine.</li>
+        <li>Tune your synth so the low note is a C, then turn FREQUENCY until the high note is exactly two octaves above. The red LED shows the trim.</li>
+        <li>Tap a button to save.</li>
       </ol>
-    </div>
-  </div>
-</section>
-
-<section class="block" id="leds">
-  <div class="idx">08</div>
-  <div class="body">
-    <h2>LEDs</h2>
-    <div class="leds">
-      <span class="led y"></span><span class="led g"></span><span class="led g"></span><span class="led g"></span><span class="led g"></span><span class="led g"></span><span class="led g"></span><span class="led g"></span>
-    </div>
-    <p>The chord model is a yellow LED; the others glow dim green. It blinks off on every step that plays. Move a control and the LEDs show its value for a second: envelope = yellow bar, resonance = red bar, density = green bar, length = yellow bar, octave = one yellow LED, speed = one LED (red for triplets).</p>
+      <p class="note">Range about −2 V to +3 V. If a held note slowly sinks back to 0 V, that module’s output is AC-coupled and the CV can’t work on it.</p>
+    </details>
   </div>
 </section>
 
 <section class="block split" id="app">
-  <div class="idx">09</div>
+  <div class="idx">06</div>
   <div class="body">
-    <h2>Dub Plaits for Android</h2>
-    <p>The app runs the <b>same firmware code</b> as the WAV — <code>ui.cc</code>, <code>voice.cc</code>, <code>dub.cc</code> and the Plaits engines — compiled for the phone, polled 4000 times a second like the module. Only the knobs, buttons, LEDs and flash memory are replaced by the screen.</p>
-    <ul class="dash">
-      <li>A Plaits panel with touch knobs, the two buttons (multi-touch for the hold gestures) and the eight LEDs.</li>
-      <li><b>Tape echo</b> in the spirit of the old dub echo machines: tempo-synced (1/16 to 1/2, dotted 1/8 by default), repeats that get darker and dirtier, wow and flutter on the tape speed. Plus a dark <b>reverb</b>. App only — the module stays dry.</li>
-      <li>A TRIG clock (30–240 BPM) or the internal 120 BPM, and the live AUX voltage.</li>
-      <li>Underneath: the pattern, the chord that is playing, the envelope, the random LFO and the output, all live.</li>
-    </ul>
-    <div class="appdl">
-      <a class="btn solid" href="downloads/DubPlaits-v1.4.1-Cminor.apk" download>Download the app</a>
-    </div>
-    <p class="note">Android 8 or newer. Allow installs from unknown sources, then open the .apk.</p>
+    <h2>Android app</h2>
+    <p>The same firmware code on your phone, with a Plaits panel, a <b>tape echo</b> (synced, wow &amp; flutter) and <b>reverb</b>, and a live view of the pattern and envelope.</p>
+    <p><a class="btn solid" href="downloads/DubPlaits-v1.4.1-Cminor.apk" download>Download the app</a></p>
+    <details class="more"><summary>More details</summary>
+      <ul class="dash">
+        <li>Runs <code>ui.cc</code>, <code>voice.cc</code>, <code>dub.cc</code> and the Plaits engines, polled 4000 times a second like the module.</li>
+        <li>Touch knobs, the two buttons (multi-touch for the hold gestures), the eight LEDs.</li>
+        <li>Echo: 1/16 to 1/2 (dotted 1/8 by default), repeats get darker and dirtier. Effects are app-only — the module stays dry.</li>
+        <li>TRIG clock 30–240 BPM or the internal 120 BPM; live AUX voltage.</li>
+        <li>Android 8 or newer: allow installs from unknown sources, then open the .apk.</li>
+      </ul>
+    </details>
   </div>
-  <figure class="shot"><img src="assets/envelope.jpg" alt="The app's envelope, LFO and output views" loading="lazy"><figcaption>Envelope, random LFO and OUT, live in the app</figcaption></figure>
+  <figure class="shot"><img src="assets/envelope.jpg" alt="The app's envelope, LFO and output views" loading="lazy"><figcaption>Envelope, random LFO and OUT</figcaption></figure>
 </section>
 
 <section class="block" id="downloads">
-  <div class="idx">10</div>
+  <div class="idx">07</div>
   <div class="body">
     <h2>Downloads</h2>
     <div class="dl">
-      <a href="downloads/DubBase-Plaits-v1.4.wav" download><b>DubBase-Plaits-v1.4.wav</b><span>Firmware update for the module · 14.8 MB</span><code>sha256 7f8d3930ca62526126e4e3cf895bd0689540743b352a7553d1e68d12b6b05952</code></a>
+      <a href="downloads/DubBase-Plaits-v1.4.wav" download><b>DubBase-Plaits-v1.4.wav</b><span>Firmware for the module · 14.8 MB</span></a>
+      <a href="downloads/DubPlaits-v1.4.1-Cminor.apk" download><b>DubPlaits-v1.4.1-Cminor.apk</b><span>Android app · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
-      <a href="downloads/DubPlaits-v1.4.1-Cminor.apk" download><b>DubPlaits-v1.4.1-Cminor.apk</b><span>Android app · tape echo + reverb</span><code>sha256 bec5b5826cc20a0eed305097b380214325f2916f4caf9a9cfd45636ceb6e839e</code></a>
-      <a href="downloads/DubBase-Plaits-v1.4.bin" download><b>DubBase-Plaits-v1.4.bin</b><span>Raw image · C minor (SWD / ST-Link)</span><code>sha256 7c6d4bccb180abe93ca57b33cb669d618cd551e66615837af65d455655c8f015</code></a>
+      <a href="downloads/DubBase-Plaits-v1.4.bin" download><b>DubBase-Plaits-v1.4.bin</b><span>Raw image for SWD / ST-Link</span></a>
     </div>
-  </div>
-</section>
-
-<section class="block" id="changes">
-  <div class="idx">11</div>
-  <div class="body">
-    <h2>Changes</h2>
-    <dl class="log">
-      <dt>app 1.4.1</dt><dd>Tape echo and reverb in the Android app.</dd>
-      <dt>v1.4</dt><dd>Cleaner, less hot output: a leveler with 6 dB of headroom keeps stacked chords and resonance out of the clipper. Distortion was up to 28 %, now under 0.5 %.</dd>
-      <dt>v1.3</dt><dd>AUX becomes a 1 V/oct pitch CV of the chord root, with CV TUNE.</dd>
-      <dt>v1.2</dt><dd>The CHORDS filter follows the inversion; the LFO starts right at power-on.</dd>
-      <dt>v1.1</dt><dd>First version: fixed C minor, DUB chords, one-knob envelope, the sequencer on the attenuverters.</dd>
-    </dl>
-  </div>
-</section>
-
-<section class="block" id="source">
-  <div class="idx">12</div>
-  <div class="body">
-    <h2>Source</h2>
-    <p>Everything is in this repository: the firmware changes against <a href="https://github.com/pichenettes/eurorack">pichenettes/eurorack</a> as a patch and as files, the clang build script, the emulator tests, and the Android app. See <a href="https://github.com/Narti-Live/dub-base-Plaits#readme">the README</a> for build steps.</p>
+    <details class="more"><summary>Checksums, changes, source</summary>
+      <p class="note mono">wav 7f8d3930ca62526126e4e3cf895bd0689540743b352a7553d1e68d12b6b05952<br>apk bec5b5826cc20a0eed305097b380214325f2916f4caf9a9cfd45636ceb6e839e<br>bin 7c6d4bccb180abe93ca57b33cb669d618cd551e66615837af65d455655c8f015</p>
+      <dl class="log">
+        <dt>app 1.4.1</dt><dd>Tape echo and reverb.</dd>
+        <dt>v1.4</dt><dd>Cleaner output: distortion was up to 28 %, now under 0.5 %.</dd>
+        <dt>v1.3</dt><dd>AUX becomes a 1 V/oct root CV, with CV TUNE.</dd>
+        <dt>v1.2</dt><dd>CHORDS filter follows the inversion; LFO starts at power-on.</dd>
+        <dt>v1.1</dt><dd>First version.</dd>
+      </dl>
+      <p>Source: the firmware patch against <a href="https://github.com/pichenettes/eurorack">pichenettes/eurorack</a>, build scripts, emulator tests and the app — see <a href="https://github.com/Narti-Live/dub-base-Plaits#readme">the README</a>.</p>
+    </details>
   </div>
 </section>
 
 <section class="block" id="narti">
-  <div class="idx">13</div>
+  <div class="idx">08</div>
   <div class="body">
     <h2>By Narti Live</h2>
-    <p class="lede-s">DUB BASE is made by Narti Live. Follow for patches, jams and new versions.</p>
     <div class="social">
       <a href="https://www.instagram.com/narti_live" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
@@ -331,31 +281,19 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9.2v5.6l5-2.8z" fill="currentColor"/></svg>
         <b>YouTube</b><span>@narti_live</span></a>
     </div>
-  </div>
-</section>
-
-<section class="beta-mini" id="beta">
-  <div class="body">
-    <h4>beta testing</h4>
-    <div class="beta-wrap" id="betaWrap">
-      <div class="beta-blur" aria-hidden="true">
-        <div class="cols3">
-          <div class="vcard"><h3>Beta · version A</h3><p>New chords, new voicings, inversions.</p><p class="chords">█████ · ███ · ████</p><span class="btn">██████ .wav</span></div>
-          <div class="vcard"><h3>Beta · version B</h3><p>Another key, more chords.</p><p class="chords">████ · ██ · █████ · ███</p><span class="btn">██████ .wav</span></div>
-          <div class="vcard"><h3>Beta · apps</h3><p>Android builds of the beta firmwares.</p><p class="chords">██ · ███</p><span class="btn">██████ .apk</span></div>
+    <div class="beta-mini" id="beta">
+      <div id="betaWrap">
+        <form class="lock" id="betaLock" autocomplete="off">
+          <span>beta testing</span>
+          <input type="password" inputmode="numeric" id="betaPw" placeholder="password" aria-label="Beta password">
+          <button type="submit" id="betaGo">unlock</button>
+          <span class="lock-msg" id="betaMsg"></span>
+        </form>
+        <div class="beta-open" id="betaOpen" hidden>
+          <span class="beta-title">beta testing — not tested on hardware yet, use at your own risk</span>
+          <div class="beta-list" id="betaList"></div>
+          <p id="betaNote"></p>
         </div>
-      </div>
-      <form class="lock" id="betaLock" autocomplete="off">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-        <b>Testers only</b>
-        <input type="password" inputmode="numeric" id="betaPw" placeholder="Password" aria-label="Beta password">
-        <button class="btn solid" type="submit" id="betaGo">Unlock</button>
-        <span class="lock-msg" id="betaMsg"></span>
-      </form>
-      <div class="beta-open" id="betaOpen" hidden>
-        <div class="warn"><b>Beta.</b> Not tested on hardware yet — use at your own risk, and please report what you find.</div>
-        <div class="dl" id="betaList"></div>
-        <p class="note" id="betaNote"></p>
       </div>
     </div>
   </div>
