@@ -1,5 +1,5 @@
 #!/bin/bash
-# Compiles the DUB BASE firmware core (unchanged ui.cc / voice.cc / dub.cc /
+# Compiles the DUB STAB PLAITS firmware core (unchanged ui.cc / voice.cc / dub.cc /
 # Plaits engines + the app shims) into a static archive for one target.
 # usage: build_core.sh <target-triple|host> <out-dir>
 set -e

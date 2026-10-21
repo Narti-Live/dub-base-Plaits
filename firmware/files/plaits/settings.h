@@ -53,7 +53,7 @@ struct PersistentData {
   enum { tag = 0x494C4143 };  // CALI
 };
 
-// DUB BASE state: chord model, octave, resonance + the current pattern (packed).
+// DUB STAB PLAITS state: chord model, octave, resonance + the current pattern (packed).
 struct State {
   uint8_t chord_model;
   uint8_t color_blind;

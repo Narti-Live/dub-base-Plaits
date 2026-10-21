@@ -1,7 +1,7 @@
-// Copyright 2016 Emilie Gillet. DUB BASE changes 2026 Narti Live.
+// Copyright 2016 Emilie Gillet. DUB STAB PLAITS changes 2026 Narti Live.
 // MIT license, see the original Plaits sources.
 //
-// DUB BASE panel:
+// DUB STAB PLAITS panel:
 //   FREQUENCY            envelope (attack + decay + filter envelope amount)
 //   LEFT  + FREQUENCY    octave
 //   RIGHT + FREQUENCY    resonance
@@ -99,7 +99,7 @@ static inline uint8_t ToU8(float v) { CONSTRAIN(v, 0.0f, 1.0f); return static_ca
 void Ui::LoadState() {
   const State& st = settings_->state();
   dub::DefaultSettings(dub_);
-  if (st.octave >= 1 && st.octave <= 5) {   // a saved DUB BASE state exists
+  if (st.octave >= 1 && st.octave <= 5) {   // a saved DUB STAB PLAITS state exists
     dub_->chord_model = st.chord_model % dub::kNumChordModels;
     dub_->octave = st.octave;
     dub_->resonance = U8(st.resonance);

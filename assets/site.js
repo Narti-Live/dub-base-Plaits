@@ -184,7 +184,7 @@
   a.addEventListener('ended', function () {
     play.disabled = false; stop.disabled = true; clearInterval(timer); clearLeds();
     for (var k = 0; k < radios.length; k++) radios[k].disabled = false;
-    status.textContent = 'Done. The module should restart into DUB BASE. All LEDs blinking red instead: press LEFT, nudge FREQUENCY, play again.';
+    status.textContent = 'Done. The module should restart into DUB STAB PLAITS. All LEDs blinking red instead: press LEFT, nudge FREQUENCY, play again.';
   });
   a.addEventListener('error', function () {
     status.textContent = 'Could not load the file. Download the .wav instead and play it with QuickTime or VLC.';

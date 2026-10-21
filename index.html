@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DUB BASE PLAITS — unofficial Plaits firmware by Narti Live</title>
+<title>DUB STAB PLAITS — unofficial Plaits firmware by Narti Live</title>
 <meta name="author" content="Narti Live">
-<meta name="description" content="DUB BASE by Narti Live: a dub techno chord sequencer firmware for Mutable Instruments Plaits. C minor dub chords, TRIG clock, one-knob envelope, 1 V/oct root CV out. Plus an Android app that runs the same code.">
+<meta name="description" content="DUB STAB PLAITS by Narti Live: a dub techno chord sequencer firmware for Mutable Instruments Plaits. C minor dub chords, TRIG clock, one-knob envelope, 1 V/oct root CV out. Plus an Android app that runs the same code.">
 <meta name="theme-color" content="#05080d">
-<meta property="og:title" content="DUB BASE — Plaits firmware">
+<meta property="og:title" content="DUB STAB PLAITS — Plaits firmware">
 <meta property="og:description" content="Dub techno chords from Mutable Instruments Plaits. Clocked from TRIG, always in C minor.">
 <meta property="og:image" content="assets/panel.jpg">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -26,7 +26,7 @@
 <header class="hero">
   <canvas id="stabs" aria-hidden="true"></canvas>
   <nav class="top">
-    <span class="mark">DUB BASE PLAITS</span>
+    <span class="mark">DUB STAB PLAITS</span>
     <span class="links">
       <a href="#flash">Flash</a>
       <a href="#panel">Panel</a>
@@ -38,16 +38,16 @@
   </nav>
   <div class="hero-text">
     <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.4 — by <a href="#narti">Narti Live</a></p>
-    <h1 class="title" aria-label="DUB BASE PLAITS">
-      <span class="line" data-text="DUB BASE">DUB BASE</span>
+    <h1 class="title" aria-label="DUB STAB PLAITS">
+      <span class="line" data-text="DUB STAB">DUB STAB</span>
       <span class="line l2" data-text="PLAITS">PLAITS</span>
     </h1>
-    <p class="lede">Dub techno chords from a Plaits. Clocked from TRIG. Always in C&nbsp;minor.<br>
+    <p class="lede"><b>Generative, controlled dub techno stabs</b> from a Plaits. Clocked from TRIG. Always in C&nbsp;minor.<br>
       No effects inside: patch your own delay and reverb after it.</p>
     <div class="cta">
       <a class="btn solid" href="#flash">Flash from this page</a>
-      <a class="btn" href="downloads/DubBase-Plaits-v1.4.wav" download>Firmware .wav</a>
-      <a class="btn" href="downloads/DubPlaits-v1.4.1-Cminor.apk" download>Android app .apk</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.4.wav" download>Firmware .wav</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.4.2.apk" download>Android app .apk</a>
       <a class="btn" href="docs/MANUAL.md">Manual</a>
     </div>
     <p class="hint">Before flashing: Plaits <b>FREQUENCY knob at 12 o’clock</b>, computer volume around <b>80 %</b>. While it plays, the level meter
@@ -80,7 +80,7 @@
           <li>Unplug all cables. Headphone out → Plaits <b>MODEL</b>.</li>
           <li><b>FREQUENCY at 12 o’clock</b>. Hold <b>LEFT</b> and power on.</li>
           <li>Volume <b>~80 %</b>, press <b>Play</b>: the <b>two green</b> LEDs lit, red off.</li>
-          <li>Wait 2:36 — the module restarts into DUB BASE.</li>
+          <li>Wait 2:36 — the module restarts into DUB STAB PLAITS.</li>
         </ol>
         <details class="more"><summary>More details</summary>
           <ul class="dash">
@@ -94,7 +94,7 @@
       </div>
       <div class="player" id="player">
         <div class="variant one" id="variants" role="radiogroup" aria-label="Firmware version">
-          <label><input type="radio" name="fw" value="downloads/DubBase-Plaits-v1.4.wav" checked><b>C minor</b><span>v1.4 · release</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.4.wav" checked><b>C minor</b><span>v1.4 · release</span></label>
         </div>
         <div class="meter" aria-hidden="true">
           <span class="m red"></span><span class="m yel"></span><span class="m grn"></span><span class="m grn"></span>
@@ -107,7 +107,7 @@
           <button class="btn" id="flashStop" type="button" disabled>Stop &amp; restart</button>
         </div>
         <p class="note" id="flashStatus">Ready. The file (14.8 MB) loads when you press Play.</p>
-        <audio id="flashAudio" preload="none" src="downloads/DubBase-Plaits-v1.4.wav"></audio>
+        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.4.wav"></audio>
       </div>
     </div>
   </div>
@@ -162,7 +162,7 @@
       </table>
     </details>
   </div>
-  <figure class="shot panelfig"><div class="anno"><img src="assets/panel.jpg" alt="The Plaits panel with DUB BASE functions" loading="lazy"><span class="tag" style="left:50.1%;top:2.9%">both buttons 2 s = CV TUNE</span><span class="tag" style="left:80.3%;top:35.4%">sound of the model</span><span class="tag" style="left:19.7%;top:47.8%">sound</span><span class="tag" style="left:80.3%;top:47.8%">sound</span><span class="tag" style="left:11.8%;top:81.8%">model CV</span><span class="tag" style="left:31.0%;top:81.8%">timbre CV</span><span class="tag" style="left:50.1%;top:81.8%">not used</span><span class="tag" style="left:69.3%;top:81.8%">morph CV</span><span class="tag" style="left:88.2%;top:81.8%">harm. CV</span><span class="tag" style="left:31.0%;top:94.2%">VCA</span><span class="tag" style="left:50.1%;top:94.2%">transpose</span><span class="tag hi" style="left:69.3%;top:94.2%">chords</span><span class="tag hi" style="left:88.2%;top:96.9%">root CV 1 V/oct</span></div><figcaption>Panel, as drawn by the Android app</figcaption></figure>
+  <figure class="shot panelfig"><div class="anno"><img src="assets/panel.jpg" alt="The Plaits panel with DUB STAB PLAITS functions" loading="lazy"><span class="tag" style="left:50.1%;top:2.9%">both buttons 2 s = CV TUNE</span><span class="tag" style="left:80.3%;top:35.4%">sound of the model</span><span class="tag" style="left:19.7%;top:47.8%">sound</span><span class="tag" style="left:80.3%;top:47.8%">sound</span><span class="tag" style="left:11.8%;top:81.8%">model CV</span><span class="tag" style="left:31.0%;top:81.8%">timbre CV</span><span class="tag" style="left:50.1%;top:81.8%">not used</span><span class="tag" style="left:69.3%;top:81.8%">morph CV</span><span class="tag" style="left:88.2%;top:81.8%">harm. CV</span><span class="tag" style="left:31.0%;top:94.2%">VCA</span><span class="tag" style="left:50.1%;top:94.2%">transpose</span><span class="tag hi" style="left:69.3%;top:94.2%">chords</span><span class="tag hi" style="left:88.2%;top:96.9%">root CV 1 V/oct</span></div><figcaption>Panel, as drawn by the Android app</figcaption></figure>
 </section>
 
 <section class="block" id="models">
@@ -231,7 +231,7 @@
   <div class="body">
     <h2>Android app</h2>
     <p>The same firmware code on your phone, with a Plaits panel, a <b>tape echo</b> (synced, wow &amp; flutter) and <b>reverb</b>, and a live view of the pattern and envelope.</p>
-    <p><a class="btn solid" href="downloads/DubPlaits-v1.4.1-Cminor.apk" download>Download the app</a></p>
+    <p><a class="btn solid" href="downloads/DubStab-Plaits-v1.4.2.apk" download>Download the app</a></p>
     <details class="more"><summary>More details</summary>
       <ul class="dash">
         <li>Runs <code>ui.cc</code>, <code>voice.cc</code>, <code>dub.cc</code> and the Plaits engines, polled 4000 times a second like the module.</li>
@@ -250,14 +250,15 @@
   <div class="body">
     <h2>Downloads</h2>
     <div class="dl">
-      <a href="downloads/DubBase-Plaits-v1.4.wav" download><b>DubBase-Plaits-v1.4.wav</b><span>Firmware for the module · 14.8 MB</span></a>
-      <a href="downloads/DubPlaits-v1.4.1-Cminor.apk" download><b>DubPlaits-v1.4.1-Cminor.apk</b><span>Android app · 0.5 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.4.wav" download><b>DubStab-Plaits-v1.4.wav</b><span>Firmware for the module · 14.8 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.4.2.apk" download><b>DubStab-Plaits-v1.4.2.apk</b><span>Android app · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
-      <a href="downloads/DubBase-Plaits-v1.4.bin" download><b>DubBase-Plaits-v1.4.bin</b><span>Raw image for SWD / ST-Link</span></a>
+      <a href="downloads/DubStab-Plaits-v1.4.bin" download><b>DubStab-Plaits-v1.4.bin</b><span>Raw image for SWD / ST-Link</span></a>
     </div>
     <details class="more"><summary>Checksums, changes, source</summary>
-      <p class="note mono">wav 7f8d3930ca62526126e4e3cf895bd0689540743b352a7553d1e68d12b6b05952<br>apk bec5b5826cc20a0eed305097b380214325f2916f4caf9a9cfd45636ceb6e839e<br>bin 7c6d4bccb180abe93ca57b33cb669d618cd551e66615837af65d455655c8f015</p>
+      <p class="note mono">wav 7f8d3930ca62526126e4e3cf895bd0689540743b352a7553d1e68d12b6b05952<br>apk d9c3ce5a5cf8d6870c583c37159e82a07d464a14835ada12311701c204148e12<br>bin 7c6d4bccb180abe93ca57b33cb669d618cd551e66615837af65d455655c8f015</p>
       <dl class="log">
+        <dt>name</dt><dd>DUB BASE is now DUB STAB PLAITS. App 1.4.2.</dd>
         <dt>app 1.4.1</dt><dd>Tape echo and reverb.</dd>
         <dt>v1.4</dt><dd>Cleaner output: distortion was up to 28 %, now under 0.5 %.</dd>
         <dt>v1.3</dt><dd>AUX becomes a 1 V/oct root CV, with CV TUNE.</dd>
@@ -303,7 +304,7 @@
 
 <footer>
   <p><b>Unofficial firmware. Use at your own risk.</b> Provided “as is”, without warranty of any kind (see the MIT license).</p>
-  <p>DUB BASE is based on the open-source Plaits firmware by Émilie Gillet (MIT). Not affiliated with or endorsed by Mutable Instruments.</p>
+  <p>DUB STAB PLAITS is based on the open-source Plaits firmware by Émilie Gillet (MIT). Not affiliated with or endorsed by Mutable Instruments.</p>
   <p>Made by <a href="https://www.instagram.com/narti_live" target="_blank" rel="noopener">Narti Live</a> · <a href="https://www.instagram.com/narti_live" target="_blank" rel="noopener">Instagram @narti_live</a> · <a href="https://www.youtube.com/@narti_live" target="_blank" rel="noopener">YouTube @narti_live</a></p>
   <p>© 2026 Narti Live · MIT license · Font: Barlow Condensed (SIL OFL), self-hosted</p>
 </footer>

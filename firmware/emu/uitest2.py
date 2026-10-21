@@ -1,4 +1,4 @@
-"""End-to-end panel test of DUB BASE v1.1 (simplified layout) in the emulator."""
+"""End-to-end panel test of DUB STAB PLAITS v1.1 (simplified layout) in the emulator."""
 import struct
 from armemu import *
 

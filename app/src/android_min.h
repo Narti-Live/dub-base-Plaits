@@ -1,4 +1,4 @@
-/* Minimal hand-written declarations of the Android NDK C APIs used by Dub Base.
+/* Minimal hand-written declarations of the Android NDK C APIs used by Dub Stab Plaits.
    Layouts match the NDK headers (android/native_activity.h, native_window.h,
    input.h, looper.h, aaudio/AAudio.h). */
 #ifndef ANDROID_MIN_H

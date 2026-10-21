@@ -1,4 +1,4 @@
-# DUB BASE for Plaits — v1.4
+# DUB STAB PLAITS — v1.4
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -88,7 +88,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubBase-Plaits-v1.4.wav` to the end (2 min 36 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.4.wav` to the end (2 min 36 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -111,4 +111,4 @@ the same way; your calibration is kept.
 **v1.1**
 - First public version: fixed C minor, DUB chords, one-knob envelope, sequencer on the attenuverters.
 
-The **Dub Plaits** Android app runs this same code, so you can try the module on your phone first. It adds an app-only tape echo (tempo-synced, wow and flutter, darkening repeats) and a reverb; the module itself stays dry.
+The **Dub Stab Plaits** Android app runs this same code, so you can try the module on your phone first. It adds an app-only tape echo (tempo-synced, wow and flutter, darkening repeats) and a reverb; the module itself stays dry.

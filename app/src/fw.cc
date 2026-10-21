@@ -1,4 +1,4 @@
-// DUB BASE app: runs the DUB BASE v1.1 Plaits firmware (ui.cc, voice.cc,
+// DUB STAB PLAITS app: runs the DUB STAB PLAITS v1.1 Plaits firmware (ui.cc, voice.cc,
 // dub.cc and the Plaits engines, unchanged) on a phone. This file plays the
 // part of plaits.cc: it owns the same global objects and calls Ui::Poll()
 // and Voice::Render() once per 12-sample block, like FillBuffer() does.

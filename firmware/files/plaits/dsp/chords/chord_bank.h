@@ -86,7 +86,7 @@ class ChordBank {
     return custom_ ? custom_ratios_[note] : ratios_[chord_index() * kChordNumNotes + note];
   }
 
-  // DUB BASE: play an externally supplied chord (ratios to the root).
+  // DUB STAB PLAITS: play an externally supplied chord (ratios to the root).
   inline void set_custom_chord(const float* ratios, int n) {
     for (int i = 0; i < kChordNumNotes; ++i) {
       custom_ratios_[i] = i < n ? ratios[i] : ratios[0] * 2.0f;

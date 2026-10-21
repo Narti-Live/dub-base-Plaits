@@ -1,4 +1,4 @@
-/* DUB BASE for Plaits (app) — NativeActivity glue: window, touch, AAudio, saved state */
+/* DUB STAB PLAITS for Plaits (app) — NativeActivity glue: window, touch, AAudio, saved state */
 #include "android_min.h"
 #include "plat.h"
 #include "fw.h"
@@ -57,7 +57,7 @@ static void audio_start(void) {
 
 /* ---------------------------------------------------------------- saved state
    One file: the app's knob positions etc. + the firmware's two flash chunks
-   (calibration + DUB BASE state), exactly as Settings would store them. */
+   (calibration + DUB STAB PLAITS state), exactly as Settings would store them. */
 #define MAGIC 0x31505544u  /* 'DUP1' */
 #define BLOB 256
 static uint8_t g_pers[BLOB], g_state[BLOB];

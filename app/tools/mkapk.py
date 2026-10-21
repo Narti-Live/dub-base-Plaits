@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds and v2-signs the Dub Base APK without the Android SDK.
+"""Builds and v2-signs the Dub Stab Plaits APK without the Android SDK.
 usage: mkapk.py <root> <out.apk>"""
 import struct, sys, os, zipfile, zlib, hashlib, datetime
 from cryptography import x509
@@ -173,7 +173,7 @@ def load_key(keydir):
     kp, cp = os.path.join(keydir, "key.pem"), os.path.join(keydir, "cert.der")
     if not os.path.exists(kp):
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        nm = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "Dub Base"), x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Narti Live")])
+        nm = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "Dub Stab Plaits"), x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Narti Live")])
         now = datetime.datetime(2026, 1, 1)
         cert = (x509.CertificateBuilder().subject_name(nm).issuer_name(nm).public_key(key.public_key())
                 .serial_number(x509.random_serial_number()).not_valid_before(now)

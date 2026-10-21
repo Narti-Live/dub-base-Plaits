@@ -1,4 +1,4 @@
-// DUB BASE app: the "hardware" the firmware sees, filled in by the Android app.
+// DUB STAB PLAITS app: the "hardware" the firmware sees, filled in by the Android app.
 #ifndef PLAITS_APP_HW_H_
 #define PLAITS_APP_HW_H_
 #include <stdint.h>

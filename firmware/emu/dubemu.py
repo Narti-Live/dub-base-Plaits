@@ -1,4 +1,4 @@
-"""Drive the DUB BASE firmware DSP (Voice + sequencer) inside the Cortex-M4 emulator."""
+"""Drive the DUB STAB PLAITS firmware DSP (Voice + sequencer) inside the Cortex-M4 emulator."""
 import sys, struct
 sys.path.insert(0, '.')
 from armemu import *

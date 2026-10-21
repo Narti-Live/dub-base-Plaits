@@ -1,4 +1,4 @@
-// DUB BASE for Plaits — generative dub chord sequencer, clocked from TRIG.
+// DUB STAB PLAITS for Plaits — generative dub chord sequencer, clocked from TRIG.
 // Copyright 2026 Narti Live. MIT license (same terms as the Plaits sources).
 
 #include "plaits/dub/dub.h"

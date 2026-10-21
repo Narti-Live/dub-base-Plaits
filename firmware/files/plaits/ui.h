@@ -1,4 +1,4 @@
-// Copyright 2016 Emilie Gillet. DUB BASE changes 2026 Narti Live.
+// Copyright 2016 Emilie Gillet. DUB STAB PLAITS changes 2026 Narti Live.
 // MIT license, see the original Plaits sources.
 //
 // User interface: two hidden knob layers (hold LEFT = sound, hold RIGHT =

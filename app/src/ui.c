@@ -1,4 +1,4 @@
-/* DUB BASE app UI: a Plaits panel (positions taken from the Plaits panel
+/* DUB STAB PLAITS app UI: a Plaits panel (positions taken from the Plaits panel
    artwork, plaits_v50.ai) driving the firmware, and under it a live view of
    how the sequence is generated and played. */
 #include "plat.h"
@@ -149,7 +149,7 @@ static void draw_panel_bg(void) {
     fill_rect(0, b0, CW, 2.5f, HEX(0xc3c3be), 1.f);
     fill_rect(0, b1 - 2.5f, CW, 2.5f, HEX(0xc3c3be), 1.f);
     for (float x = -60; x < CW + 60; x += 16) line(x, b1 - 3, x + (b1 - b0 - 6), b0 + 3, 2.5f, HEX(0xcfcfca), 1.f);
-    text(F_TINY, 18, (b0 + b1) * 0.5f, "DUB BASE", HEX(0x9b9b96), 1.f, AL_LEFT);
+    text(F_TINY, 18, (b0 + b1) * 0.5f, "DUB STAB PLAITS", HEX(0x9b9b96), 1.f, AL_LEFT);
     read_variant();
     text(F_TINY, CW - 18, (b0 + b1) * 0.5f, g_minor_only ? (key_pc() == 7 ? "G MINOR - MINOR CHORDS" : "MINOR CHORDS") : key_name(), HEX(0x9b9b96), 1.f, AL_RIGHT);
 
@@ -791,10 +791,10 @@ static void draw_viz(void) {
     y += draw_scope(y) + 14;
     y += draw_leds_help(y) + 14;
     text_wrap(F_TINY, 34, y, CW - 68, 22,
-              g_voicings ? "This app runs the DUB BASE v1.5 Plaits firmware code itself (ui.cc, voice.cc, dub.cc and the Plaits "
+              g_voicings ? "This app runs the DUB STAB PLAITS v1.5 firmware code itself (ui.cc, voice.cc, dub.cc and the Plaits "
               "engines), polled 4000 times a second like the module. Only the knobs, buttons, LEDs and flash memory "
               "are replaced by the screen. The tape echo and reverb are app-only. Plaits by Emilie Gillet, MIT license." :
-              "This app runs the DUB BASE v1.4 Plaits firmware code itself (ui.cc, voice.cc, dub.cc and the Plaits "
+              "This app runs the DUB STAB PLAITS v1.4 firmware code itself (ui.cc, voice.cc, dub.cc and the Plaits "
               "engines), polled 4000 times a second like the module. Only the knobs, buttons, LEDs and flash memory "
               "are replaced by the screen. The tape echo and reverb are app-only. Plaits by Emilie Gillet, MIT license.", C_DIM, 1.f);
 }
