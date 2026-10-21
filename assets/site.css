@@ -255,3 +255,25 @@ footer p { margin: 0 0 6px; }
 .variant.one { grid-template-columns: 1fr; }
 @media (max-width: 600px) { .lock { position: relative; left: auto; top: auto; transform: none; margin-top: -120px; }
   .lock.shake { animation: none; } }
+
+/* beta: tiny, at the very end */
+.beta-mini { border-top: 1px solid var(--line); padding: 18px clamp(16px, 4vw, 48px) 20px; position: relative; z-index: 1; }
+.beta-mini h4 { font: 500 12px/1 var(--display); letter-spacing: .28em; text-transform: uppercase; color: #4f5a6b; margin: 0 0 10px; }
+.beta-mini .body { max-width: 760px; }
+.beta-mini .beta-blur { display: none; }
+.beta-mini .lock { position: static; transform: none; min-width: 0; display: inline-flex; gap: 8px; padding: 0; background: none; border: 0; }
+.beta-mini .lock svg { width: 14px; height: 14px; color: #4f5a6b; }
+.beta-mini .lock b { font-size: 11px; letter-spacing: .2em; color: #4f5a6b; }
+.beta-mini .lock input { flex: 0 0 120px; min-width: 0; width: 120px; padding: 6px 8px; font-size: 13px; letter-spacing: .25em; }
+.beta-mini .lock .btn { padding: 7px 12px; font-size: 11px; }
+.beta-mini .lock-msg { flex-basis: auto; text-align: left; font-size: 11px; min-height: 0; }
+.beta-mini .lock.shake { animation: shake2 .35s; }
+@keyframes shake2 { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.beta-mini .warn { font-size: 14px; padding: 10px 14px; margin: 8px 0 12px; }
+.beta-mini .dl b { font-size: 16px; }
+.beta-mini .dl a { padding: 12px 14px; }
+.beta-mini .note { font-size: 13px; }
+@media (max-width: 600px) { .beta-mini .lock { margin-top: 0; flex-wrap: wrap; } }
+.beta-mini .lock[hidden], .beta-mini .beta-open[hidden] { display: none; }
+.beta-mini .dl span { font-size: 13px; }
+.beta-mini .dl code { font-size: 10px; }

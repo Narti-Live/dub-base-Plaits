@@ -34,7 +34,6 @@
       <a href="#cv">CV</a>
       <a href="#app">App</a>
       <a href="#downloads">Download</a>
-      <a href="#beta">Beta</a>
       <a href="#narti">Narti Live</a>
     </span>
   </nav>
@@ -117,35 +116,6 @@
       <div><h3>TRIG is the clock</h3><p>16th-note pulses into TRIG drive a 16-step generative sequencer. Unpatched, it runs at an internal 120&nbsp;BPM.</p></div>
       <div><h3>One-knob envelope</h3><p>FREQUENCY sets attack, decay and filter envelope together: short dark pluck, dub stab at noon, long swell on the right.</p></div>
       <div><h3>Root CV out</h3><p>AUX sends the root of every chord as 1&nbsp;V/oct, so a second synth can follow the progression.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="block beta" id="beta">
-  <div class="idx">β</div>
-  <div class="body">
-    <h2>Beta testing</h2>
-    <p class="lede-s">New versions in testing. Locked for testers.</p>
-    <div class="beta-wrap" id="betaWrap">
-      <div class="beta-blur" aria-hidden="true">
-        <div class="cols3">
-          <div class="vcard"><h3>Beta · version A</h3><p>New chords, new voicings, inversions.</p><p class="chords">█████ · ███ · ████</p><span class="btn">██████ .wav</span></div>
-          <div class="vcard"><h3>Beta · version B</h3><p>Another key, more chords.</p><p class="chords">████ · ██ · █████ · ███</p><span class="btn">██████ .wav</span></div>
-          <div class="vcard"><h3>Beta · apps</h3><p>Android builds of the beta firmwares.</p><p class="chords">██ · ███</p><span class="btn">██████ .apk</span></div>
-        </div>
-      </div>
-      <form class="lock" id="betaLock" autocomplete="off">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-        <b>Testers only</b>
-        <input type="password" inputmode="numeric" id="betaPw" placeholder="Password" aria-label="Beta password">
-        <button class="btn solid" type="submit" id="betaGo">Unlock</button>
-        <span class="lock-msg" id="betaMsg"></span>
-      </form>
-      <div class="beta-open" id="betaOpen" hidden>
-        <div class="warn"><b>Beta.</b> Not tested on hardware yet — use at your own risk, and please report what you find.</div>
-        <div class="dl" id="betaList"></div>
-        <p class="note" id="betaNote"></p>
-      </div>
     </div>
   </div>
 </section>
@@ -360,6 +330,33 @@
       <a href="https://www.youtube.com/@narti_live" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9.2v5.6l5-2.8z" fill="currentColor"/></svg>
         <b>YouTube</b><span>@narti_live</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="beta-mini" id="beta">
+  <div class="body">
+    <h4>beta testing</h4>
+    <div class="beta-wrap" id="betaWrap">
+      <div class="beta-blur" aria-hidden="true">
+        <div class="cols3">
+          <div class="vcard"><h3>Beta · version A</h3><p>New chords, new voicings, inversions.</p><p class="chords">█████ · ███ · ████</p><span class="btn">██████ .wav</span></div>
+          <div class="vcard"><h3>Beta · version B</h3><p>Another key, more chords.</p><p class="chords">████ · ██ · █████ · ███</p><span class="btn">██████ .wav</span></div>
+          <div class="vcard"><h3>Beta · apps</h3><p>Android builds of the beta firmwares.</p><p class="chords">██ · ███</p><span class="btn">██████ .apk</span></div>
+        </div>
+      </div>
+      <form class="lock" id="betaLock" autocomplete="off">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <b>Testers only</b>
+        <input type="password" inputmode="numeric" id="betaPw" placeholder="Password" aria-label="Beta password">
+        <button class="btn solid" type="submit" id="betaGo">Unlock</button>
+        <span class="lock-msg" id="betaMsg"></span>
+      </form>
+      <div class="beta-open" id="betaOpen" hidden>
+        <div class="warn"><b>Beta.</b> Not tested on hardware yet — use at your own risk, and please report what you find.</div>
+        <div class="dl" id="betaList"></div>
+        <p class="note" id="betaNote"></p>
+      </div>
     </div>
   </div>
 </section>
