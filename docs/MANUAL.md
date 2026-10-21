@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.6
+# DUB STAB PLAITS — v1.6.1
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -82,7 +82,7 @@ octave = one yellow LED, speed = one LED (straight green, triplets red).
 | 8 | **ACID** (mono bass) | cutoff | accent | resonance |
 
 **ACID (model 8)** plays a mono acid bass line generated with the pattern: chord roots, octaves,
-fifths and thirds, one octave below the chords, with slides and the pattern's accents. Every note
+fifths and thirds, one octave above the chords, with slides and the pattern's accents. Every note
 is in the key. On ACID, **FREQUENCY sets the filter envelope amount**; decay is fixed, the wave is
 a saw and the character warm. Accents are louder and snappier, and repeated accents build up a
 "sweep". Resonance goes up to a strong squelch but never self-oscillates, and the level matches
@@ -95,7 +95,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.6.wav` to the end (2 min 37 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.6.1.wav` to the end (2 min 37 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -103,6 +103,9 @@ the same way; your calibration is kept.
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
 ## Changes
+
+**v1.6.1**
+- ACID plays one octave above the chords; its cutoff range moved up with it.
 
 **v1.6**
 - New model 8: ACID, a mono acid bass line. STRING MACHINE moves to model 7; the Plaits CHORDS engine is removed.
