@@ -37,7 +37,7 @@
     </span>
   </nav>
   <div class="hero-text">
-    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.6.1 — by <a href="#narti">Narti Live</a></p>
+    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.6.2 — by <a href="#narti">Narti Live</a></p>
     <h1 class="title" aria-label="DUB STAB PLAITS">
       <span class="line" data-text="DUB STAB">DUB STAB</span>
       <span class="line l2" data-text="PLAITS">PLAITS</span>
@@ -46,7 +46,7 @@
       No effects inside: patch your own delay and reverb after it.</p>
     <div class="cta">
       <a class="btn solid" href="#flash">Flash from this page</a>
-      <a class="btn" href="downloads/DubStab-Plaits-v1.6.1.wav" download>Firmware .wav</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.6.2.wav" download>Firmware .wav</a>
       <a class="btn" href="downloads/DubStab-Plaits-v1.6.1.apk" download>Android app .apk</a>
       <a class="btn" href="docs/MANUAL.md">Manual</a>
     </div>
@@ -94,7 +94,7 @@
       </div>
       <div class="player" id="player">
         <div class="variant one" id="variants" role="radiogroup" aria-label="Firmware version">
-          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.6.1.wav" checked><b>C minor</b><span>v1.6.1 · release</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.6.2.wav" checked><b>C minor</b><span>v1.6.2 · release</span></label>
         </div>
         <div class="meter" aria-hidden="true">
           <span class="m red"></span><span class="m yel"></span><span class="m grn"></span><span class="m grn"></span>
@@ -107,7 +107,7 @@
           <button class="btn" id="flashStop" type="button" disabled>Stop &amp; restart</button>
         </div>
         <p class="note" id="flashStatus">Ready. The file (14.8 MB) loads when you press Play.</p>
-        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.6.1.wav"></audio>
+        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.6.2.wav"></audio>
       </div>
     </div>
   </div>
@@ -155,7 +155,7 @@
         <tr><th>TRIG</th><td>Clock in, counted as 16ths. Unpatched: internal 120 BPM.</td></tr>
         <tr><th>V/OCT</th><td>Moves the progression by scale degrees (D = ii, Eb = III …), snapped to C minor.</td></tr>
         <tr><th>MODEL</th><td>Selects the chord model.</td></tr>
-        <tr><th>HARMO · TIMBRE · MORPH</th><td>CV for those parameters (TIMBRE and MORPH at full strength).</td></tr>
+        <tr><th>HARMO · TIMBRE · MORPH</th><td>CV for those parameters, attenuated: a full ±5 V moves them only ±15 % around the knob.</td></tr>
         <tr><th>LEVEL</th><td>VCA on OUT.</td></tr>
         <tr><th>FM</th><td>Not used.</td></tr>
         <tr><th>OUT / AUX</th><td>The chords / the chord root as 1 V/oct, C3 = 0 V, held until the next chord.</td></tr>
@@ -251,15 +251,16 @@
   <div class="body">
     <h2>Downloads</h2>
     <div class="dl">
-      <a href="downloads/DubStab-Plaits-v1.6.1.wav" download><b>DubStab-Plaits-v1.6.1.wav</b><span>Firmware for the module · 15.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.6.2.wav" download><b>DubStab-Plaits-v1.6.2.wav</b><span>Firmware for the module · 15.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.6.1.apk" download><b>DubStab-Plaits-v1.6.1.apk</b><span>Android app · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
       <a href="downloads/DubStab-Plaits-v1.6.1-ACID-demo.mp3"><b>ACID demo .mp3</b><span>24 s: dry, then with the app’s echo + reverb</span></a>
-      <a href="downloads/DubStab-Plaits-v1.6.1.bin" download><b>DubStab-Plaits-v1.6.1.bin</b><span>Raw image for SWD / ST-Link</span></a>
+      <a href="downloads/DubStab-Plaits-v1.6.2.bin" download><b>DubStab-Plaits-v1.6.2.bin</b><span>Raw image for SWD / ST-Link</span></a>
     </div>
     <details class="more"><summary>Checksums, changes, source</summary>
-      <p class="note mono">wav df0fcc3cb5d21add2d433e9642696669cae823b05a510d6b98c6f0dac0dd9473<br>apk e0d07b976408e45f059983e0d5c46e27b5fa91058012dbb2ce478fc6bc6ed49a<br>bin 975abbfc1a036d3de5938df0b1fa4fd1317cd30f0fdcf643cb3cca9a3034b297</p>
+      <p class="note mono">wav 0507fbfef6da90ff5c4c768d3d792ec167c95b7b66160b3ca4a55f198be6736f<br>apk e0d07b976408e45f059983e0d5c46e27b5fa91058012dbb2ce478fc6bc6ed49a<br>bin 3ddb76ee990e9c958f11554f090406e3373c4da9d3a28bf8968d6b51e7a29fe1</p>
       <dl class="log">
+        <dt>v1.6.2</dt><dd>HARMO, TIMBRE and MORPH CV attenuated: ±5 V moves ±15 % around the knob. (App unchanged, stays v1.6.1.)</dd>
         <dt>v1.6.1</dt><dd>ACID plays one octave above the chords.</dd>
         <dt>v1.6</dt><dd>New model 8: ACID, a mono acid bass line (FREQUENCY = env mod, HARMONICS = cutoff, MORPH = resonance, TIMBRE = accent). STRING MACHINE moves to 7, the CHORDS engine is gone.</dd>
         <dt>name</dt><dd>DUB BASE is now DUB STAB PLAITS.</dd>

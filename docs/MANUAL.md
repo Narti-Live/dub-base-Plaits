@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.6.1
+# DUB STAB PLAITS — v1.6.2
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -55,7 +55,7 @@ while a note is held, the output stage is AC-coupled and the CV cannot work on t
 | **TRIG** | Clock in, counted as 16ths. Unpatched: internal 120 BPM. |
 | **V/OCT** | Picks the chord's scale degree (D = II, Eb = III …). It is snapped to C minor, so chords stay in the scale. |
 | **MODEL** | Selects the chord model |
-| **HARMONICS / TIMBRE / MORPH** | CV for those parameters |
+| **HARMONICS / TIMBRE / MORPH** | CV for those parameters, attenuated: a full ±5 V swing moves them ±15 % around the knob position (1 V = 3 %) |
 | **LEVEL** | VCA |
 | **FM** | not used |
 | **OUT** | Chords |
@@ -95,7 +95,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.6.1.wav` to the end (2 min 37 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.6.2.wav` to the end (2 min 37 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -103,6 +103,9 @@ the same way; your calibration is kept.
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
 ## Changes
+
+**v1.6.2**
+- HARMONICS, TIMBRE and MORPH CV inputs attenuated: ±5 V now moves ±15 % around the knob (before: HARMONICS ±100 %, TIMBRE/MORPH ±160 %). The Android app has no CV inputs, so it stays v1.6.1.
 
 **v1.6.1**
 - ACID plays one octave above the chords; its cutoff range moved up with it.
