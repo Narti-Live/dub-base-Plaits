@@ -232,7 +232,7 @@ footer p { margin: 0 0 6px; }
 .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 22px; }
 .vcard { display: flex; flex-direction: column; }
 .vcard .btn { margin-top: auto; align-self: flex-start; }
-.variant { grid-template-columns: repeat(3, 1fr); }
+.variant { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
 .appdl { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 16px; }
 @media (max-width: 980px) { .cols3 { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .variant { grid-template-columns: 1fr; } }

@@ -94,8 +94,9 @@
         </details>
       </div>
       <div class="player" id="player">
-        <div class="variant one" id="variants" role="radiogroup" aria-label="Firmware version">
-          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.1.wav" checked><b>C minor</b><span>v1.1 · release</span></label>
+        <div class="variant" id="variants" role="radiogroup" aria-label="Firmware version">
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.1.wav" data-label="C minor, release v1.1" checked><b>C minor</b><span>v1.1 · all chords, DUB voicing</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.1-DEEP.wav" data-label="C minor DEEP, release v1.1"><b>C minor DEEP</b><span>v1.1 · open dub techno chords</span></label>
         </div>
         <div class="meter" aria-hidden="true">
           <span class="m red"></span><span class="m yel"></span><span class="m grn"></span><span class="m grn"></span>
@@ -286,16 +287,18 @@
     <div class="dl">
       <a href="downloads/DubStab-Plaits-v1.1.wav" download><b>DubStab-Plaits-v1.1.wav</b><span>Firmware for the module · 15.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.1.apk" download><b>DubStab-Plaits-v1.1.apk</b><span>Android app · 0.5 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.1-DEEP.wav" download><b>DubStab-Plaits-v1.1-DEEP.wav</b><span>Firmware · C minor DEEP chords · 15.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.1-DEEP.apk" download><b>DubStab-Plaits-v1.1-DEEP.apk</b><span>Android app “Dub Stab Deep” · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
       <a href="downloads/DubStab-M4L-v1.0.zip" download><b>DubStab-M4L-v1.0.zip</b><span>Max for Live devices · 0.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3"><b>ACID demo .mp3</b><span>24 s: dry, then with the app’s echo + reverb</span></a>
       <a href="downloads/DubStab-Plaits-v1.1.bin" download><b>DubStab-Plaits-v1.1.bin</b><span>Raw image for SWD / ST-Link</span></a>
     </div>
     <details class="more"><summary>Checksums, version, source</summary>
-      <p class="note mono">wav 4734f82c6b94b246fd619a5f05ebd8e9099d603fe59f6f530823e005ec5df205<br>apk a31d0decc7d6a8eae933ea8338e42bacb4d8761f9f8702bb9fb8acf8b49124bb<br>bin a3f312bad4f6bb7f91e2baae9ec53e61f96a003c52b8dc7ca3624da635838520</p>
+      <p class="note mono">wav 4734f82c6b94b246fd619a5f05ebd8e9099d603fe59f6f530823e005ec5df205<br>apk a31d0decc7d6a8eae933ea8338e42bacb4d8761f9f8702bb9fb8acf8b49124bb<br>bin a3f312bad4f6bb7f91e2baae9ec53e61f96a003c52b8dc7ca3624da635838520<br>DEEP wav 4f7c9e3f171ec3f04f0e60374ec42216aa4320222462b1db6a21a3859dc4ba41<br>DEEP apk e6b00cd6734d59fa2793db1d93850c999687461ad356b0d86dd504d4e6910618<br>DEEP bin 1c5bbdb808889069894d9c41028c8e28f9efee64379d2d4933bfcd7025815e16</p>
       <dl class="log">
         <dt>v1.0</dt><dd>First release. Generative dub techno stabs in key, 8 chord models (model 7 STRING MACHINE, model 8 ACID bass line one octave above the chords), 16-step sequencer on the attenuverters, clean levelled output, AUX = 1 V/oct root CV with CV TUNE, HARMO · TIMBRE · MORPH CV attenuated to ±15 %. Android app with tape echo and reverb.</dd>
-        <dt>v1.1</dt><dd>Hold RIGHT switches each model between chords and single notes (ACID: mono line or acid chords) instead of randomising the knobs. The model LED shows it: yellow = chords, red = single notes.</dd>
+        <dt>v1.1</dt><dd>Two versions: C minor (all 7 chords, DUB voicing) and <b>C minor DEEP</b> — open dub techno shapes: DUB m7, open m9, stacked 4ths (m11), 7sus4, sus2, fifths, open minor, m(add9), one shape per pattern most of the time, no major chords. Hold RIGHT switches each model between chords and single notes (ACID: mono line or acid chords) instead of randomising the knobs. The model LED shows it: yellow = chords, red = single notes.</dd>
         <dt>app 1.0.1</dt><dd>Screen recordings now include the app’s sound (Android “record device audio”).</dd>
         <dt>M4L 1.0</dt><dd>Max for Live devices: Dub Stab MIDI, Dub Stab Synth, Dub Stab Plaits — root, four minor scales, minor chords only, CHORDS on/off (mono notes).</dd>
       </dl>
