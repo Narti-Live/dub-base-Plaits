@@ -105,7 +105,7 @@ the same way; your calibration is kept.
 ## Version
 
 **v1.1** — hold RIGHT: chords / single notes per model, acid chords.
-  Also as **C minor DEEP** (`DubStab-Plaits-v1.1-DEEP.wav`): open dub techno shapes in root position — DUB m7, open m9, stacked 4ths (m11), 7sus4, sus2, fifths, open minor, m(add9). One shape per pattern most of the time; roots mostly i, iv, v, with VII and VI; on III, VI and VII the shapes become sus chords, so no major chord sounds.
+  Also as **C minor DEEP** (`DubStab-Plaits-v1.1-Cm-DEEP.wav`): open dub techno shapes in root position — DUB m7, open m9, stacked 4ths (m11), 7sus4, sus2, fifths, open minor, m(add9). One shape per pattern most of the time; roots mostly i, iv, v, with VII and VI; on III, VI and VII the shapes become sus chords, so no major chord sounds.
 
 **v1.0** — first release.
 
