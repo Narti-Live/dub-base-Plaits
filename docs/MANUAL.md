@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.0
+# DUB STAB PLAITS — v1.1
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -22,7 +22,7 @@ your own delay and reverb after it. Based on the open-source Plaits firmware by 
 | **MORPH attenuverter** | **Speed**: 1/2, 1/4, 1/8, **1/8T**, 1/16 (centre), **1/16T**, 1/32, **1/32T** |
 | Tap **LEFT / RIGHT** | Previous / next chord model |
 | Hold **LEFT** 1 s | **NEW** pattern (LEDs pulse green, then sweep) |
-| Hold **RIGHT** 1 s | **RANDOM** sound: new HARMONICS / TIMBRE / MORPH (the knobs pick up again when you turn them) |
+| Hold **RIGHT** 1 s | **Chords / single notes** for the model that is playing (each model remembers it). Single notes = one note per step, a melody in the scale that follows the chord progression. ACID starts on its mono line; hold RIGHT for **acid chords**. The model LED is **yellow** for chords, **red** for single notes. |
 
 A slow random LFO is always on (speed 20, depth 15). It gently drifts HARMONICS, TIMBRE,
 MORPH and the filter.
@@ -95,7 +95,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.0.wav` to the end (2 min 37 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.1.wav` to the end (2 min 37 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -103,6 +103,8 @@ the same way; your calibration is kept.
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
 ## Version
+
+**v1.1** — hold RIGHT: chords / single notes per model, acid chords.
 
 **v1.0** — first release.
 

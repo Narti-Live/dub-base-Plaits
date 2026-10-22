@@ -13,8 +13,8 @@ app that runs the same firmware code so you can try it on your phone.
 
 | Download | |
 |---|---|
-| [`DubStab-Plaits-v1.0.wav`](downloads/DubStab-Plaits-v1.0.wav) | Firmware update for the module (play it into Plaits) |
-| [`DubStab-Plaits-v1.0.1.apk`](downloads/DubStab-Plaits-v1.0.1.apk) | Android app (Android 8+), with tape echo + reverb |
+| [`DubStab-Plaits-v1.1.wav`](downloads/DubStab-Plaits-v1.1.wav) | Firmware update for the module (play it into Plaits) |
+| [`DubStab-Plaits-v1.1.apk`](downloads/DubStab-Plaits-v1.1.apk) | Android app (Android 8+), with tape echo + reverb |
 | [`DubStab-M4L-v1.0.zip`](downloads/DubStab-M4L-v1.0.zip) | Max for Live devices: Dub Stab MIDI, Dub Stab Synth, Dub Stab Plaits (root, four minor scales, minor chords only) |
 
 Also: [`MANUAL.md`](docs/MANUAL.md) and the raw `.bin` image for SWD / ST-Link in [`downloads/`](downloads/) (app at `0x08008000`). Beta versions for testers are on the website (password protected).
@@ -23,7 +23,7 @@ Also: [`MANUAL.md`](docs/MANUAL.md) and the raw `.bin` image for SWD / ST-Link i
 
 1. Power off, unplug all cables from Plaits, patch your computer's headphone output into **MODEL**.
 2. Set **FREQUENCY** to 12 o'clock, hold the **LEFT** button and power on.
-3. Play `DubStab-Plaits-v1.0.wav` at about 80 % volume (no MP3, no notification sounds), or use the flasher on the website.
+3. Play `DubStab-Plaits-v1.1.wav` at about 80 % volume (no MP3, no notification sounds), or use the flasher on the website.
    The level meter (LEDs 1–4) should show both green LEDs lit, yellow at most flickering, red off. When it ends, the module restarts into DUB STAB PLAITS.
 
 All LEDs blinking red: press LEFT, nudge FREQUENCY and play the file again.
@@ -38,7 +38,8 @@ Going back: install the official Plaits WAV the same way.
 | HARMONICS · TIMBRE · MORPH | Sound of the chord model |
 | Attenuverters | Density · length · speed (with triplets) |
 | Tap LEFT / RIGHT | Previous / next chord model |
-| Hold LEFT / RIGHT 1 s | NEW pattern / RANDOM sound |
+| Hold LEFT 1 s | NEW pattern |
+| Hold RIGHT 1 s | Chords / single notes for the playing model (LED yellow / red) |
 | Both buttons 2 s | CV TUNE for the AUX pitch CV |
 
 ## Repository
