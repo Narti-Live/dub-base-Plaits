@@ -1,4 +1,4 @@
-MONSOON — Narti Live firmware v1.6 (Parasites v2.01 for Monsoon + new modes)
+MONSOON — Narti Live firmware v1.7 (Parasites v2.01 for Monsoon + new modes)
 unofficial, use at your own risk
 
 MODES (open mode select: press the LED button + LOAD/SAVE together, or hold the
@@ -68,29 +68,40 @@ BUTTONS AND JACKS
   Mode select ......... hold the LED button 2.5 s without moving a control
                         (or LED + LOAD/SAVE together)
 
-ALGORITHMS (first switch / second switch)
-  1 up/up         ANALOGUE PAIR + DUNGEON   WARP L expo FM, R ring mod; SPAN
-                  modulator tuning; MORPH carrier pulse>saw>sine; SCAN
-                  modulator wave; FUSE L chorus, R resonance + band-pass
-  2 up/centre     WAVESHAPING PAIR + REFLEKTA   WARP L index + mod feedback,
-                  R index + carrier feedback; SPAN carrier ratio; SCAN shaper
-                  set; FUSE L audio-rate delay mod, R saturation
-  3 up/down       SINE CLUSTER BANK + DUNGEON   WARP L phase feedback, R cross
-                  FM; MORPH cluster scan; SCAN ring-mod mix; FUSE L chorus,
-                  R noise modulation
-  4 centre/up     4-OSC WAVETABLE + DUNGEON   WARP L bit reduction, R cross FM;
-                  MORPH frame; SCAN table set; FUSE L band-pass + sine,
-                  R chorus + resonance
-  5 centre/centre 4-OSC WAVETABLE + DUNGEON   WARP L phase mod, R cross FM;
-                  FUSE L chorus, R chorus + resonance
-  6 centre/down   4-OSC WAVETABLE + REFLEKTA   WARP as 5; FUSE L oscillator-
-                  modulated all-pass, R wavefold per oscillator
-  7 down/up       DIATONIC CLUSTER + REFLEKTA (minor-scale quantised spread)
-  8 down/centre   CLUSTER + DUNGEON
-  9 down/down     CLUSTER + REFLEKTA
-                  (7-9: WARP L phase mod, R cross FM; SPAN bipolar cluster
-                  spread; MORPH cluster scan; SCAN table set; FUSE L stereo
-                  chorus, R saturation)
+ALGORITHMS (first switch / second switch) - each with its own character
+  1 up/up         ANALOGUE PAIR + DUNGEON: carrier + modulator with a soft sub
+                  an octave down; clear tape-like repeats.
+                  WARP L expo FM, R ring mod; SPAN modulator tuning; MORPH
+                  carrier pulse>saw>sine; SCAN modulator wave; FUSE L chorus,
+                  R resonance + band-pass
+  2 up/centre     WAVESHAPING PAIR + REFLEKTA: a stereo shaped pair.
+                  WARP L index + mod feedback, R index + carrier feedback; SPAN
+                  carrier ratio; SCAN shaper set; FUSE L audio-rate delay mod,
+                  R saturation
+  3 up/down       SINE CLUSTER + DUNGEON: pure sines that shimmer slowly.
+                  WARP L phase feedback, R cross FM; MORPH cluster; SCAN
+                  ring-mod mix; FUSE L chorus, R noise modulation
+  4 centre/up     STACK WAVETABLE + DUNGEON: four detuned oscillators, a
+                  built-in unison chorus. WARP L bit reduction, R cross FM;
+                  MORPH frame; SCAN table set; SPAN wider unison; FUSE L
+                  band-pass + sine, R chorus + resonance
+  5 centre/centre FM WAVETABLE + DUNGEON (short, bright combs): two carrier /
+                  modulator pairs, bells, keys, glass. SPAN = the ratio (0.5,
+                  1, 1.5, 2 ... 7), WARP L the FM index, R cross FM; MORPH
+                  carrier frame; SCAN carrier set; FUSE L chorus + sub
+  6 centre/down   FORMANT WAVETABLE + REFLEKTA: window-synced grains, vocal
+                  and resonant. MORPH = the vowel / formant, WARP L formant
+                  wobble, R cross FM; SCAN table set; FUSE L oscillator all-
+                  pass, R wavefold
+  7 down/up       DIATONIC PAD + REFLEKTA (long, dark): minor-scale chord
+                  tones on soft tables that breathe slowly
+  8 down/centre   METAL CLUSTER + DUNGEON (short metallic combs): inharmonic,
+                  bell-like partials that ring into each other
+  9 down/down     SWARM + REFLEKTA (very long wash): octave stacks of drifting,
+                  shimmering voices
+                  (7-9: WARP L phase mod, R cross FM; SPAN spread; MORPH
+                  cluster scan; SCAN table set; FUSE L stereo chorus,
+                  R saturation)
 
 ------------------------------------------------------------------------------
 7  CAVERN (Vhikk X-inspired space)
@@ -104,13 +115,16 @@ ALGORITHMS (first switch / second switch)
   REVERB Clouds reverb · FREEZE holds the sweep · TRIG restarts the LFO
 
 INSTALL
-  Hold FREEZE and power on, play Monsoon-NartiLive-v1.6.wav (about 5.5 minutes) into IN L (no MP3,
+  Hold FREEZE and power on, play Monsoon-NartiLive-v1.7.wav (about 5.5 minutes) into IN L (no MP3,
   no notification sounds). The module restarts when it is done.
 GO BACK
   Monsoon-ORIGINAL-Parasites-v2.01-restore.wav = the original Monsoon firmware
   (Tom Burns, github.com/boourns/eurorack). Install it the same way.
 
 CHANGES
+  v1.7  Every VHIKK algorithm has its own character (sub oscillator, shimmer,
+        unison stack, FM, formant, breathing pad, metal, swarm) and its own
+        space (delay time, structure and tone).
   v1.6  VHIKK sounds cleaner and keeps its level:
         - band-limited wavetables with 4x more harmonics (96), switching
           smoothly to simpler versions as the pitch goes up: no aliasing fizz

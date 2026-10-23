@@ -1,12 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>html,body{margin:0}</style>
-</head>
-<body>
 <title>Monsoon Narti Live Manual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -109,7 +102,7 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); max-width: 72ch
 
 <div class="wrap">
   <header>
-    <div class="eyebrow"><a href="../" style="color:inherit">← Monsoon firmware page</a> · After Later Audio Monsoon · Narti Live firmware v1.6</div>
+    <div class="eyebrow">After Later Audio Monsoon · Narti Live firmware v1.7</div>
     <h1>Monsoon <span>visual manual</span></h1>
     <p class="lede">What every knob, fader, button and jack does in the three new modes, with a sound example for each control. Tap a control on the panel or in the list. The VHIKK examples are the module on its own with no input; the CAVERN and PHASER examples process the Dub Stab Cm DEEP chords.</p>
   </header>
@@ -182,8 +175,8 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); max-width: 72ch
       tab: "VHIKK", num: "8", leds: VOICE_LEDS, ledtext: "all but LED 4",
       intro: "A stereo drone voice and processor, highly inspired by the Forge TME Vhikk X: nine algorithms, each a generator, a FIELD filter and a VCA, then the CAVERN engine as a metallic DUNGEON or a diffuse REFLEKTA delay. Everything is on one page. The Monsoon has 9 controls and the Vhikk X has 12, so SPAN, FUSE and SCAN are played with the LED button held, the way the Vhikk X shares its encoders.",
       items: [
-        ["disp", "LED button", "Algorithm + shift", "Tap for the next algorithm 1 to 9. LEDs 1 to 3 show the two switches of the original: green = first switch (up, centre, down), red = second switch, amber when both are on one LED; green glows with the VCA. Hold it and move STEREO, REVERB or SIZE to play SPAN, FUSE and SCAN. Held 2.5 s without moving anything = mode select.",
-          [["x_alg1", "1 Analogue pair"], ["x_alg2", "2 Waveshaping pair"], ["x_alg3", "3 Sine cluster"], ["x_alg4", "4 Wavetable"], ["x_alg5", "5 Wavetable"], ["x_alg6", "6 Wavetable"], ["x_alg7", "7 Diatonic cluster"], ["x_alg8", "8 Cluster"], ["x_alg9", "9 Cluster"]],
+        ["disp", "LED button", "Algorithm + shift", "Tap for the next algorithm 1 to 9, each with its own character and space: 1 analogue pair with a sub, 2 stereo waveshaping pair, 3 shimmering sine cluster, 4 unison wavetable stack, 5 FM wavetable (SPAN = ratio), 6 formant wavetable (MORPH = vowel), 7 breathing diatonic pad, 8 metal cluster, 9 drifting swarm. LEDs 1 to 3 show the two switches of the original: green = first switch (up, centre, down), red = second switch, amber when both are on one LED; green glows with the VCA. Hold it and move STEREO, REVERB or SIZE to play SPAN, FUSE and SCAN. Held 2.5 s without moving anything = mode select.",
+          [["x_alg1", "1 Analogue pair + sub"], ["x_alg2", "2 Waveshaping pair"], ["x_alg3", "3 Sine shimmer"], ["x_alg4", "4 Unison stack"], ["x_alg5", "5 FM"], ["x_alg6", "6 Formant"], ["x_alg7", "7 Diatonic pad"], ["x_alg8", "8 Metal"], ["x_alg9", "9 Swarm"]],
           "Each algorithm as a drone, the root moving every 2.5 s and MORPH drifting.", null, "ALGORITHM"],
         ["leds", "4 LEDs", "Switches + VCA", "LED 1 to 3: the algorithm as two switches. LED 4: red while the LED button is held (shift), blue when the processor is frozen."],
         ["save", "LOAD/SAVE button", "Scan step", "Tap to jump SCAN to the next table set (it glides there). Hold the LED button and move SIZE for SCAN in between.", null, null, null, "SCAN"],
@@ -490,6 +483,3 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); max-width: 72ch
   render();
 })();
 </script>
-
-</body>
-</html>
