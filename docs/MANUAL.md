@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.1
+# DUB STAB PLAITS — v1.2
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -52,7 +52,7 @@ while a note is held, the output stage is AC-coupled and the CV cannot work on t
 
 | Jack | Function |
 |---|---|
-| **TRIG** | Clock in, counted as 16ths. Unpatched: internal 120 BPM. |
+| **TRIG** | Clock in, counted as 16ths. Starting the clock starts the pattern from step 1: when the clock stops (no pulse for 4 clock periods, 0.5–4.5 s) the sequencer goes back to the first step and waits. Plugging the cable in does the same. Unpatched: internal 120 BPM. |
 | **V/OCT** | Picks the chord's scale degree (D = II, Eb = III …). It is snapped to C minor, so chords stay in the scale. |
 | **MODEL** | Selects the chord model |
 | **HARMONICS / TIMBRE / MORPH** | CV for those parameters, attenuated: a full ±5 V swing moves them ±15 % around the knob position (1 V = 3 %) |
@@ -95,7 +95,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.1.wav` to the end (2 min 37 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.2.wav` (or `DubStab-Plaits-v1.2-Cm-DEEP.wav`) to the end (2 min 37 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -103,6 +103,8 @@ the same way; your calibration is kept.
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
 ## Version
+
+**v1.2** — starting the TRIG clock starts the sequencer from step 1 (both versions).
 
 **v1.1** — hold RIGHT: chords / single notes per model, acid chords.
   Also as **C minor DEEP** (`DubStab-Plaits-v1.1-Cm-DEEP.wav`): open dub techno shapes in root position — DUB m7, open m9, stacked 4ths (m11), 7sus4, sus2, fifths, open minor, m(add9). One shape per pattern most of the time; roots mostly i, iv, v, with VII and VI; on III, VI and VII the shapes become sus chords, so no major chord sounds.

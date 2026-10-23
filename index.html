@@ -38,7 +38,7 @@
     </span>
   </nav>
   <div class="hero-text">
-    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.1 — by <a href="#narti">Narti Live</a></p>
+    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.2 — by <a href="#narti">Narti Live</a></p>
     <h1 class="title" aria-label="DUB STAB PLAITS">
       <span class="line" data-text="DUB STAB">DUB STAB</span>
       <span class="line l2" data-text="PLAITS">PLAITS</span>
@@ -47,7 +47,7 @@
       No effects inside: patch your own delay and reverb after it.</p>
     <div class="cta">
       <a class="btn solid" href="#flash">Flash from this page</a>
-      <a class="btn" href="downloads/DubStab-Plaits-v1.1.wav" download>Firmware .wav</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.2.wav" download>Firmware .wav</a>
       <a class="btn" href="downloads/DubStab-Plaits-v1.1.apk" download>Android app .apk</a>
       <a class="btn" href="#m4l">Max for Live</a>
       <a class="btn" href="docs/MANUAL.md">Manual</a>
@@ -96,8 +96,8 @@
       </div>
       <div class="player" id="player">
         <div class="variant" id="variants" role="radiogroup" aria-label="Firmware version">
-          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.1.wav" data-label="C minor, release v1.1" checked><b>C minor</b><span>v1.1 · all chords, DUB voicing</span></label>
-          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.1-Cm-DEEP.wav" data-label="Cm DEEP, release v1.1"><b>Cm DEEP</b><span>v1.1 · open dub techno chords</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.2.wav" data-label="C minor, release v1.2" checked><b>C minor</b><span>v1.2 · all chords, DUB voicing</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.2-Cm-DEEP.wav" data-label="Cm DEEP, release v1.2"><b>Cm DEEP</b><span>v1.2 · open dub techno chords</span></label>
         </div>
         <div class="meter" aria-hidden="true">
           <span class="m red"></span><span class="m yel"></span><span class="m grn"></span><span class="m grn"></span>
@@ -110,7 +110,7 @@
           <button class="btn" id="flashStop" type="button" disabled>Stop &amp; restart</button>
         </div>
         <p class="note" id="flashStatus">Ready. The file (14.8 MB) loads when you press Play.</p>
-        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.1.wav"></audio>
+        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.2.wav"></audio>
       </div>
     </div>
   </div>
@@ -122,7 +122,7 @@
     <h2>What it is</h2>
     <div class="cols4">
       <div><h3>Dub chords</h3><p>C minor DUB voicings: root, 5th, 7th, 3rd and 5th up. Never out of key.</p></div>
-      <div><h3>TRIG = clock</h3><p>16th pulses drive a 16-step generative sequencer. Unpatched: 120 BPM.</p></div>
+      <div><h3>TRIG = clock</h3><p>16th pulses drive a 16-step generative sequencer. Start the clock and it plays from step 1. Unpatched: 120 BPM.</p></div>
       <div><h3>One-knob envelope</h3><p>FREQUENCY: pluck → dub stab → long swell, filter included.</p></div>
       <div><h3>Root CV out</h3><p>AUX: the chord root as 1 V/oct for a second synth.</p></div>
     </div>
@@ -155,7 +155,7 @@
       </table>
       <h3>Jacks</h3>
       <table class="spec">
-        <tr><th>TRIG</th><td>Clock in, counted as 16ths. Unpatched: internal 120 BPM.</td></tr>
+        <tr><th>TRIG</th><td>Clock in, counted as 16ths. When the clock stops (no pulse for 4 clock periods, 0.5–4.5 s) the sequencer goes back to step 1, so starting the clock always starts the pattern from the beginning; plugging the cable in does the same. Unpatched: internal 120 BPM.</td></tr>
         <tr><th>V/OCT</th><td>Moves the progression by scale degrees (D = ii, Eb = III …), snapped to C minor.</td></tr>
         <tr><th>MODEL</th><td>Selects the chord model.</td></tr>
         <tr><th>HARMO · TIMBRE · MORPH</th><td>CV for those parameters, attenuated: a full ±5 V moves them only ±15 % around the knob.</td></tr>
@@ -286,20 +286,22 @@
   <div class="body">
     <h2>Downloads</h2>
     <div class="dl">
-      <a href="downloads/DubStab-Plaits-v1.1.wav" download><b>DubStab-Plaits-v1.1.wav</b><span>Firmware for the module · 15.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.2.wav" download><b>DubStab-Plaits-v1.2.wav</b><span>Firmware for the module · 15.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.1.apk" download><b>DubStab-Plaits-v1.1.apk</b><span>Android app · 0.5 MB</span></a>
-      <a href="downloads/DubStab-Plaits-v1.1-Cm-DEEP.wav" download><b>DubStab-Plaits-v1.1-Cm-DEEP.wav</b><span>Firmware · C minor DEEP chords · 15.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.2-Cm-DEEP.wav" download><b>DubStab-Plaits-v1.2-Cm-DEEP.wav</b><span>Firmware · C minor DEEP chords · 15.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.1-Cm-DEEP.apk" download><b>DubStab-Plaits-v1.1-Cm-DEEP.apk</b><span>Android app “Dub Stab Cm Deep” · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
       <a href="downloads/DubStab-M4L-v1.0.zip" download><b>DubStab-M4L-v1.0.zip</b><span>Max for Live devices · 0.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3"><b>ACID demo .mp3</b><span>24 s: dry, then with the app’s echo + reverb</span></a>
-      <a href="downloads/DubStab-Plaits-v1.1.bin" download><b>DubStab-Plaits-v1.1.bin</b><span>Raw image for SWD / ST-Link</span></a>
+      <a href="downloads/DubStab-Plaits-v1.2.bin" download><b>DubStab-Plaits-v1.2.bin</b><span>Raw image for SWD / ST-Link</span></a>
+      <a href="downloads/DubStab-Plaits-v1.2-Cm-DEEP.bin" download><b>DubStab-Plaits-v1.2-Cm-DEEP.bin</b><span>Raw image, Cm DEEP</span></a>
     </div>
     <details class="more"><summary>Checksums, version, source</summary>
-      <p class="note mono">wav 4734f82c6b94b246fd619a5f05ebd8e9099d603fe59f6f530823e005ec5df205<br>apk a31d0decc7d6a8eae933ea8338e42bacb4d8761f9f8702bb9fb8acf8b49124bb<br>bin a3f312bad4f6bb7f91e2baae9ec53e61f96a003c52b8dc7ca3624da635838520<br>DEEP wav 4f7c9e3f171ec3f04f0e60374ec42216aa4320222462b1db6a21a3859dc4ba41<br>DEEP apk d240c239fe8e134bd5b41d34c882d1c8cff471072562e5669f2759eca45f11d8<br>DEEP bin 1c5bbdb808889069894d9c41028c8e28f9efee64379d2d4933bfcd7025815e16</p>
+      <p class="note mono">wav bfceee9488fac5c0b168ab47bf138c4235599f04378fb3638763bd34a0e9a618<br>apk a31d0decc7d6a8eae933ea8338e42bacb4d8761f9f8702bb9fb8acf8b49124bb<br>bin 376a58b5c1af5e2cdcbc63aa5ff4311864500bd06313d37950af9bb5563495bb<br>DEEP wav e19dbcee9fc664fcd4a388ee21ca13e68365b571c38d0e5d8695e74d157ce6bc<br>DEEP apk d240c239fe8e134bd5b41d34c882d1c8cff471072562e5669f2759eca45f11d8<br>DEEP bin f288bdf996908f5c24dab80bf89f1af107ec8e4151934c0954a29bcea8dc0524</p>
       <dl class="log">
         <dt>v1.0</dt><dd>First release. Generative dub techno stabs in key, 8 chord models (model 7 STRING MACHINE, model 8 ACID bass line one octave above the chords), 16-step sequencer on the attenuverters, clean levelled output, AUX = 1 V/oct root CV with CV TUNE, HARMO · TIMBRE · MORPH CV attenuated to ±15 %. Android app with tape echo and reverb.</dd>
         <dt>v1.1</dt><dd>Two versions: C minor (all 7 chords, DUB voicing) and <b>C minor DEEP</b> — open dub techno shapes: DUB m7, open m9, stacked 4ths (m11), 7sus4, sus2, fifths, open minor, m(add9), one shape per pattern most of the time, no major chords. Hold RIGHT switches each model between chords and single notes (ACID: mono line or acid chords) instead of randomising the knobs. The model LED shows it: yellow = chords, red = single notes.</dd>
+        <dt>v1.2</dt><dd>Both versions (C minor and Cm DEEP): starting the TRIG clock starts the sequencer from step 1. When the clock stops (no pulse for 4 clock periods, between 0.5 and 4.5 s) it goes back to the first step and waits; plugging the clock in does the same. Short hiccups in the clock do not reset it. The Android apps stay at v1.1.</dd>
         <dt>app 1.0.1</dt><dd>Screen recordings now include the app’s sound (Android “record device audio”).</dd>
         <dt>M4L 1.0</dt><dd>Max for Live devices: Dub Stab MIDI, Dub Stab Synth, Dub Stab Plaits — root, four minor scales, minor chords only, CHORDS on/off (mono notes).</dd>
       </dl>
