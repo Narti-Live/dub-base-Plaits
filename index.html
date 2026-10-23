@@ -38,7 +38,7 @@
     </span>
   </nav>
   <div class="hero-text">
-    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.2 — by <a href="#narti">Narti Live</a></p>
+    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.3 — by <a href="#narti">Narti Live</a></p>
     <h1 class="title" aria-label="DUB STAB PLAITS">
       <span class="line" data-text="DUB STAB">DUB STAB</span>
       <span class="line l2" data-text="PLAITS">PLAITS</span>
@@ -47,8 +47,8 @@
       No effects inside: patch your own delay and reverb after it.</p>
     <div class="cta">
       <a class="btn solid" href="#flash">Flash from this page</a>
-      <a class="btn" href="downloads/DubStab-Plaits-v1.2.wav" download>Firmware .wav</a>
-      <a class="btn" href="downloads/DubStab-Plaits-v1.1.apk" download>Android app .apk</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.3.wav" download>Firmware .wav</a>
+      <a class="btn" href="downloads/DubStab-Plaits-v1.3.apk" download>Android app .apk</a>
       <a class="btn" href="#m4l">Max for Live</a>
       <a class="btn" href="docs/MANUAL.md">Manual</a>
     </div>
@@ -96,8 +96,8 @@
       </div>
       <div class="player" id="player">
         <div class="variant" id="variants" role="radiogroup" aria-label="Firmware version">
-          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.2.wav" data-label="C minor, release v1.2" checked><b>C minor</b><span>v1.2 · all chords, DUB voicing</span></label>
-          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.2-Cm-DEEP.wav" data-label="Cm DEEP, release v1.2"><b>Cm DEEP</b><span>v1.2 · open dub techno chords</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.3.wav" data-label="C minor, release v1.3" checked><b>C minor</b><span>v1.3 · all chords, DUB voicing</span></label>
+          <label><input type="radio" name="fw" value="downloads/DubStab-Plaits-v1.3-Cm-DEEP.wav" data-label="Cm DEEP, release v1.3"><b>Cm DEEP</b><span>v1.3 · open dub techno chords</span></label>
         </div>
         <div class="meter" aria-hidden="true">
           <span class="m red"></span><span class="m yel"></span><span class="m grn"></span><span class="m grn"></span>
@@ -110,7 +110,7 @@
           <button class="btn" id="flashStop" type="button" disabled>Stop &amp; restart</button>
         </div>
         <p class="note" id="flashStatus">Ready. The file (14.8 MB) loads when you press Play.</p>
-        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.2.wav"></audio>
+        <audio id="flashAudio" preload="none" src="downloads/DubStab-Plaits-v1.3.wav"></audio>
       </div>
     </div>
   </div>
@@ -172,8 +172,9 @@
   <div class="idx">03</div>
   <div class="body">
     <h2>Chord models</h2>
-    <p class="chips"><span>1 DUB SAW</span><span>2 VA</span><span>3 WAVESHAPE</span><span>4 FM</span><span>5 PHASE DIST</span><span>6 CHIPTUNE</span><span>7 STRING MACHINE</span><span>8 ACID (mono)</span></p>
-    <p class="note">Model 8 <b>ACID</b> plays a mono acid bass line with the pattern — chord roots, octaves and fifths, one octave above the chords, with slides and accents, always in key. On ACID, FREQUENCY sets the filter envelope amount; decay is fixed, saw wave, warm character. <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3">Listen to the demo</a>.</p>
+    <p class="chips"><span>1 DUB SAW</span><span>2 VA</span><span>3 WAVESHAPE</span><span>4 FM</span><span>5 PHASE DIST</span><span>6 VHIKK</span><span>7 STRING MACHINE</span><span>8 ACID (mono)</span></p>
+    <p class="note">Model 8 <b>ACID</b> plays a mono acid bass line with the pattern — chord roots, octaves and fifths, one octave above the chords, with slides and accents, always in key. On ACID, FREQUENCY sets the filter envelope amount; decay is fixed, saw wave, warm character. <a href="downloads/DubStab-Plaits-v1.3-VHIKK-demo.mp3"><b>VHIKK demo .mp3</b><span>25 s: model 6, WARP / feedback / SPACE</span></a>
+      <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3">Listen to the demo</a>.</p>
     <details class="more"><summary>What HARMONICS / TIMBRE / MORPH do</summary>
     <div class="table-wrap">
     <table class="models">
@@ -184,7 +185,7 @@
         <tr><td>3</td><td>WAVESHAPE</td><td>asymmetry</td><td>fold</td><td>triangle → saw</td></tr>
         <tr><td>4</td><td>FM</td><td>ratio</td><td>index</td><td>feedback</td></tr>
         <tr><td>5</td><td>PHASE DIST</td><td>resonance</td><td>distortion</td><td>PD ↔ resonant</td></tr>
-        <tr><td>6</td><td>CHIPTUNE</td><td>duty cycle</td><td>bit crush</td><td>square ↔ triangle</td></tr>
+        <tr><td>6</td><td><b>VHIKK</b> (Vhikk X-inspired)</td><td>WARP: left phase modulation (keys, bells), noon clean, right ring modulation (hollow, metallic)</td><td>carrier feedback: sine → warm saw-like</td><td>SPACE: a dark comb tuned to the chord fades in and rings longer; past noon a frequency shifter in its loop makes the repeats spiral</td></tr>
         <tr><td>7</td><td>Plaits <b>STRING MACHINE</b></td><td>brightness</td><td>filter / ensemble</td><td>registration</td></tr>
         <tr><td>8</td><td><b>ACID</b> mono bass</td><td>cutoff</td><td>accent</td><td>resonance</td></tr>
       </tbody>
@@ -235,7 +236,7 @@
   <div class="body">
     <h2>Android app</h2>
     <p>The same firmware code on your phone, with a Plaits panel, a <b>tape echo</b> (synced, wow &amp; flutter) and <b>reverb</b>, and a live view of the pattern and envelope.</p>
-    <p><a class="btn solid" href="downloads/DubStab-Plaits-v1.1.apk" download>Download the app</a></p>
+    <p><a class="btn solid" href="downloads/DubStab-Plaits-v1.3.apk" download>Download the app</a></p>
     <details class="more"><summary>More details</summary>
       <ul class="dash">
         <li>Runs <code>ui.cc</code>, <code>voice.cc</code>, <code>dub.cc</code> and the Plaits engines, polled 4000 times a second like the module.</li>
@@ -272,7 +273,7 @@
         <li>Voicing: DUB (root 5th 7th 3rd 5th), Triads, 7ths (any inversion), Mixed, or <b>DEEP</b> — the G minor firmware’s open dub techno shapes (Root G + DEEP = the same chords). Density, Steps, Rate 1/2–1/32T, Octave.</li>
         <li><b>Seed</b>: the pattern is made from a number and saved with your set. Two devices on the same seed play the same pattern — one for chords, one for the ACID line.</li>
         <li>A played MIDI note transposes the pattern within the scale (C3 = no change), like V/OCT on the module.</li>
-        <li>Models: DUB SAW, VA, WAVESHAPE, FM, PHASE DIST, CHIPTUNE, STRINGS (own string machine with ensemble), ACID. Drift = the slow random LFO.</li>
+        <li>Models: DUB SAW, VA, WAVESHAPE, FM, PHASE DIST, VHIKK, STRINGS (own string machine with ensemble), ACID. Drift = the slow random LFO.</li>
         <li><b>NEW MELODY</b>: a new mono line and ACID line over the same chords. <b>RANDOM</b>: new Harmonics, Timbre and Morph, like holding RIGHT on the module.</li>
         <li>Grainy dark grey panels, yellow sequencer knobs, blue synth knobs and a small green phosphor oscilloscope.</li>
         <li>Dry, like the module: add Live’s Echo and Hybrid Reverb after it.</li>
@@ -286,22 +287,24 @@
   <div class="body">
     <h2>Downloads</h2>
     <div class="dl">
-      <a href="downloads/DubStab-Plaits-v1.2.wav" download><b>DubStab-Plaits-v1.2.wav</b><span>Firmware for the module · 15.1 MB</span></a>
-      <a href="downloads/DubStab-Plaits-v1.1.apk" download><b>DubStab-Plaits-v1.1.apk</b><span>Android app · 0.5 MB</span></a>
-      <a href="downloads/DubStab-Plaits-v1.2-Cm-DEEP.wav" download><b>DubStab-Plaits-v1.2-Cm-DEEP.wav</b><span>Firmware · C minor DEEP chords · 15.1 MB</span></a>
-      <a href="downloads/DubStab-Plaits-v1.1-Cm-DEEP.apk" download><b>DubStab-Plaits-v1.1-Cm-DEEP.apk</b><span>Android app “Dub Stab Cm Deep” · 0.5 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.3.wav" download><b>DubStab-Plaits-v1.3.wav</b><span>Firmware for the module · 15.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.3.apk" download><b>DubStab-Plaits-v1.3.apk</b><span>Android app · 0.5 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.3-Cm-DEEP.wav" download><b>DubStab-Plaits-v1.3-Cm-DEEP.wav</b><span>Firmware · C minor DEEP chords · 15.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.3-Cm-DEEP.apk" download><b>DubStab-Plaits-v1.3-Cm-DEEP.apk</b><span>Android app “Dub Stab Cm Deep” · 0.5 MB</span></a>
       <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
       <a href="downloads/DubStab-M4L-v1.0.zip" download><b>DubStab-M4L-v1.0.zip</b><span>Max for Live devices · 0.1 MB</span></a>
+      <a href="downloads/DubStab-Plaits-v1.3-VHIKK-demo.mp3"><b>VHIKK demo .mp3</b><span>25 s: model 6, WARP / feedback / SPACE</span></a>
       <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3"><b>ACID demo .mp3</b><span>24 s: dry, then with the app’s echo + reverb</span></a>
-      <a href="downloads/DubStab-Plaits-v1.2.bin" download><b>DubStab-Plaits-v1.2.bin</b><span>Raw image for SWD / ST-Link</span></a>
-      <a href="downloads/DubStab-Plaits-v1.2-Cm-DEEP.bin" download><b>DubStab-Plaits-v1.2-Cm-DEEP.bin</b><span>Raw image, Cm DEEP</span></a>
+      <a href="downloads/DubStab-Plaits-v1.3.bin" download><b>DubStab-Plaits-v1.3.bin</b><span>Raw image for SWD / ST-Link</span></a>
+      <a href="downloads/DubStab-Plaits-v1.3-Cm-DEEP.bin" download><b>DubStab-Plaits-v1.3-Cm-DEEP.bin</b><span>Raw image, Cm DEEP</span></a>
     </div>
     <details class="more"><summary>Checksums, version, source</summary>
-      <p class="note mono">wav bfceee9488fac5c0b168ab47bf138c4235599f04378fb3638763bd34a0e9a618<br>apk a31d0decc7d6a8eae933ea8338e42bacb4d8761f9f8702bb9fb8acf8b49124bb<br>bin 376a58b5c1af5e2cdcbc63aa5ff4311864500bd06313d37950af9bb5563495bb<br>DEEP wav e19dbcee9fc664fcd4a388ee21ca13e68365b571c38d0e5d8695e74d157ce6bc<br>DEEP apk d240c239fe8e134bd5b41d34c882d1c8cff471072562e5669f2759eca45f11d8<br>DEEP bin f288bdf996908f5c24dab80bf89f1af107ec8e4151934c0954a29bcea8dc0524</p>
+      <p class="note mono">wav 203347052805ffaf48f6af2014123ee63196a2201df952a80a32f48a77df8f34<br>apk 0b6c15a488ebdcd5b0229416a26526b8b0c1462ad9c572312abcaf1113ffab30<br>bin 32785f2eddd95d270650f7d0463e9a2d6564e1b6ec81c7a687406ab17a420d47<br>DEEP wav d792d55495c7980fb3d66d93bd5b35629d2a7a4094758e4ff247d7d271de48cd<br>DEEP apk eaa38cdd61f011c69f25438894694a800e8d657d853f616deb5ee9828f7708cc<br>DEEP bin 7e39359dd70d1e62e8d6c534ef4d7ce8b2b4d1311e209c8fcb6dbaf688046d3f</p>
       <dl class="log">
         <dt>v1.0</dt><dd>First release. Generative dub techno stabs in key, 8 chord models (model 7 STRING MACHINE, model 8 ACID bass line one octave above the chords), 16-step sequencer on the attenuverters, clean levelled output, AUX = 1 V/oct root CV with CV TUNE, HARMO · TIMBRE · MORPH CV attenuated to ±15 %. Android app with tape echo and reverb.</dd>
         <dt>v1.1</dt><dd>Two versions: C minor (all 7 chords, DUB voicing) and <b>C minor DEEP</b> — open dub techno shapes: DUB m7, open m9, stacked 4ths (m11), 7sus4, sus2, fifths, open minor, m(add9), one shape per pattern most of the time, no major chords. Hold RIGHT switches each model between chords and single notes (ACID: mono line or acid chords) instead of randomising the knobs. The model LED shows it: yellow = chords, red = single notes.</dd>
-        <dt>v1.2</dt><dd>Both versions (C minor and Cm DEEP): starting the TRIG clock starts the sequencer from step 1. When the clock stops (no pulse for 4 clock periods, between 0.5 and 4.5 s) it goes back to the first step and waits; plugging the clock in does the same. Short hiccups in the clock do not reset it. The Android apps stay at v1.1.</dd>
+        <dt>v1.2</dt><dd>Both versions (C minor and Cm DEEP): starting the TRIG clock starts the sequencer from step 1. When the clock stops (no pulse for 4 clock periods, between 0.5 and 4.5 s) it goes back to the first step and waits; plugging the clock in does the same. Short hiccups in the clock do not reset it. </dd>
+        <dt>v1.3</dt><dd>Model 6 is now <b>VHIKK</b>, inspired by the Forge TME Vhikk X (CHIPTUNE is gone; every other model and the sequencer are unchanged): a carrier / modulator pair per chord note and its own space. HARMONICS = WARP (left phase modulation, noon clean, right ring modulation), TIMBRE = carrier feedback (sine → warm saw-like), MORPH = SPACE: a dark comb echo tuned to the chord that glides from chord to chord, and past noon a frequency shifter in its loop that makes the repeats spiral. FREQUENCY stays the envelope. Firmware and both apps v1.3. <a href="downloads/DubStab-Plaits-v1.3-VHIKK-demo.mp3">VHIKK demo</a>.</dd>
         <dt>app 1.0.1</dt><dd>Screen recordings now include the app’s sound (Android “record device audio”).</dd>
         <dt>M4L 1.0</dt><dd>Max for Live devices: Dub Stab MIDI, Dub Stab Synth, Dub Stab Plaits — root, four minor scales, minor chords only, CHORDS on/off (mono notes).</dd>
       </dl>

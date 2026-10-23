@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.2
+# DUB STAB PLAITS — v1.3
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -77,7 +77,7 @@ octave = one yellow LED, speed = one LED (straight green, triplets red).
 | 3 | WAVESHAPE | asymmetry | fold | triangle → saw |
 | 4 | FM | ratio | index | feedback |
 | 5 | PHASE DIST | resonance | distortion | PD ↔ resonant |
-| 6 | CHIPTUNE | duty cycle | bit crush | square ↔ triangle |
+| 6 | **VHIKK** (Vhikk X-inspired) | WARP: left phase modulation, noon clean, right ring modulation | carrier feedback: sine → saw-like | SPACE: tuned dark comb, past noon frequency-shifted spiralling repeats |
 | 7 | Plaits **STRING MACHINE** | brightness | filter / ensemble | registration |
 | 8 | **ACID** (mono bass) | cutoff | accent | resonance |
 
@@ -95,7 +95,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.2.wav` (or `DubStab-Plaits-v1.2-Cm-DEEP.wav`) to the end (2 min 37 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.3.wav` (or `DubStab-Plaits-v1.3-Cm-DEEP.wav`) to the end (2 min 37 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -103,6 +103,8 @@ the same way; your calibration is kept.
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
 ## Version
+
+**v1.3** — model 6 is VHIKK (Vhikk X-inspired pair + tuned, frequency-shifting space) instead of CHIPTUNE.
 
 **v1.2** — starting the TRIG clock starts the sequencer from step 1 (both versions).
 
