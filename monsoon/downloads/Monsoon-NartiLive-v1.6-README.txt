@@ -1,4 +1,4 @@
-MONSOON — Narti Live firmware v1.5 (Parasites v2.01 for Monsoon + new modes)
+MONSOON — Narti Live firmware v1.6 (Parasites v2.01 for Monsoon + new modes)
 unofficial, use at your own risk
 
 MODES (open mode select: press the LED button + LOAD/SAVE together, or hold the
@@ -104,13 +104,26 @@ ALGORITHMS (first switch / second switch)
   REVERB Clouds reverb · FREEZE holds the sweep · TRIG restarts the LFO
 
 INSTALL
-  Hold FREEZE and power on, play Monsoon-NartiLive-v1.5.wav into IN L (no MP3,
+  Hold FREEZE and power on, play Monsoon-NartiLive-v1.6.wav (about 5.5 minutes) into IN L (no MP3,
   no notification sounds). The module restarts when it is done.
 GO BACK
   Monsoon-ORIGINAL-Parasites-v2.01-restore.wav = the original Monsoon firmware
   (Tom Burns, github.com/boourns/eurorack). Install it the same way.
 
 CHANGES
+  v1.6  VHIKK sounds cleaner and keeps its level:
+        - band-limited wavetables with 4x more harmonics (96), switching
+          smoothly to simpler versions as the pitch goes up: no aliasing fizz
+        - the waveshaper runs at twice the rate, cross FM gets gentler at
+          high pitches, two soft poles at ~13 kHz smooth the very top
+        - slow analogue-like drift of every oscillator (a few cents)
+        - automatic level: every algorithm and knob position at a similar
+          loudness (measured within 2 dB between algorithms; FIELD at its
+          extremes within about 5 dB), the processor follows what goes in
+        - subtle built-in saturation after the VCA, a clean peak limiter at
+          the end (no soft clipping, nothing near full scale)
+        - smoother delay taps in the processor (also in CAVERN)
+        - FIELD has a more musical range (12 kHz - 110 Hz, 25 Hz - 2.8 kHz)
   v1.5  VHIKK: PITCH knob = octave switch, V/OCT notes fire the VCA (TRIG
         wins when patched), audio inputs only go through the effects.
   v1.4  Mode 8 is now VHIKK (Vhikk X-inspired voice + processor, one page).
