@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MONSOON VHIKK — unofficial Monsoon firmware by Narti Live</title>
+<meta name="author" content="Narti Live">
+<meta name="description" content="Narti Live firmware for the After Later Audio Monsoon (Clouds / Parasites): VHIKK, a Vhikk X-inspired drone voice + processor, the CAVERN space and a stereo phaser. Plus an Android app with a sequencer that runs the same code.">
+<meta name="theme-color" content="#05080d">
+<meta property="og:title" content="MONSOON VHIKK — Monsoon firmware">
+<meta property="og:description" content="A Vhikk X-inspired drone voice, the CAVERN space and a stereo phaser for the Monsoon (Clouds) module.">
+<meta property="og:image" content="assets/app-vhikk.png">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/BarlowCondensed-Bold.woff" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  .red { color: #ff6a5c; }
+  .modes td .leds { display: inline-flex; gap: 6px; }
+  .modes td .leds i { width: 12px; height: 12px; border-radius: 50%; background: #1c2533; display: inline-block; }
+  .modes td .leds i.on { background: #6ee38c; box-shadow: 0 0 8px #3bd66a; }
+  .kv li b.red { color: #ff6a5c; }
+  .shot img { max-width: 100%; height: auto; display: block; border: 1px solid var(--line); }
+  .shots2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .shots2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<svg class="defs" aria-hidden="true" width="0" height="0">
+  <filter id="wave" x="-5%" y="-20%" width="110%" height="140%">
+    <feTurbulence id="waveNoise" type="fractalNoise" baseFrequency="0.0025 0.008" numOctaves="1" seed="11" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+<header class="hero">
+  <canvas id="stabs" aria-hidden="true"></canvas>
+  <nav class="top">
+    <span class="mark">MONSOON · NARTI LIVE</span>
+    <span class="links">
+      <a href="#flash">Flash</a>
+      <a href="#vhikk">VHIKK</a>
+      <a href="#modes">Modes</a>
+      <a href="#app">App</a>
+      <a href="#downloads">Download</a>
+      <a href="../">Dub Stab Plaits</a>
+    </span>
+  </nav>
+  <div class="hero-text">
+    <p class="kicker">Unofficial alternate firmware for the After Later Audio Monsoon (Clouds / Parasites) — v1.5 — by Narti Live</p>
+    <h1 class="title" aria-label="MONSOON VHIKK">
+      <span class="line" data-text="MONSOON">MONSOON</span>
+      <span class="line l2" data-text="VHIKK">VHIKK</span>
+    </h1>
+    <p class="lede"><b>A stereo drone voice and its own space</b> inside your Monsoon: nine algorithms, a frequency-shifting delay that turns metallic or diffuse,
+      one control per function. Play it from one V/OCT cable.</p>
+    <div class="cta">
+      <a class="btn solid" href="#flash">Flash from this page</a>
+      <a class="btn" href="downloads/Monsoon-NartiLive-v1.5.wav" download>Firmware .wav</a>
+      <a class="btn" href="downloads/Monsoon-NartiLive-app-v1.2.apk" download>Android app .apk</a>
+      <a class="btn" href="manual/">Visual manual + sounds</a>
+      <a class="btn" href="downloads/Monsoon-VHIKK-demo.mp3">Listen</a>
+    </div>
+    <div class="social hero-social">
+      <a href="https://www.instagram.com/narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
+        <b>Instagram</b><span>@narti_live</span></a>
+      <a href="https://www.youtube.com/@narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9.2v5.6l5-2.8z" fill="currentColor"/></svg>
+        <b>YouTube</b><span>@narti_live</span></a>
+    </div>
+  </div>
+  <p class="risk">Unofficial firmware — not made, tested or supported by After Later Audio, Mutable Instruments or Forge TME. Use it at your own risk.</p>
+  <div class="hero-meta">
+    <span>9 ALGORITHMS</span><span>ONE PAGE</span><span>V/OCT = TRIG</span><span>STEREO</span>
+  </div>
+</header>
+
+<main>
+
+<section class="block flash" id="flash">
+  <div class="idx">00</div>
+  <div class="body">
+    <h2>Flash from this page</h2>
+    <p class="lede-s">The update travels as audio: this page plays it into the Monsoon. <span class="risk-inline">Unofficial firmware, use at your own risk.</span></p>
+    <div class="cols2">
+      <div>
+        <ol class="steps tight check">
+          <li>Unplug all cables. Headphone out → Monsoon <b>IN L</b>.</li>
+          <li>Hold <b>FREEZE</b> and power on: the LEDs show the bootloader.</li>
+          <li>Volume high, notifications off, press <b>Play</b>.</li>
+          <li>Wait about 2:28 — the module restarts on its own.</li>
+        </ol>
+        <details class="more"><summary>More details</summary>
+          <ul class="dash">
+            <li>Use a 3.5 mm stereo → mono cable (or an adapter plus a patch cable). IN LEVEL fully up helps.</li>
+            <li>No Bluetooth, no other sounds, keep this tab in front.</li>
+            <li>If it fails, power off and on with FREEZE held, then play again from the start.</li>
+            <li>Going back to the stock Monsoon firmware: pick “Original Parasites” and flash it the same way. Saved buffers are kept.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="player">
+        <div class="variant" role="radiogroup" aria-label="Firmware version">
+          <label><input type="radio" name="mfw" value="downloads/Monsoon-NartiLive-v1.5.wav" data-label="Narti Live v1.5" checked><b>Narti Live v1.5</b><span>VHIKK · CAVERN · PHASER</span></label>
+          <label><input type="radio" name="mfw" value="downloads/Monsoon-ORIGINAL-Parasites-v2.01-restore.wav" data-label="Original Parasites 2.01"><b>Original Parasites</b><span>go back to stock</span></label>
+        </div>
+        <div class="bar"><div class="fill" id="mFill"></div></div>
+        <div class="time"><span id="mTime">0:00</span><span id="mDur">2:28</span></div>
+        <div class="pbtns">
+          <button class="btn solid" id="mPlay" type="button">Play firmware</button>
+          <button class="btn" id="mStop" type="button" disabled>Stop</button>
+        </div>
+        <p class="note" id="mStatus">Ready. The file (14.2 MB) loads when you press Play.</p>
+        <audio id="mAudio" preload="none" src="downloads/Monsoon-NartiLive-v1.5.wav"></audio>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="about">
+  <div class="idx">01</div>
+  <div class="body">
+    <h2>What it is</h2>
+    <div class="cols4">
+      <div><h3>VHIKK</h3><p>A drone voice and processor highly inspired by the Forge TME Vhikk X: pairs, sine clusters, wavetables, chord clusters.</p></div>
+      <div><h3>One page</h3><p>Every function on its own fader or knob. SPAN, FUSE and SCAN with the LED button held.</p></div>
+      <div><h3>One cable</h3><p>New notes at V/OCT fire the VCA, so a single pitch CV (the Plaits AUX out) plays it. TRIG wins when patched.</p></div>
+      <div><h3>Plus</h3><p>CAVERN, the processor on its own for any input, and a stereo phaser. The original modes stay.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="vhikk">
+  <div class="idx">02</div>
+  <div class="body">
+    <h2>VHIKK on the panel</h2>
+    <div class="cols2">
+      <div>
+        <h3>Faders</h3>
+        <ul class="kv">
+          <li><b class="red">POSITION</b> TIME · delay length 20 ms – 0.8 s, glides</li>
+          <li><b class="red">DENSITY</b> CELL · frequency shift in the loop, none at noon</li>
+          <li><b class="red">SIZE</b> MORPH · timbral scan &nbsp;|&nbsp; LED held: SCAN</li>
+          <li><b class="red">TEXTURE</b> FORM · repeats → metallic / diffuse</li>
+        </ul>
+        <h3>Knobs</h3>
+        <ul class="kv">
+          <li><b class="red">TUNE</b> BASIS · octave switch −2 … +2</li>
+          <li><b class="red">WET</b> MIX · generator ↔ processor</li>
+          <li><b class="red">STER</b> WARP · cross modulation &nbsp;|&nbsp; LED held: SPAN</li>
+          <li><b class="red">FBK</b> FEED · none at noon, two kinds of shifter mix</li>
+          <li><b class="red">RVB</b> FIELD · low-pass ↔ high-pass &nbsp;|&nbsp; LED held: FUSE</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Buttons and jacks</h3>
+        <ul class="kv">
+          <li><b>LED button</b> tap = next algorithm (LEDs 1–3 show the two switches) · hold = shift · 2.5 s still = mode select</li>
+          <li><b>LOAD/SAVE</b> tap = SCAN to the next table set</li>
+          <li><b>FREEZE</b> tap = SEED (new offsets and echo spacing) · hold 1 s = freeze the processor</li>
+          <li><b>V/OCT</b> the note; every new note fires the VCA 2 ms after the jump. The same note twice does not retrigger</li>
+          <li><b>TRIG</b> when it gets pulses, TRIG alone fires the VCA (V/OCT only sets the pitch). Nothing for 3 s = drone</li>
+          <li><b>IN L / R</b> straight into the effects, not through the voice’s filter or VCA</li>
+        </ul>
+        <p class="note">Nine algorithms: 1 analogue pair · 2 waveshaping pair · 3 sine cluster · 4–6 four-oscillator wavetables · 7 diatonic cluster · 8–9 clusters, each into a DUNGEON (metallic) or REFLEKTA (diffuse) delay. Every control with a sound example: <a href="manual/">the visual manual</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="modes">
+  <div class="idx">03</div>
+  <div class="body">
+    <h2>All modes</h2>
+    <p>Mode select: press the LED button and LOAD/SAVE together (or hold the LED button 2.5 s). LOAD/SAVE = next mode, LED button = previous.</p>
+    <div class="table-wrap"><table class="models modes">
+      <tr><th></th><th>Mode</th><th>LEDs</th><th></th></tr>
+      <tr><td>1</td><td>Granular</td><td><span class="leds"><i class="on"></i><i></i><i></i><i></i></span></td><td>unchanged</td></tr>
+      <tr><td>2</td><td>Pitch / stretch</td><td><span class="leds"><i></i><i class="on"></i><i></i><i></i></span></td><td>unchanged</td></tr>
+      <tr><td>3</td><td>Looping delay</td><td><span class="leds"><i></i><i></i><i class="on"></i><i></i></span></td><td>unchanged</td></tr>
+      <tr><td>4</td><td>PHASER</td><td><span class="leds"><i></i><i></i><i></i><i class="on"></i></span></td><td>new: stereo phaser, 2–12 stages</td></tr>
+      <tr><td>5</td><td>MI reverb</td><td><span class="leds"><i></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td><td>unchanged</td></tr>
+      <tr><td>6</td><td>Resonator</td><td><span class="leds"><i class="on"></i><i></i><i class="on"></i><i class="on"></i></span></td><td>unchanged</td></tr>
+      <tr><td>7</td><td class="red">CAVERN</td><td><span class="leds"><i class="on"></i><i class="on"></i><i></i><i class="on"></i></span></td><td>new: Vhikk X-inspired space for any input</td></tr>
+      <tr><td>8</td><td class="red">VHIKK</td><td><span class="leds"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td><td>new: Vhikk X-inspired voice + processor</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="block split" id="app">
+  <div class="idx">04</div>
+  <div class="body">
+    <h2>Android app</h2>
+    <p>The same firmware code on your phone, with a 16-step generative sequencer playing it: NEW, NEW NOTES, root, four minor scales, rate, length, density, swing.
+      In the app every VHIKK function has its own knob and the nine algorithms are a 3 × 3 grid. In the other modes the sequencer plays the VHIKK voice into the input.</p>
+    <p><a class="btn" href="downloads/Monsoon-NartiLive-app-v1.2.apk" download>Download the app (.apk, 0.4 MB)</a></p>
+    <p class="note">Android 8 or newer. Allow installing from your browser or file manager when Android asks.</p>
+  </div>
+  <div class="shot shots2">
+    <img src="assets/app-vhikk.png" alt="The app's VHIKK panel: algorithm grid, BASIS and VCA, generator and processor knobs" loading="lazy" width="720" height="1600">
+    <img src="assets/app-sequencer.png" alt="The app's sequencer: 16 steps on a minor scale grid" loading="lazy" width="720" height="1600">
+  </div>
+</section>
+
+<section class="block" id="downloads">
+  <div class="idx">05</div>
+  <div class="body">
+    <h2>Downloads</h2>
+    <div class="dl">
+      <a href="downloads/Monsoon-NartiLive-v1.5.wav" download><b>Monsoon-NartiLive-v1.5.wav</b><span>Firmware for the module · 14.2 MB</span></a>
+      <a href="downloads/Monsoon-NartiLive-app-v1.2.apk" download><b>Monsoon-NartiLive-app-v1.2.apk</b><span>Android app · 0.4 MB</span></a>
+      <a href="manual/"><b>Visual manual</b><span>Every control, with sound examples</span></a>
+      <a href="downloads/Monsoon-NartiLive-v1.5-README.txt"><b>README.txt</b><span>Full text manual</span></a>
+      <a href="downloads/Monsoon-VHIKK-demo.mp3"><b>VHIKK demo .mp3</b><span>50 s: algorithms, V/OCT stabs, CELL, FORM</span></a>
+      <a href="downloads/Monsoon-CAVERN-demo.mp3"><b>CAVERN demo .mp3</b><span>Chords through the space</span></a>
+      <a href="downloads/Monsoon-Phaser-demo.mp3"><b>PHASER demo .mp3</b><span>Chords through the phaser</span></a>
+      <a href="downloads/Monsoon-ORIGINAL-Parasites-v2.01-restore.wav" download><b>Original Parasites 2.01 .wav</b><span>Go back to the stock firmware · 13.1 MB</span></a>
+      <a href="downloads/Monsoon-NartiLive-v1.5.bin" download><b>Monsoon-NartiLive-v1.5.bin</b><span>Raw image for SWD / ST-Link</span></a>
+      <a href="downloads/Monsoon-NartiLive-v1.5.zip" download><b>Monsoon-NartiLive-v1.5.zip</b><span>Everything: wav, bin, README, restore wav · 1.9 MB</span></a>
+    </div>
+    <details class="more"><summary>Checksums and changes</summary>
+      <p class="note mono">wav e6d9cec9e48e7bc4ec50445f0f42673b1331092b5ae1763374c7b3a0397b62ec<br>bin 34db6245d324650850a880359b4d10e5d391b67122070834a608b8e1c44728ca<br>apk d8897a3c392f8cff313a9e7702f45f031ab16355b609f9b30ef0cfaaabf41633<br>restore fe1216bc45efdf1371ca46dff154769b83200cbe015be7ad2328dea3dfd47e96</p>
+      <dl class="log">
+        <dt>v1.5</dt><dd>VHIKK: TUNE is an octave switch, new notes at V/OCT fire the VCA (TRIG wins when patched), the audio inputs only go through the effects.</dd>
+        <dt>v1.4</dt><dd>VHIKK mode: nine algorithms, one control per function.</dd>
+        <dt>v1.2</dt><dd>CAVERN: TIME and CELL glide without clicks.</dd>
+        <dt>v1.1</dt><dd>CAVERN mode.</dd>
+        <dt>v1.0</dt><dd>Stereo phaser instead of the spectral mode.</dd>
+      </dl>
+      <p>Built from the Monsoon Parasites source (Clouds by Emilie Gillet, Parasites by Matthias Puech, Monsoon port by Tom Burns), MIT license.
+        CAVERN and VHIKK are original Narti Live code inspired by the Forge TME Vhikk X; not affiliated with Forge TME, After Later Audio or Mutable Instruments.</p>
+    </details>
+  </div>
+</section>
+
+<section class="block" id="narti">
+  <div class="idx">06</div>
+  <div class="body">
+    <h2>By Narti Live</h2>
+    <p>Also: <a href="../">DUB STAB PLAITS</a>, dub techno chord firmware for Mutable Instruments Plaits — its AUX pitch out can play VHIKK with one cable.</p>
+    <div class="social">
+      <a href="https://www.instagram.com/narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
+        <b>Instagram</b><span>@narti_live</span></a>
+      <a href="https://www.youtube.com/@narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9.2v5.6l5-2.8z" fill="currentColor"/></svg>
+        <b>YouTube</b><span>@narti_live</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="../assets/site.js"></script>
+<script>
+// Monsoon flasher: plays the firmware WAV untouched and shows the progress.
+(function () {
+  var a = document.getElementById('mAudio'), play = document.getElementById('mPlay'), stop = document.getElementById('mStop');
+  var fill = document.getElementById('mFill'), time = document.getElementById('mTime'), dur = document.getElementById('mDur');
+  var status = document.getElementById('mStatus'), radios = document.querySelectorAll('input[name=mfw]');
+  function fmt(x) { x = Math.max(0, Math.floor(x)); return Math.floor(x / 60) + ':' + ('0' + x % 60).slice(-2); }
+  function lock(on) { for (var i = 0; i < radios.length; i++) radios[i].disabled = on; }
+  function picked() { for (var i = 0; i < radios.length; i++) if (radios[i].checked) return radios[i]; return radios[0]; }
+  for (var i = 0; i < radios.length; i++) radios[i].addEventListener('change', function () {
+    if (!a.paused) return;
+    a.src = picked().value; fill.style.width = '0'; time.textContent = '0:00';
+    dur.textContent = picked().value.indexOf('ORIGINAL') >= 0 ? '2:16' : '2:28';
+    status.textContent = 'Ready: ' + picked().dataset.label + '.';
+  });
+  play.addEventListener('click', function () {
+    lock(true);
+    if (a.getAttribute('src') !== picked().value) a.src = picked().value;
+    a.currentTime = 0; status.textContent = 'Loading the firmware…';
+    var p = a.play();
+    if (p && p.catch) p.catch(function () { lock(false); status.textContent = 'The browser blocked playback. Press Play again.'; });
+  });
+  stop.addEventListener('click', function () {
+    a.pause(); a.currentTime = 0; fill.style.width = '0'; time.textContent = '0:00';
+    play.disabled = false; stop.disabled = true; lock(false);
+    status.textContent = 'Stopped. Power the module off and on with FREEZE held, then play again from the start.';
+  });
+  a.addEventListener('playing', function () { play.disabled = true; stop.disabled = false; status.textContent = 'Playing — don’t touch the computer or the module.'; });
+  a.addEventListener('timeupdate', function () {
+    var d = a.duration || 148;
+    fill.style.width = (100 * a.currentTime / d).toFixed(2) + '%'; time.textContent = fmt(a.currentTime);
+  });
+  a.addEventListener('ended', function () {
+    play.disabled = false; stop.disabled = true; lock(false);
+    status.textContent = 'Done. The Monsoon restarts on its own. If not: power off, hold FREEZE, power on and play again.';
+  });
+  a.addEventListener('error', function () { status.textContent = 'Could not load the file. Download the .wav and play it with QuickTime or VLC.'; });
+})();
+</script>
+</body>
+</html>

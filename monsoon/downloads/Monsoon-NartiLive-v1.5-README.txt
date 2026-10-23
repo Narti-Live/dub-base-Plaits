@@ -1,0 +1,123 @@
+MONSOON — Narti Live firmware v1.5 (Parasites v2.01 for Monsoon + new modes)
+unofficial, use at your own risk
+
+MODES (open mode select: press the LED button + LOAD/SAVE together, or hold the
+LED button 2.5 s; then LOAD/SAVE = next mode, LED button = previous mode)
+  1 Granular          LED 1           (unchanged)
+  2 Pitch / stretch   LED 2           (unchanged)
+  3 Looping delay     LED 3           (unchanged)
+  4 PHASER            LED 4           stereo phaser (new)
+  5 MI reverb         all but LED 1   (unchanged)
+  6 Resonator         all but LED 2   (unchanged)
+  7 CAVERN            all but LED 3   Vhikk X-inspired stereo delay / space (new)
+  8 VHIKK             all but LED 4   Vhikk X-inspired voice + processor (new)
+To leave the mode-select screen: hold the LED button ~1 s, then ~1 s again.
+
+------------------------------------------------------------------------------
+8  VHIKK (Vhikk X-inspired drone voice + processor)
+An original stereo drone voice highly inspired by the Forge TME Vhikk X: nine
+algorithms, each a generator -> FIELD filter -> VCA, then the processor (the
+CAVERN engine as a metallic DUNGEON or a diffuse REFLEKTA delay). Anything at
+the audio inputs goes straight to the effects (not through the FIELD filter
+or the VCA); its dry part follows MIX like the generator. Stereo out.
+
+ONE PAGE - every function has its own control:
+  POSITION slider ... TIME   delay length, 20 ms - 0.8 s (glides)
+  DENSITY slider .... CELL   frequency shift in the loop, none at noon
+  SIZE slider ....... MORPH  timbral scan (wave / wavetable frame / cluster)
+  TEXTURE slider .... FORM   repeats > metallic > diffuse (reverb-like)
+  PITCH knob ........ BASIS  octave switch: -2 / -1 / 0 / +1 / +2 octaves
+                             (5 positions, C2 at noon)
+  V/OCT ............. note, 1 V/oct on top of the octave
+  DRY/WET knob ...... MIX    generator <-> processor
+  STEREO knob ....... WARP   cross modulation (two kinds, left / right of noon)
+  FEEDBACK knob ..... FEED   neutral at noon. Left: the output hears the
+                             frequency shifter alone; right: shifter blended
+                             with the raw echoes (moving notches)
+  REVERB knob ....... FIELD  low-pass (left) / open (noon) / high-pass (right)
+The Monsoon has 9 controls and the Vhikk X has 12, so three functions live on
+the LED button, the way the Vhikk X shares its encoders:
+  hold LED button + STEREO .. SPAN   oscillator spread / tuning (right of
+                                     noon adds stereo width)
+  hold LED button + REVERB .. FUSE   colour, depends on the algorithm
+  hold LED button + SIZE .... SCAN   second timbral scan (table set)
+  (each control picks up where it was, nothing jumps; LED 4 is red while
+   the LED button is held)
+
+BUTTONS AND JACKS
+  LED button tap ...... next algorithm 1..9. LED 1-3 show the two switches of
+                        the original: green = first switch (up / centre /
+                        down), red = second switch, amber = both on one LED.
+                        Green glows with the VCA.
+  LOAD/SAVE tap ....... SCAN to the next table set
+  FREEZE tap .......... SEED: new random pitch / wave offsets and echo spacing
+  FREEZE hold 1 s ..... freeze the processor loop (LED 4 blue); again to free
+  FREEZE jack ......... gate = freeze the processor loop
+  TRIG jack ........... VCA. Nothing patched: drone. Patch a clock or gates:
+                        each trigger plays a stab whose decay follows the
+                        trigger rate; 3 s without triggers = drone again.
+  V/OCT as trigger .... one cable from a sequencer is enough (e.g. the Plaits
+                        AUX pitch out): every NEW note at V/OCT fires the VCA,
+                        2 ms after the jump so the pitch has settled. The same
+                        note twice in a row does not retrigger (use TRIG for
+                        that). Slow LFOs / vibrato (under 0.4 semitone per
+                        step) never trigger.
+                        As soon as TRIG gets pulses, TRIG alone fires the VCA
+                        (V/OCT then only sets the pitch); 2 s after the last
+                        TRIG pulse, V/OCT notes trigger again.
+  Mode select ......... hold the LED button 2.5 s without moving a control
+                        (or LED + LOAD/SAVE together)
+
+ALGORITHMS (first switch / second switch)
+  1 up/up         ANALOGUE PAIR + DUNGEON   WARP L expo FM, R ring mod; SPAN
+                  modulator tuning; MORPH carrier pulse>saw>sine; SCAN
+                  modulator wave; FUSE L chorus, R resonance + band-pass
+  2 up/centre     WAVESHAPING PAIR + REFLEKTA   WARP L index + mod feedback,
+                  R index + carrier feedback; SPAN carrier ratio; SCAN shaper
+                  set; FUSE L audio-rate delay mod, R saturation
+  3 up/down       SINE CLUSTER BANK + DUNGEON   WARP L phase feedback, R cross
+                  FM; MORPH cluster scan; SCAN ring-mod mix; FUSE L chorus,
+                  R noise modulation
+  4 centre/up     4-OSC WAVETABLE + DUNGEON   WARP L bit reduction, R cross FM;
+                  MORPH frame; SCAN table set; FUSE L band-pass + sine,
+                  R chorus + resonance
+  5 centre/centre 4-OSC WAVETABLE + DUNGEON   WARP L phase mod, R cross FM;
+                  FUSE L chorus, R chorus + resonance
+  6 centre/down   4-OSC WAVETABLE + REFLEKTA   WARP as 5; FUSE L oscillator-
+                  modulated all-pass, R wavefold per oscillator
+  7 down/up       DIATONIC CLUSTER + REFLEKTA (minor-scale quantised spread)
+  8 down/centre   CLUSTER + DUNGEON
+  9 down/down     CLUSTER + REFLEKTA
+                  (7-9: WARP L phase mod, R cross FM; SPAN bipolar cluster
+                  spread; MORPH cluster scan; SCAN table set; FUSE L stereo
+                  chorus, R saturation)
+
+------------------------------------------------------------------------------
+7  CAVERN (Vhikk X-inspired space)
+  POSITION TIME · SIZE FIELD · DENSITY CELL (shift) · TEXTURE FORM
+  PITCH + V/OCT FUSE (left chorus, right saturation) · FEEDBACK · STEREO spread
+  DRY/WET · REVERB (Clouds reverb) · FREEZE holds the loop · TRIG = SEED
+
+4  PHASER
+  POSITION rate · SIZE depth · PITCH + V/OCT centre · DENSITY LFO shape
+  TEXTURE stages 2-12 · FEEDBACK resonance · STEREO L/R offset · DRY/WET mix
+  REVERB Clouds reverb · FREEZE holds the sweep · TRIG restarts the LFO
+
+INSTALL
+  Hold FREEZE and power on, play Monsoon-NartiLive-v1.5.wav into IN L (no MP3,
+  no notification sounds). The module restarts when it is done.
+GO BACK
+  Monsoon-ORIGINAL-Parasites-v2.01-restore.wav = the original Monsoon firmware
+  (Tom Burns, github.com/boourns/eurorack). Install it the same way.
+
+CHANGES
+  v1.5  VHIKK: PITCH knob = octave switch, V/OCT notes fire the VCA (TRIG
+        wins when patched), audio inputs only go through the effects.
+  v1.4  Mode 8 is now VHIKK (Vhikk X-inspired voice + processor, one page).
+        The LOQUAX VOICE mode of v1.3 is gone.
+  v1.2  CAVERN: POSITION and DENSITY glide (no clicks).
+  v1.1  CAVERN mode.   v1.0  Stereo phaser instead of spectral.
+
+Built from the Monsoon Parasites source (Clouds by Emilie Gillet, Parasites by
+Matthias Puech, Monsoon port by Tom Burns), MIT license. CAVERN and VHIKK are
+original code inspired by the Forge TME Vhikk X; not affiliated with Forge TME.

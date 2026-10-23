@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html,body{margin:0}</style>
+</head>
+<body>
+<title>Monsoon Narti Live Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: hardware panel on the left (sticky on desktop), the control list for the chosen mode on the right; stacked on phones. */
+:root {
+  --bg: #1d1e20; --bg2: #26282b; --line: #3a3d41; --fg: #e9e6dc; --muted: #a3a59d;
+  --accent: #f2c230; --blue: #5aa8ff; --phos: #57e389; --lq: #5aa8ff; --vx: #ff5a4e; --sel: #e9e6dc;
+  --alu: #d8dad4; --alu-edge: #b9bcb4; --legend: #2d8a49; --ink: #1d1f1c;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #e7e6e1; --bg2: #f3f2ee; --line: #cfcdc6; --fg: #1f2021; --muted: #5d5f5a;
+  --accent: #a87b00; --blue: #1f6fd1; --phos: #198a46; --lq: #1f6fd1; --vx: #c8322a; --sel: #1f2021; color-scheme: light } }
+:root[data-theme="light"] {
+  --bg: #e7e6e1; --bg2: #f3f2ee; --line: #cfcdc6; --fg: #1f2021; --muted: #5d5f5a;
+  --accent: #a87b00; --blue: #1f6fd1; --phos: #198a46; --lq: #1f6fd1; --vx: #c8322a; --sel: #1f2021; color-scheme: light }
+
+body {
+  background-color: var(--bg); color: var(--fg); font: 15px/1.55 var(--body);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+header { display: grid; gap: 6px; margin-bottom: 22px; }
+.eyebrow { font: 600 13px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(34px, 6vw, 58px)/.95 var(--display); letter-spacing: .01em; margin: 0; text-transform: uppercase; text-wrap: balance; }
+h1 span { color: var(--muted); font-weight: 500; }
+.lede { max-width: 66ch; color: var(--muted); margin: 6px 0 0; }
+h2 { font: 700 26px/1.1 var(--display); text-transform: uppercase; letter-spacing: .03em; margin: 0; text-wrap: balance; }
+h3 { font: 600 18px/1.2 var(--display); text-transform: uppercase; letter-spacing: .05em; margin: 0; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+.tab { font: 600 15px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--fg);
+  background: var(--bg2); border: 1px solid var(--line); border-radius: 3px; padding: 10px 14px; cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.tab[aria-selected="true"] { background: var(--accent); color: #1b1a14; border-color: var(--accent); }
+.tab .num { font-family: var(--mono); font-size: 12px; opacity: .75; }
+.tab:focus-visible, button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.main { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.panelcol { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 12px; }
+.panelbox { background: var(--bg2); border: 1px solid var(--line); border-radius: 4px; padding: 14px; }
+svg.panel { width: 100%; height: auto; display: block; max-width: 420px; margin: 0 auto; }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+
+.modehead { display: grid; gap: 8px; margin-bottom: 16px; }
+.modehead p { margin: 0; max-width: 68ch; }
+.ledrow { display: inline-flex; gap: 6px; align-items: center; font: 500 12px var(--mono); color: var(--muted); }
+.led { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--line); background: transparent; }
+.led.on { background: var(--phos); border-color: var(--phos); box-shadow: 0 0 6px var(--phos); }
+.howto { font-size: 14px; color: var(--muted); }
+
+.pagesw { display: inline-flex; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+.pagesw button { font: 600 14px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; padding: 8px 12px; background: transparent; color: var(--fg); border: 0; cursor: pointer; }
+.pagesw button[aria-pressed="true"] { background: var(--blue); color: #08131f; }
+
+.list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.item { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 4px; background: color-mix(in srgb, var(--bg2) 70%, transparent); cursor: pointer; }
+.item.sel { border-color: var(--sel); box-shadow: 0 0 0 1px var(--sel) inset; }
+.fn.v { color: var(--lq); } .fn.s { color: var(--vx); }
+.badge.v { background: var(--lq); color: #08131f; } .badge.s { background: var(--vx); color: #fff; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.badge { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #1b1a14; font: 700 14px/26px var(--display); text-align: center; }
+.item .top { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.ctl { font: 600 13px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.fn { font: 700 19px/1.1 var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.pagechip { font: 500 11px/1 var(--mono); padding: 3px 6px; border-radius: 2px; border: 1px solid var(--lq); color: var(--lq); }
+.pagechip.s { border-color: var(--vx); color: var(--vx); }
+.pagesw button.sp[aria-pressed="true"] { background: var(--vx); color: #fff; }
+.item p { margin: 4px 0 0; max-width: 68ch; }
+.clips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.play { display: inline-flex; gap: 8px; align-items: center; font: 500 13px/1 var(--body); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 20px; padding: 6px 12px 6px 6px; cursor: pointer; position: relative; overflow: hidden; }
+.play .ic { width: 22px; height: 22px; border-radius: 50%; background: var(--phos); display: grid; place-items: center; flex: none; }
+.play .ic::before { content: ""; border-left: 8px solid #0c1a10; border-top: 5px solid transparent; border-bottom: 5px solid transparent; margin-left: 2px; }
+.play.on .ic::before { border: 0; width: 8px; height: 8px; background: #0c1a10; margin: 0; }
+.play .bar { position: absolute; left: 0; bottom: 0; height: 2px; background: var(--phos); width: 0; }
+.play small { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+.what { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+.sect { margin-top: 48px; display: grid; gap: 14px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.card { border: 1px solid var(--line); border-radius: 4px; padding: 14px; background: var(--bg2); display: grid; gap: 6px; align-content: start; }
+.card p { margin: 0; font-size: 14px; }
+table.modes { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.modes td, table.modes th { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: middle; }
+table.modes th { font: 600 13px var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+table.modes .n { font: 700 18px var(--display); color: var(--accent); width: 32px; }
+.tscroll { overflow-x: auto; }
+footer { margin-top: 48px; font-size: 13px; color: var(--muted); max-width: 72ch; }
+
+@media (max-width: 820px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .panelcol { position: static; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><a href="../" style="color:inherit">← Monsoon firmware page</a> · After Later Audio Monsoon · Narti Live firmware v1.5</div>
+    <h1>Monsoon <span>visual manual</span></h1>
+    <p class="lede">What every knob, fader, button and jack does in the three new modes, with a sound example for each control. Tap a control on the panel or in the list. The VHIKK examples are the module on its own with no input; the CAVERN and PHASER examples process the Dub Stab Cm DEEP chords.</p>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+
+  <div class="main">
+    <div class="panelcol">
+      <div class="panelbox"><svg class="panel" id="panel" viewBox="0 0 300 640" role="img" aria-label="Monsoon front panel"></svg></div>
+      <p class="hint" id="panelhint">Each label shows what that control does in this mode; the number matches the list. Red = Vhikk X-inspired functions. A label with a bar (WARP|SPAN) is the knob alone | with the LED button held. Dark ring = selected.</p>
+    </div>
+    <section aria-live="polite">
+      <div class="modehead" id="modehead"></div>
+      <ol class="list" id="list"></ol>
+    </section>
+  </div>
+
+  <section class="sect" id="modes">
+    <h2>All eight modes</h2>
+    <p class="howto">Open mode select: press the LED button and LOAD/SAVE together, or hold the LED button for 2.5 s. Then LOAD/SAVE steps to the next mode and the LED button to the previous one. To leave, hold the LED button about 1 s, then about 1 s again. The four LEDs show which mode you are on.</p>
+    <div class="tscroll"><table class="modes" id="modetable"></table></div>
+  </section>
+
+  <section class="sect">
+    <h2>Install and restore</h2>
+    <div class="grid2">
+      <div class="card"><h3>Flash v1.3</h3><p>Hold FREEZE while you power on. The LEDs show the bootloader. Play <code>Monsoon-NartiLive-v1.3.wav</code> into IN L from a phone or computer at full volume, with no other sounds playing. The module restarts when it is done.</p></div>
+      <div class="card"><h3>Go back to stock</h3><p>Flash <code>Monsoon-ORIGINAL-Parasites-v2.01-restore.wav</code> the same way. Your saved buffers are kept.</p></div>
+      <div class="card"><h3>Buttons, everywhere</h3><p>LED button: tap = meter display, hold 1 s = quality menu, hold 2.5 s = mode select. In VHIKK a tap changes the algorithm and holding it is the shift for SPAN, FUSE and SCAN. FREEZE: tap = freeze, hold 1 s = reverse (granular modes).</p></div>
+    </div>
+  </section>
+
+  <footer>Built from the Monsoon Parasites source (Clouds by Emilie Gillet, Parasites by Matthias Puech, Monsoon port by Tom Burns), MIT license. CAVERN and VHIKK are original Narti Live code, inspired by the Forge TME Vhikk X and not affiliated with Forge TME. Panel drawing after the Monsoon panel by Jak Plugg.</footer>
+</div>
+
+<script>
+(function () {
+  // ---------- panel geometry (viewBox 300 x 640, from the panel drawing)
+  var SX = [127, 175, 225, 273];                // slider x: POSITION DENSITY SIZE TEXTURE
+  var SL = ["POSITION", "DENSITY", "SIZE", "TEXTURE"];
+  var KX = [48, 119, 185, 254], KL = ["WET", "STER", "FBK", "RVB"];
+  var J1 = [27, 75, 123, 173, 223, 273], J1L = ["V/OCT", "TRIG", "POSITION", "DENSITY", "SIZE", "TEXTURE"];
+  var G = {
+    disp: { ring: [[52, 67, 12]], badge: [52, 89] },
+    leds: { ring: [[150, 67, 70, 14, "rect"]], badge: [150, 89] },
+    save: { ring: [[254, 67, 12]], badge: [254, 89] },
+    tune: { ring: [[50, 140, 28]], badge: [50, 192] },
+    inlevel: { ring: [[50, 233, 28]], badge: [50, 285] },
+    sl_pos: { ring: [[127, 192, 12, 96, "rect"]], badge: [127, 314] },
+    sl_den: { ring: [[175, 192, 12, 96, "rect"]], badge: [175, 314] },
+    sl_size: { ring: [[225, 192, 12, 96, "rect"]], badge: [225, 329] },
+    sl_tex: { ring: [[273, 192, 12, 96, "rect"]], badge: [273, 314] },
+    k_wet: { ring: [[48, 358, 22]], badge: [48, 405] },
+    k_ster: { ring: [[119, 358, 22]], badge: [119, 405] },
+    k_fbk: { ring: [[185, 358, 22]], badge: [185, 405] },
+    k_rvb: { ring: [[254, 358, 22]], badge: [254, 405] },
+    cvk: { ring: [[48, 437, 15], [119, 437, 15], [185, 437, 15], [254, 437, 15]], badge: [152, 437] },
+    voct: { ring: [[27, 496, 15]], badge: [27, 471] },
+    trig: { ring: [[75, 496, 15]], badge: [75, 471] },
+    cvs: { ring: [[123, 496, 15], [173, 496, 15], [223, 496, 15], [273, 496, 15]], badge: [198, 471] },
+    ins: { ring: [[27, 556, 15], [75, 556, 15]], badge: [51, 600] },
+    freeze: { ring: [[125, 556, 25], [173, 556, 15]], badge: [125, 528] },
+    outs: { ring: [[223, 556, 15], [273, 556, 15]], badge: [248, 600] }
+  };
+
+  // ---------- content
+  var VOICE_LEDS = [1, 1, 1, 0], CAV_LEDS = [1, 1, 0, 1], PH_LEDS = [0, 0, 0, 1];
+  var MODES = {
+    vhikk: {
+      tab: "VHIKK", num: "8", leds: VOICE_LEDS, ledtext: "all but LED 4",
+      intro: "A stereo drone voice and processor, highly inspired by the Forge TME Vhikk X: nine algorithms, each a generator, a FIELD filter and a VCA, then the CAVERN engine as a metallic DUNGEON or a diffuse REFLEKTA delay. Everything is on one page. The Monsoon has 9 controls and the Vhikk X has 12, so SPAN, FUSE and SCAN are played with the LED button held, the way the Vhikk X shares its encoders.",
+      items: [
+        ["disp", "LED button", "Algorithm + shift", "Tap for the next algorithm 1 to 9. LEDs 1 to 3 show the two switches of the original: green = first switch (up, centre, down), red = second switch, amber when both are on one LED; green glows with the VCA. Hold it and move STEREO, REVERB or SIZE to play SPAN, FUSE and SCAN. Held 2.5 s without moving anything = mode select.",
+          [["x_alg1", "1 Analogue pair"], ["x_alg2", "2 Waveshaping pair"], ["x_alg3", "3 Sine cluster"], ["x_alg4", "4 Wavetable"], ["x_alg5", "5 Wavetable"], ["x_alg6", "6 Wavetable"], ["x_alg7", "7 Diatonic cluster"], ["x_alg8", "8 Cluster"], ["x_alg9", "9 Cluster"]],
+          "Each algorithm as a drone, the root moving every 2.5 s and MORPH drifting.", null, "ALGORITHM"],
+        ["leds", "4 LEDs", "Switches + VCA", "LED 1 to 3: the algorithm as two switches. LED 4: red while the LED button is held (shift), blue when the processor is frozen."],
+        ["save", "LOAD/SAVE button", "Scan step", "Tap to jump SCAN to the next table set (it glides there). Hold the LED button and move SIZE for SCAN in between.", null, null, null, "SCAN"],
+        ["tune", "TUNE knob", "Basis", "An octave switch with 5 positions: −2, −1, 0, +1, +2 octaves (C2 at noon). The note itself comes from V/OCT."],
+        ["inlevel", "IN LEVEL knob", "Input level", "Level of the audio at IN L/R. It goes straight to the effects: not through the FIELD filter or the VCA."],
+        ["sl_pos", "POSITION slider", "Time", "Delay length of the processor, 20 ms to 0.8 s. It glides when you move it.", [["x_time", "Short → long"]]],
+        ["sl_den", "DENSITY slider", "Cell", "Frequency shift inside the delay loop: down to the left, none at noon, up to the right, up to ±2 kHz. Every repeat moves further.", [["x_cell", "Noon → up → down"]]],
+        ["sl_size", "SIZE slider", "Morph / Scan", "MORPH: timbral scan (carrier wave, wavetable frame or cluster, depending on the algorithm). With the LED button held: SCAN, the second scan (modulator wave, shaper set, ring-mod mix or table set).", [["x_morph", "MORPH sweep"], ["x_scan", "SCAN sweep (LED held)"]], null, null, "MORPH|SCAN"],
+        ["sl_tex", "TEXTURE slider", "Form", "Structure of the processor: distinct repeats, then metallic multi-tap (DUNGEON) or diffuse reverb-like echoes (REFLEKTA).", [["x_form", "Repeats → diffuse"]]],
+        ["k_wet", "WET knob", "Mix", "Generator against processor, equal at noon.", [["x_mix", "Generator → processor"]]],
+        ["k_ster", "STER knob", "Warp / Span", "WARP: cross modulation, a different kind left and right of noon (neutral at noon). With the LED button held: SPAN, oscillator spread and tuning; right of noon also widens the stereo image.", [["x_warp", "WARP sweep"], ["x_span", "SPAN sweep (LED held)"]], null, null, "WARP|SPAN"],
+        ["k_fbk", "FBK knob", "Feed", "Processor feedback, none at noon. Left of noon the output hears the frequency shifter alone; right of noon the shifter is blended with the raw echoes for moving notches.", [["x_feed", "Left → noon → right"]]],
+        ["k_rvb", "RVB knob", "Field / Fuse", "FIELD: low-pass left of noon, open at noon, high-pass right. With the LED button held: FUSE, the colour of the algorithm (chorus, resonance, saturation, wavefold, audio-rate modulation).", [["x_field", "FIELD sweep"], ["x_fuse", "FUSE sweep (LED held)"]], null, null, "FIELD|FUSE"],
+        ["cvk", "CV jacks under the knobs", "Knob CV", "Voltage control of MIX, WARP, FEED and FIELD (SPAN and FUSE while the LED button is held)."],
+        ["voct", "V/OCT jack", "Note + trigger", "1 V/oct on top of the octave switch. Every new note also fires the VCA, 2 ms after the jump so the pitch has settled, so one cable from a sequencer (the Plaits AUX pitch out, for example) plays the voice. The same note twice in a row does not retrigger, and vibrato or slow LFOs never trigger. As soon as TRIG gets pulses, TRIG alone fires the VCA; 2 s after the last TRIG pulse, V/OCT notes trigger again.", [["x_voct", "A melody on V/OCT only"]], "No TRIG cable: the notes alone fire the stabs.", null, "NOTE+TRIG"],
+        ["trig", "TRIG jack", "VCA", "Nothing patched (and no new notes at V/OCT): the voice drones. Patch a clock or gates and every trigger plays a stab whose decay follows the trigger rate; while TRIG gets pulses, it alone fires the VCA. Three seconds without triggers and it drones again.", [["x_stab", "Stabs, then back to drone"]]],
+        ["cvs", "Slider CV jacks", "Time, Cell, Morph, Form CV", "Voltage control of each slider."],
+        ["freeze", "FREEZE button + jack", "Seed / Freeze", "Tap: SEED, new random pitch and wave offsets and new echo spacing, gliding. Hold 1 s: freeze the processor loop (again to release). A gate at the jack freezes too.", [["x_seed", "A new seed every 1.5 s"], ["x_freeze", "Freeze at 4 s"]], null, null, "SEED"],
+        ["ins", "IN L / IN R", "Audio in", "Only through the effects (TIME, CELL, FORM, FEED, FUSE colour of the delay); its dry part follows MIX like the generator."],
+        ["outs", "OUT L / OUT R", "Stereo out", "Always stereo."]
+      ]
+    },
+    cavern: {
+      tab: "CAVERN", num: "7", leds: CAV_LEDS, ledtext: "all but LED 3",
+      intro: "A stereo delay that turns into metallic echoes and diffuse space, with a frequency shifter inside its loop and chorus or saturation on top. Inspired by the processor section of the Forge TME Vhikk X. Use it on anything you patch into IN L/R.",
+      items: [
+        ["disp", "LED button", "Display", "Tap: meter display. Hold 1 s: quality menu. Hold 2.5 s: mode select."],
+        ["leds", "4 LEDs", "Meter", "Show the level as usual; in mode select LEDs 1, 2 and 4 mean CAVERN."],
+        ["save", "LOAD/SAVE button", "Load / save", "Loads and saves the granular buffers as in Parasites. Loading switches back to granular mode."],
+        ["tune", "TUNE knob", "Fuse", "Left of noon adds stereo chorus, right of noon adds saturation, noon is clean. V/OCT moves it too.", [["c_fuse", "Chorus → clean → saturation"]]],
+        ["inlevel", "IN LEVEL knob", "Input level", "Level into the space."],
+        ["sl_pos", "POSITION slider", "Time", "Delay time, 20 ms to 0.8 s. Glides smoothly as you move it.", [["c_time", "Sweep short → long"]]],
+        ["sl_den", "DENSITY slider", "Cell", "Frequency shift in the loop: down to the left, none at noon, up to the right, up to ±2 kHz.", [["c_cell", "Noon → up → down"]]],
+        ["sl_size", "SIZE slider", "Field", "Tone of the loop: dark, open at noon, thin.", [["c_field", "Sweep dark → thin"]]],
+        ["sl_tex", "TEXTURE slider", "Form", "Distinct repeats, then metallic multi-tap, then diffuse reverb.", [["c_form", "Repeats → reverb"]]],
+        ["k_wet", "WET knob", "Dry / wet", "Balance between the input and the space.", [["c_wet", "Dry → wet"]]],
+        ["k_ster", "STER knob", "Spread", "Offsets the left and right taps and adds ping-pong cross-feedback.", [["c_stereo", "Mono → wide"]]],
+        ["k_fbk", "FBK knob", "Feedback", "Regeneration, up to self-sustaining. It is soft-limited so it never runs away.", [["c_feedback", "Low → endless"]]],
+        ["k_rvb", "RVB knob", "Reverb", "The original Clouds reverb, after the space."],
+        ["cvk", "CV jacks under the knobs", "Knob CV", "Voltage control of WET, STER, FBK and RVB."],
+        ["voct", "V/OCT jack", "Fuse CV", "Adds to TUNE, so it moves the chorus / saturation amount."],
+        ["trig", "TRIG jack", "Seed", "Picks a new random spacing for the multi-tap echoes."],
+        ["cvs", "Slider CV jacks", "Time, Cell, Field, Form CV", "Voltage control of each slider."],
+        ["freeze", "FREEZE button + jack", "Hold", "Holds the loop: the input is muted and the repeats go on forever.", [["c_freeze", "Freeze at 4 s"]]],
+        ["ins", "IN L / IN R", "Audio in", "Stereo or mono input."],
+        ["outs", "OUT L / OUT R", "Stereo out", "Always stereo, also from a mono input."]
+      ]
+    },
+    phaser: {
+      tab: "PHASER", num: "4", leds: PH_LEDS, ledtext: "LED 4",
+      intro: "A stereo phaser with up to 12 all-pass stages per channel, swept by one LFO. It replaces the spectral mode. The right channel's LFO can be offset for a wide image.",
+      items: [
+        ["disp", "LED button", "Display", "Tap: meter display. Hold 1 s: quality menu. Hold 2.5 s: mode select."],
+        ["leds", "4 LEDs", "Meter", "Level meter; in mode select LED 4 alone means PHASER."],
+        ["save", "LOAD/SAVE button", "Load / save", "Loads and saves the granular buffers as in Parasites. Loading switches back to granular mode."],
+        ["tune", "TUNE knob", "Centre", "Centre frequency of the sweep, 700 Hz at noon, 1 V/oct with V/OCT.", [["p_center", "Low → high"]]],
+        ["inlevel", "IN LEVEL knob", "Input level", "Level into the phaser."],
+        ["sl_pos", "POSITION slider", "Rate", "LFO speed, 0.02 Hz to 10 Hz.", [["p_rate", "Slow → fast"]]],
+        ["sl_den", "DENSITY slider", "Shape", "LFO shape: sine, then triangle, then smooth random.", [["p_shape", "Sine, triangle, random"]]],
+        ["sl_size", "SIZE slider", "Depth", "How far the notches sweep, 0 to 5 octaves.", [["p_depth", "0 → 5 octaves"]]],
+        ["sl_tex", "TEXTURE slider", "Stages", "2 to 12 all-pass stages, crossfaded smoothly. More stages give more notches.", [["p_stages", "2 → 12 stages"]]],
+        ["k_wet", "WET knob", "Mix", "Dry / wet."],
+        ["k_ster", "STER knob", "Stereo", "Offset between the left and right LFO, 0 to 180°.", [["p_stereo", "Mono → 180°"]]],
+        ["k_fbk", "FBK knob", "Resonance", "Feedback around the stages. The level is compensated so it stays even.", [["p_feedback", "0 → full"]]],
+        ["k_rvb", "RVB knob", "Reverb", "The original Clouds reverb."],
+        ["cvk", "CV jacks under the knobs", "Knob CV", "Voltage control of WET, STER, FBK and RVB."],
+        ["voct", "V/OCT jack", "Centre CV", "1 V/oct, adds to TUNE."],
+        ["trig", "TRIG jack", "Reset", "Restarts the LFO from the beginning, for sync."],
+        ["cvs", "Slider CV jacks", "Rate, Shape, Depth, Stages CV", "Voltage control of each slider."],
+        ["freeze", "FREEZE button + jack", "Hold sweep", "Stops the LFO where it is.", [["p_freeze", "Freeze at 4 s"]]],
+        ["ins", "IN L / IN R", "Audio in", "Stereo or mono input."],
+        ["outs", "OUT L / OUT R", "Stereo out", "Left and right swept separately."]
+      ]
+    }
+  };
+  var ALLMODES = [
+    ["1", "Granular", [1, 0, 0, 0], "Clouds grain cloud from the recording buffer. Unchanged."],
+    ["2", "Pitch / stretch", [0, 1, 0, 0], "Time-stretching and pitch shifting. Unchanged."],
+    ["3", "Looping delay", [0, 0, 1, 0], "Delay with pitch shifter. Unchanged."],
+    ["4", "PHASER", PH_LEDS, "New: stereo phaser, replaces spectral."],
+    ["5", "MI reverb", [0, 1, 1, 1], "Parasites Oliverb. Unchanged."],
+    ["6", "Resonator", [1, 0, 1, 1], "Parasites Resonestor. Unchanged."],
+    ["7", "CAVERN", CAV_LEDS, "New: Vhikk X-inspired stereo space."],
+    ["8", "VHIKK", VOICE_LEDS, "New: Vhikk X-inspired drone voice + processor."]
+  ];
+
+  // ---------- state
+  var state = { mode: "vhikk", page: "", sel: -1 };
+  try { var m = (location.hash || "").slice(1); if (MODES[m]) state.mode = m; } catch (e) {}
+
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent, text) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function h(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function visibleItems() {
+    var md = MODES[state.mode];
+    return md.items.filter(function (it) { return !it[6] || !md.paged || it[6] === state.page; });
+  }
+
+  function cat(it) {
+    if (state.mode === "vhikk") return it[0] === "ins" || it[0] === "outs" || it[0] === "inlevel" ? "" : "s";
+    if (state.mode === "cavern") return CAV_IDS[it[0]] ? "s" : "";
+    return "";
+  }
+  var CAV_IDS = { sl_pos: 1, sl_den: 1, sl_size: 1, sl_tex: 1, tune: 1, k_wet: 1, k_ster: 1, k_fbk: 1, freeze: 1, trig: 1, voct: 1, cvs: 1 };
+  var CAT_FILL = { v: "#5aa8ff", s: "#ff5a4e", "": "#f2c230" }, CAT_INK = { v: "#08131f", s: "#ffffff", "": "#1b1a14" };
+  var SHORT = { cvk: "Knob CV", cvs: "Slider CV", leds: "LEDs" };
+  function shortFn(it) { if (it[7]) return it[7]; return it[2].length > 11 ? (SHORT[it[0]] || it[2]) : it[2]; }
+
+  // ---------- panel
+  var svg = document.getElementById("panel");
+  function drawPanel() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var md = MODES[state.mode];
+    var legend = "var(--legend)";
+    el("rect", { x: 2, y: 2, width: 296, height: 636, rx: 6, fill: "var(--alu)", stroke: "var(--alu-edge)", "stroke-width": 2 }, svg);
+    [[30, 14], [254, 14], [30, 618], [254, 618]].forEach(function (p) { el("rect", { x: p[0], y: p[1], width: 18, height: 9, rx: 4.5, fill: "var(--bg)" }, svg); });
+    el("text", { x: 150, y: 24, "text-anchor": "middle", fill: legend, "font-family": "Barlow Condensed, sans-serif", "font-weight": 700, "font-size": 15, "letter-spacing": 4 }, svg, "MONSOON");
+    el("text", { x: 150, y: 625, "text-anchor": "middle", fill: legend, "font-family": "Barlow Condensed, sans-serif", "font-size": 10, "letter-spacing": 1 }, svg, "Narti Live fw v1.3");
+    function lab(x, y, t, size) { el("text", { x: x, y: y, "text-anchor": "middle", fill: legend, "font-family": "Barlow Condensed, sans-serif", "font-weight": 600, "font-size": size || 10, "letter-spacing": .5 }, svg, t); }
+    // buttons + leds
+    [52, 254].forEach(function (x) { el("circle", { cx: x, cy: 67, r: 9, fill: "#2b2d2b", stroke: "#111", "stroke-width": 1.5 }, svg); });
+    lab(52, 50, "DISP", 9); lab(254, 50, "LOAD/SAVE", 8);
+    [92, 131, 171, 208].forEach(function (x, i) {
+      var on = md.leds[i];
+      el("circle", { cx: x, cy: 67, r: 5, fill: on ? "#57e389" : "#5f6b60", stroke: "#2a2f2a", "stroke-width": 1 }, svg);
+      if (on) el("circle", { cx: x, cy: 67, r: 8, fill: "#57e389", opacity: .25 }, svg);
+    });
+    // knobs
+    function knob(x, y, r, label) {
+      for (var a = -135; a <= 135; a += 27) {
+        var rad = (a - 90) * Math.PI / 180;
+        el("line", { x1: x + Math.cos(rad) * (r + 3), y1: y + Math.sin(rad) * (r + 3), x2: x + Math.cos(rad) * (r + 7), y2: y + Math.sin(rad) * (r + 7), stroke: legend, "stroke-width": 1.2 }, svg);
+      }
+      el("circle", { cx: x, cy: y, r: r, fill: "#202221", stroke: "#0d0e0d", "stroke-width": 1.5 }, svg);
+      el("circle", { cx: x, cy: y, r: r * .72, fill: "#2e302f" }, svg);
+      el("line", { x1: x, y1: y - r * .2, x2: x, y2: y - r * .9, stroke: "#e9e6dc", "stroke-width": 2, "stroke-linecap": "round" }, svg);
+      lab(x, y + r + 18, label, 10);
+    }
+    knob(50, 140, 19, "TUNE"); knob(50, 233, 19, "IN LEVEL");
+    KX.forEach(function (x, i) { knob(x, 358, 15, KL[i]); });
+    // sliders
+    SX.forEach(function (x, i) {
+      el("circle", { cx: x, cy: 96, r: 3.5, fill: "#5f6b60", stroke: "#2a2f2a" }, svg);
+      el("rect", { x: x - 3, y: 106, width: 6, height: 172, rx: 3, fill: "#1b1c1b" }, svg);
+      for (var t = 0; t <= 10; t++) el("line", { x1: x + 7, y1: 110 + t * 16.4, x2: x + (t % 5 ? 10 : 13), y2: 110 + t * 16.4, stroke: legend, "stroke-width": 1 }, svg);
+      el("rect", { x: x - 9, y: 184, width: 18, height: 16, rx: 2, fill: "#e9e6dc", stroke: "#8c8f88" }, svg);
+      el("line", { x1: x - 7, y1: 192, x2: x + 7, y2: 192, stroke: "#2a2a2a", "stroke-width": 1.5 }, svg);
+      lab(x, 300, SL[i], 8.3);
+    });
+    // CV jacks under knobs and jack rows
+    function jack(x, y) { el("circle", { cx: x, cy: y, r: 11, fill: "#c3c6be", stroke: "#202221", "stroke-width": 3 }, svg); el("circle", { cx: x, cy: y, r: 5, fill: "#0d0e0d" }, svg); }
+    KX.forEach(function (x) { el("line", { x1: x, y1: 383, x2: x, y2: 426, stroke: legend, "stroke-width": 1 }, svg); jack(x, 437); });
+    J1.forEach(function (x, i) { jack(x, 496); lab(x, 521, J1L[i], 8.5); });
+    [27, 75, 223, 273].forEach(function (x) { jack(x, 556); });
+    el("circle", { cx: 125, cy: 556, r: 19, fill: "#b9bcb4", stroke: "#6f726b", "stroke-width": 2 }, svg);
+    jack(173, 556);
+    lab(27, 580, "L"); lab(51, 580, "IN"); lab(75, 580, "R"); lab(150, 584, "FREEZE"); lab(223, 580, "L"); lab(248, 580, "OUT"); lab(273, 580, "R");
+
+    // badges and selection
+    var items = visibleItems();
+    items.forEach(function (it, i) {
+      var g = G[it[0]];
+      var grp = el("g", { "data-i": i, style: "cursor:pointer", tabindex: 0, role: "button", "aria-label": (i + 1) + " " + it[1] + ": " + it[2] }, svg);
+      g.ring.forEach(function (r) {
+        var sel = state.sel === i;
+        var attrs = { fill: "transparent", stroke: sel ? "#1b1a14" : "transparent", "stroke-width": 3 };
+        if (r[4] === "rect") { attrs.x = r[0] - r[2]; attrs.y = r[1] - r[3]; attrs.width = r[2] * 2; attrs.height = r[3] * 2; attrs.rx = 5; el("rect", attrs, grp); }
+        else { attrs.cx = r[0]; attrs.cy = r[1]; attrs.r = r[2]; el("circle", attrs, grp); }
+      });
+      var label = (i + 1) + " " + shortFn(it).toUpperCase();
+      var pw = Math.max(18, label.length * 4.9 + 8);
+      el("rect", { x: g.badge[0] - pw / 2, y: g.badge[1] - 6.5, width: pw, height: 13, rx: 6.5, fill: CAT_FILL[cat(it)], stroke: "#1b1a14", "stroke-width": state.sel === i ? 2.2 : .8 }, grp);
+      el("text", { x: g.badge[0], y: g.badge[1] + 3, "text-anchor": "middle", fill: CAT_INK[cat(it)], "font-family": "Barlow Condensed, sans-serif", "font-weight": 700, "font-size": 8.2, "letter-spacing": .2 }, grp, label);
+      grp.addEventListener("click", function () { select(i, true); });
+      grp.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(i, true); } });
+    });
+  }
+
+  // ---------- audio
+  var audio = new Audio(); var current = null;
+  audio.addEventListener("timeupdate", function () { if (current && audio.duration) current.querySelector(".bar").style.width = (100 * audio.currentTime / audio.duration) + "%"; });
+  audio.addEventListener("ended", stop);
+  function stop() { if (current) { current.classList.remove("on"); current.querySelector(".bar").style.width = 0; current.setAttribute("aria-pressed", "false"); } current = null; }
+  function playClip(btn, name) {
+    if (current === btn) { audio.pause(); stop(); return; }
+    stop(); current = btn; btn.classList.add("on"); btn.setAttribute("aria-pressed", "true");
+    audio.src = "audio/" + name + ".mp3"; audio.currentTime = 0;
+    var pr = audio.play(); if (pr && pr.catch) pr.catch(function () { stop(); });
+  }
+
+  // ---------- list
+  var list = document.getElementById("list");
+  function drawList() {
+    list.innerHTML = "";
+    visibleItems().forEach(function (it, i) {
+      var li = h("li", "item" + (state.sel === i ? " sel" : ""));
+      li.dataset.i = i;
+      var c = cat(it); li.appendChild(h("div", "badge" + (c ? " " + c : ""), String(i + 1)));
+      var body = h("div"); body.style.minWidth = 0;
+      var top = h("div", "top");
+      top.appendChild(h("span", "fn" + (c ? " " + c : ""), it[2]));
+      top.appendChild(h("span", "ctl", it[1]));
+      if (it[6]) top.appendChild(h("span", "pagechip" + (it[6] === "SPACE" ? " s" : ""), it[6] + " page"));
+      body.appendChild(top);
+      body.appendChild(h("p", null, it[3]));
+      if (it[4]) {
+        var cl = h("div", "clips");
+        it[4].forEach(function (c) {
+          var b = h("button", "play"); b.type = "button"; b.setAttribute("aria-pressed", "false");
+          b.innerHTML = '<span class="ic"></span><span></span><span class="bar"></span>';
+          b.children[1].textContent = c[1];
+          b.addEventListener("click", function (e) { e.stopPropagation(); select(i, false); playClip(b, c[0]); });
+          cl.appendChild(b);
+        });
+        body.appendChild(cl);
+        if (it[5]) body.appendChild(h("div", "what", it[5]));
+      }
+      li.appendChild(body);
+      li.addEventListener("click", function () { select(i, false); });
+      li.addEventListener("mouseenter", function () { highlight(i); });
+      li.addEventListener("mouseleave", function () { highlight(state.sel); });
+      list.appendChild(li);
+    });
+  }
+  function highlight(i) {
+    var groups = svg.querySelectorAll("g[data-i]");
+    for (var k = 0; k < groups.length; k++) {
+      var on = +groups[k].getAttribute("data-i") === i;
+      var shapes = groups[k].querySelectorAll("rect, circle");
+      for (var s = 0; s < shapes.length - 1; s++) shapes[s].setAttribute("stroke", on ? "#1b1a14" : "transparent");
+      shapes[shapes.length - 1].setAttribute("stroke-width", on ? 2.2 : .8);
+    }
+  }
+  function select(i, scroll) {
+    state.sel = i;
+    var lis = list.children;
+    for (var k = 0; k < lis.length; k++) lis[k].classList.toggle("sel", k === i);
+    highlight(i);
+    if (scroll && lis[i]) lis[i].scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+
+  // ---------- head + tabs
+  function ledDots(leds) {
+    var s = h("span", "ledrow");
+    leds.forEach(function (on) { s.appendChild(h("span", "led" + (on ? " on" : ""))); });
+    return s;
+  }
+  function drawHead() {
+    var md = MODES[state.mode], head = document.getElementById("modehead");
+    head.innerHTML = "";
+    head.appendChild(h("h2", null, "Mode " + md.num + " · " + md.tab));
+    var lr = ledDots(md.leds); lr.appendChild(document.createTextNode(" mode select: " + md.ledtext)); head.appendChild(lr);
+    head.appendChild(h("p", null, md.intro));
+    if (state.mode !== "phaser") {
+      var lg = h("div", "legend");
+      lg.innerHTML = '<span><i style="background:var(--vx)"></i>Red: Vhikk X-inspired (VHIKK voice and processor, CAVERN space)</span><span><i style="background:var(--accent)"></i>Yellow: the module itself</span>';
+      head.appendChild(lg);
+    }
+    if (md.paged) {
+      var sw = h("div", "pagesw"); sw.setAttribute("role", "group"); sw.setAttribute("aria-label", "Slider page");
+      ["VOICE", "SPACE"].forEach(function (p) {
+        var b = h("button", p === "SPACE" ? "sp" : null, p + " page"); b.type = "button"; b.setAttribute("aria-pressed", state.page === p ? "true" : "false");
+        b.addEventListener("click", function () { state.page = p; state.sel = -1; render(); });
+        sw.appendChild(b);
+      });
+      var row = h("div"); row.style.display = "flex"; row.style.flexWrap = "wrap"; row.style.gap = "10px"; row.style.alignItems = "center";
+      row.appendChild(sw);
+      row.appendChild(h("span", "hint", "Sliders shown for the " + state.page + " page. LOAD/SAVE flips it on the module."));
+      head.appendChild(row);
+    }
+  }
+  var tabs = document.getElementById("tabs");
+  ["vhikk", "cavern", "phaser"].forEach(function (k) {
+    var b = h("button", "tab"); b.type = "button"; b.setAttribute("role", "tab"); b.id = "tab-" + k;
+    b.innerHTML = '<span class="num"></span><span></span>';
+    b.children[0].textContent = MODES[k].num; b.children[1].textContent = MODES[k].tab;
+    b.addEventListener("click", function () { state.mode = k; state.sel = -1; state.page = ""; audio.pause(); stop(); render(); });
+    tabs.appendChild(b);
+  });
+  function render() {
+    for (var i = 0; i < tabs.children.length; i++) tabs.children[i].setAttribute("aria-selected", tabs.children[i].id === "tab-" + state.mode ? "true" : "false");
+    drawHead(); drawPanel(); drawList();
+  }
+
+  // ---------- all-modes table
+  var tbl = document.getElementById("modetable");
+  var thead = h("tr"); ["", "Mode", "LEDs", ""].forEach(function (t) { thead.appendChild(h("th", null, t)); }); tbl.appendChild(thead);
+  ALLMODES.forEach(function (r) {
+    var tr = h("tr");
+    tr.appendChild(h("td", "n", r[0]));
+    tr.appendChild(h("td", null, r[1]));
+    var td = h("td"); td.appendChild(ledDots(r[2])); tr.appendChild(td);
+    tr.appendChild(h("td", null, r[3]));
+    tbl.appendChild(tr);
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
