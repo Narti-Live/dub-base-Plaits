@@ -1,4 +1,4 @@
-# DUB STAB PLAITS — v1.4
+# DUB STAB PLAITS — v1.5
 
 By **Narti Live** · [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
@@ -95,7 +95,7 @@ Chord model, octave, resonance and the pattern are saved 2 s after a change.
 ## Installing
 
 Unplug all cables. Patch your audio output into **MODEL** and set FREQUENCY to 12 o'clock.
-Power on with the **left** button held, then play `DubStab-Plaits-v1.4.wav` (or `DubStab-Plaits-v1.4-Cm-DEEP.wav`) to the end (2 min 37 s).
+Power on with the **left** button held, then play `DubStab-Plaits-v1.5.wav` (or `DubStab-Plaits-v1.5-Cm-DEEP.wav`) to the end (2 min 42 s).
 LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off (computer volume around 80 %). If all LEDs blink red, press the left button,
 adjust FREQUENCY and play the file again. To go back, install the official Plaits WAV
 the same way; your calibration is kept.
@@ -103,6 +103,8 @@ the same way; your calibration is kept.
 *Tested in a Cortex-M4 emulator (boot, panel, flash save/restore, audio, CPU) and running on a Plaits clone.*
 
 ## Version
+
+**v1.5** — lighter on the processor (8–17 % less CPU on the busiest models), same sound.
 
 **v1.4** — no more soft clipping with long envelopes (FREQUENCY to the right): the limiter catches every peak at once and holds it.
 
