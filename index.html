@@ -13,6 +13,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/BarlowCondensed-Bold.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/panelmap.css?v=15">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -50,7 +51,7 @@
       <a class="btn" href="downloads/DubStab-Plaits-v1.5.wav" download>Firmware .wav</a>
       <a class="btn" href="downloads/DubStab-Plaits-v1.5.apk" download>Android app .apk</a>
       <a class="btn" href="#m4l">Max for Live</a>
-      <a class="btn" href="docs/MANUAL.md">Manual</a>
+      <a class="btn" href="docs/manual/">Manual</a>
     </div>
     <p class="hint">Before flashing: Plaits <b>FREQUENCY knob at 12 o’clock</b>, computer volume around <b>80 %</b>. While it plays, the level meter
       (LEDs 1–4) should show the <b>two green LEDs</b> lit — yellow may flicker, red should stay off.</p>
@@ -133,12 +134,8 @@
   <div class="idx">02</div>
   <div class="body">
     <h2>The panel</h2>
-    <ul class="kv">
-      <li><b>FREQUENCY</b> envelope · <b>+LEFT</b> octave · <b>+RIGHT</b> resonance</li>
-      <li><b>Attenuverters</b> density · length · speed (with triplets)</li>
-      <li><b>Tap L / R</b> chord model · <b>hold L</b> NEW · <b>hold R</b> chords / single notes</li>
-      <li><b>LEDs</b> model LED yellow = chords, red = single notes; blinks on each step</li>
-    </ul>
+    <p class="pm-lede">Every control, numbered. Hover or tap a number on the panel to see it in the list. The <a href="docs/manual/">visual manual</a> explains each one in full.</p>
+    <div id="pmList" class="pm-compact"></div>
     <details class="more"><summary>More details</summary>
       <table class="spec">
         <tr><th>FREQUENCY</th><td>Attack, decay and filter envelope on one knob. Left = short dark pluck, noon = dub stab, right = long swell with a big filter sweep.</td></tr>
@@ -165,7 +162,7 @@
       </table>
     </details>
   </div>
-  <figure class="shot panelfig"><div class="anno"><img src="assets/panel.jpg" alt="The Plaits panel with DUB STAB PLAITS functions" loading="lazy"><span class="tag" style="left:50.1%;top:2.9%">both buttons 2 s = CV TUNE</span><span class="tag" style="left:80.3%;top:35.4%">sound of the model</span><span class="tag" style="left:19.7%;top:47.8%">sound</span><span class="tag" style="left:80.3%;top:47.8%">sound</span><span class="tag" style="left:11.8%;top:81.8%">model CV</span><span class="tag" style="left:31.0%;top:81.8%">timbre CV</span><span class="tag" style="left:50.1%;top:81.8%">not used</span><span class="tag" style="left:69.3%;top:81.8%">morph CV</span><span class="tag" style="left:88.2%;top:81.8%">harm. CV</span><span class="tag" style="left:31.0%;top:94.2%">VCA</span><span class="tag" style="left:50.1%;top:94.2%">transpose</span><span class="tag hi" style="left:69.3%;top:94.2%">chords</span><span class="tag hi" style="left:88.2%;top:96.9%">root CV 1 V/oct</span></div><figcaption>Panel, as drawn by the Android app</figcaption></figure>
+<figure class="shot panelfig" id="pmFig"><figcaption>Plaits running DUB STAB PLAITS v1.5 · drawn by the app</figcaption></figure>
 </section>
 
 <section class="block" id="models">
@@ -173,8 +170,7 @@
   <div class="body">
     <h2>Chord models</h2>
     <p class="chips"><span>1 DUB SAW</span><span>2 VA</span><span>3 WAVESHAPE</span><span>4 FM</span><span>5 PHASE DIST</span><span>6 VHIKK</span><span>7 STRING MACHINE</span><span>8 ACID (mono)</span></p>
-    <p class="note">Model 8 <b>ACID</b> plays a mono acid bass line with the pattern — chord roots, octaves and fifths, one octave above the chords, with slides and accents, always in key. On ACID, FREQUENCY sets the filter envelope amount; decay is fixed, saw wave, warm character. <a href="downloads/DubStab-Plaits-v1.3-VHIKK-demo.mp3"><b>VHIKK demo .mp3</b><span>25 s: model 6, WARP / feedback / SPACE</span></a>
-      <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3">Listen to the demo</a>.</p>
+    <p class="note">Model 8 <b>ACID</b> plays a mono acid bass line with the pattern — chord roots, octaves and fifths, one octave above the chords, with slides and accents, always in key. On ACID, FREQUENCY sets the filter envelope amount; decay is fixed, saw wave, warm character.<br>Listen: <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3">ACID demo</a> · <a href="downloads/DubStab-Plaits-v1.3-VHIKK-demo.mp3">VHIKK demo</a> (25 s: WARP, feedback, SPACE).</p>
     <details class="more"><summary>What HARMONICS / TIMBRE / MORPH do</summary>
     <div class="table-wrap">
     <table class="models">
@@ -291,7 +287,7 @@
       <a href="downloads/DubStab-Plaits-v1.5.apk" download><b>DubStab-Plaits-v1.5.apk</b><span>Android app · 0.5 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.5-Cm-DEEP.wav" download><b>DubStab-Plaits-v1.5-Cm-DEEP.wav</b><span>Firmware · C minor DEEP chords · 15.5 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.5-Cm-DEEP.apk" download><b>DubStab-Plaits-v1.5-Cm-DEEP.apk</b><span>Android app “Dub Stab Cm Deep” · 0.5 MB</span></a>
-      <a href="docs/MANUAL.md"><b>MANUAL.md</b><span>Full manual</span></a>
+      <a href="docs/manual/"><b>Visual manual</b><span>Every control, the chord models, quick start</span></a>
       <a href="downloads/DubStab-M4L-v1.0.zip" download><b>DubStab-M4L-v1.0.zip</b><span>Max for Live devices · 0.1 MB</span></a>
       <a href="downloads/DubStab-Plaits-v1.3-VHIKK-demo.mp3"><b>VHIKK demo .mp3</b><span>25 s: model 6, WARP / feedback / SPACE</span></a>
       <a href="downloads/DubStab-Plaits-v1.0-ACID-demo.mp3"><b>ACID demo .mp3</b><span>24 s: dry, then with the app’s echo + reverb</span></a>
@@ -356,5 +352,15 @@
 </footer>
 
 <script src="assets/site.js"></script>
+<script src="assets/panelmap.js?v=15"></script>
+<script>
+(function () {
+  var fig = document.getElementById("pmFig"), list = document.getElementById("pmList"), sec = document.getElementById("panel");
+  PanelMap.mount({ figure: fig, list: list, compact: true });
+  var mq = window.matchMedia("(max-width: 980px)");
+  function place() { if (mq.matches) list.parentNode.insertBefore(fig, list); else sec.appendChild(fig); }
+  place(); if (mq.addEventListener) mq.addEventListener("change", place);
+})();
+</script>
 </body>
 </html>

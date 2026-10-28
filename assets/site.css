@@ -360,3 +360,15 @@ details.more[open] > summary { color: var(--bone); margin-bottom: 14px; }
 .m4l-shots img { display: block; width: 100%; height: auto; border: 1px solid var(--line); }
 .m4l-shots figcaption { font: 600 11px/1.4 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim, #8a93a6); margin-top: 6px; }
 @media (max-width: 640px) { .m4l-shots { grid-template-columns: 1fr; } }
+
+/* v1.5: numbered panel map */
+#panel { grid-template-columns: 110px minmax(0, 1fr) minmax(0, 440px); }
+#panel .panelfig { max-width: 440px; }
+#panel .panelfig figcaption { line-height: 1.3; }
+.pm-lede { margin: 0 0 20px; max-width: 60ch; }
+.pm-compact .pm-list { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.pm-compact .pm-item { padding: 8px 10px; align-items: center; }
+.pm-compact .pm-fn { font-size: 18px; }
+@media (max-width: 980px) { #panel { grid-template-columns: 1fr; } #panel .panelfig { justify-self: center; max-width: 440px; margin: 0 auto 24px; }
+  .pm-compact .pm-list { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } .pm-compact .pm-fn { font-size: 16px; } .pm-compact .pm-ctl { font-size: 11px; letter-spacing: .08em; } }
+#panel .body { padding-right: clamp(0px, 3vw, 40px); }
