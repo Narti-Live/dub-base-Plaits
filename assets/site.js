@@ -152,8 +152,8 @@
     l.innerHTML = '<input type="radio" name="fw"><b></b><span></span>';
     var inp = l.querySelector('input'); inp.value = 'beta:' + f.file; inp.dataset.beta = '1'; inp._get = get;
     inp.dataset.label = f.label.replace('Firmware · ', '');
-    l.querySelector('b').textContent = f.variant === 'gmin' ? 'G minor β' : 'G minor+ β';
-    l.querySelector('span').textContent = f.variant === 'gmin' ? 'v1.1 · DEEP dub chords' : 'all chords';
+    l.querySelector('b').textContent = f.short || (f.variant === 'gmin' ? 'G minor β' : 'G minor+ β');
+    l.querySelector('span').textContent = f.sub || (f.variant === 'gmin' ? 'DEEP dub chords' : 'all chords');
     box.appendChild(l); box.classList.remove('one');
     inp.addEventListener('change', onPick);
     radios = document.querySelectorAll('input[name=fw]');

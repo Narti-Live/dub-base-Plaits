@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEQ PLAITS — stock Plaits engines + a generative sequencer, by Narti Live</title>
+<meta name="author" content="Narti Live">
+<meta name="description" content="SEQ PLAITS by Narti Live: free, unofficial firmware for Mutable Instruments Plaits. All 24 stock Plaits 1.2 engines, played by a built-in generative melody sequencer, always in a minor key. TRIG = clock, 130 BPM without a cable, V/OCT sets the key.">
+<meta name="theme-color" content="#05080d">
+<meta property="og:title" content="SEQ PLAITS — Plaits firmware">
+<meta property="og:description" content="All 24 stock Plaits engines, played by a built-in generative sequencer. Free.">
+<meta property="og:image" content="https://narti-live.github.io/dub-base-Plaits/assets/seq-plaits-functions.jpg">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/BarlowCondensed-Bold.woff" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="../assets/site.css?v=16">
+<style>
+  .cheat { margin: 8px 0 24px; max-width: 1100px; }
+  .cheat img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+  .cheat figcaption { font: 500 15px/1.4 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--fog); padding-top: 12px; }
+  @media (max-width: 600px) { .cheat { margin-left: -16px; margin-right: -16px; } .cheat img { border-radius: 0; border-left: 0; border-right: 0; } .cheat figcaption { padding: 12px 16px 0; } }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<svg class="defs" aria-hidden="true" width="0" height="0">
+  <filter id="wave" x="-5%" y="-20%" width="110%" height="140%">
+    <feTurbulence id="waveNoise" type="fractalNoise" baseFrequency="0.0025 0.008" numOctaves="1" seed="5" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+<header class="hero">
+  <canvas id="stabs" aria-hidden="true"></canvas>
+  <nav class="top">
+    <span class="mark">SEQ PLAITS</span>
+    <span class="links">
+      <a href="#flash">Flash</a>
+      <a href="#controls">Controls</a>
+      <a href="#how">How it plays</a>
+      <a href="#downloads">Download</a>
+      <a href="../">Dub Stab Plaits</a>
+      <a href="../monsoon/">Monsoon</a>
+    </span>
+  </nav>
+  <div class="hero-text">
+    <p class="kicker">Unofficial alternate firmware for Mutable Instruments Plaits — v1.0 — by Narti Live</p>
+    <h1 class="title" aria-label="SEQ PLAITS">
+      <span class="line" data-text="SEQ">SEQ</span>
+      <span class="line l2" data-text="PLAITS">PLAITS</span>
+    </h1>
+    <p class="lede"><b>All 24 stock Plaits 1.2 engines, played by a built-in generative sequencer.</b> Every note in a minor key.
+      Clock it from TRIG, or let it run at 130 BPM on its own. V/OCT picks the key.</p>
+    <div class="cta">
+      <a class="btn solid" href="#flash">Flash from this page</a>
+      <a class="btn" href="downloads/SeqPlaits-v1.0.wav" download>Firmware .wav</a>
+      <a class="btn" href="#controls">What every control does</a>
+    </div>
+    <div class="social hero-social">
+      <a href="https://www.instagram.com/narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
+        <b>Instagram</b><span>@narti_live</span></a>
+      <a href="https://www.youtube.com/@narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9.2v5.6l5-2.8z" fill="currentColor"/></svg>
+        <b>YouTube</b><span>@narti_live</span></a>
+    </div>
+  </div>
+  <p class="risk">Unofficial firmware — not made, tested or supported by Mutable Instruments. Use it at your own risk.</p>
+  <div class="hero-meta">
+    <span>24 STOCK ENGINES</span><span>16 STEPS</span><span>130 BPM INTERNAL</span><span>ALWAYS MINOR</span>
+  </div>
+</header>
+
+<main>
+
+<section class="block flash" id="flash">
+  <div class="idx">00</div>
+  <div class="body">
+    <h2>Flash from this page</h2>
+    <p class="lede-s">The update travels as audio: this page plays it into your Plaits. <span class="risk-inline">Unofficial firmware, use at your own risk.</span></p>
+    <div class="cols2">
+      <div>
+        <ol class="steps tight check">
+          <li>Unplug all cables. Audio out of your computer or phone → Plaits <b>MODEL</b> jack.</li>
+          <li><b>FREQUENCY at 12 o’clock</b>. Hold the <b>left button</b> and power on.</li>
+          <li>Volume about <b>80 %</b>, notifications off, press <b>Play</b>.</li>
+          <li>Wait 2:39 — the module restarts into SEQ PLAITS.</li>
+        </ol>
+        <details class="more"><summary>More details</summary>
+          <ul class="dash">
+            <li>While it plays, LEDs 1–4 are a level meter: both green LEDs lit is right, yellow may flicker, red should stay off.</li>
+            <li>All LEDs blink red: press the left button, adjust the volume, play it again from the start.</li>
+            <li>Your calibration is kept. Your saved engine and settings start fresh once.</li>
+            <li>Going back: flash the official Plaits .wav, or <a href="../">DUB STAB PLAITS</a>, the same way.</li>
+          </ul>
+        </details>
+      </div>
+      <div class="player">
+        <div class="variant" role="radiogroup" aria-label="Firmware version">
+          <label><input type="radio" name="sfw" value="downloads/SeqPlaits-v1.0.wav" data-label="SEQ PLAITS v1.0 · C minor" checked><b>SEQ PLAITS v1.0</b><span>C minor · V/OCT sets the key</span></label>
+        </div>
+        <div class="bar"><div class="fill" id="sFill"></div></div>
+        <div class="time"><span id="sTime">0:00</span><span id="sDur">2:39</span></div>
+        <div class="pbtns">
+          <button class="btn solid" id="sPlay" type="button">Play firmware</button>
+          <button class="btn" id="sStop" type="button" disabled>Stop</button>
+        </div>
+        <p class="note" id="sStatus">Ready. The file (15.2 MB) loads when you press Play.</p>
+        <audio id="sAudio" preload="none" src="downloads/SeqPlaits-v1.0.wav"></audio>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="about">
+  <div class="idx">01</div>
+  <div class="body">
+    <h2>What it is</h2>
+    <div class="cols4">
+      <div><h3>Stock sound</h3><p>The 24 engines, HARMONICS, TIMBRE, MORPH and the low-pass gate are the official Plaits 1.2 code, untouched.</p></div>
+      <div><h3>A melody that writes itself</h3><p>16 steps over a chord progression, always in a minor key. Hold LEFT for a new one.</p></div>
+      <div><h3>TRIG = clock</h3><p>16th notes from your clock. Start it and the pattern plays from step 1. No cable: 130 BPM.</p></div>
+      <div><h3>V/OCT = key</h3><p>0 V is C minor. Every semitone up is a new minor key, so a sequencer can change the key.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="controls">
+  <div class="idx">02</div>
+  <div class="body">
+    <h2>What every control does</h2>
+    <p class="lede-s">Tap the picture to open it full size.</p>
+    <figure class="cheat"><a href="../assets/seq-plaits-functions.jpg?v=1" target="_blank" rel="noopener"><img src="../assets/seq-plaits-functions.jpg?v=1" width="2250" height="3060" loading="lazy" alt="SEQ PLAITS: the Plaits panel with every function labelled — green / red bank and NEW on the buttons, envelope on FREQUENCY, density / length / speed on the small knobs, clock in on TRIG, key root on V/OCT — and the list of the 24 stock engines"></a>
+      <figcaption><a href="../assets/seq-plaits-functions.jpg?v=1" download>Download the cheat sheet</a></figcaption></figure>
+    <details class="more"><summary>Every control in words</summary>
+      <table class="spec">
+        <tr><th>FREQUENCY</th><td>The envelope: left a short pluck, noon a medium note, right a long note; the last third adds a soft attack that always fits in the step. <b>Hold LEFT + turn</b>: octave 1–5 (one LED).</td></tr>
+        <tr><th>HARMONICS · TIMBRE · MORPH</th><td>Stock, for each engine. <b>Hold LEFT + TIMBRE</b>: low-pass gate colour. <b>Hold RIGHT + HARMONICS</b>: fine tune ±1 semitone (centre = in tune).</td></tr>
+        <tr><th>Small knob under TIMBRE</th><td><b>DENSITY</b>: how many of the 16 steps play (fully left = silent). Off-beats come first.</td></tr>
+        <tr><th>Small knob under FM</th><td><b>LENGTH</b>: 1–16 steps.</td></tr>
+        <tr><th>Small knob under MORPH</th><td><b>SPEED</b>: 1/2 · 1/4 · 1/8 · 1/8T · 1/16 (centre) · 1/16T · 1/32 · 1/32T steps per clock.</td></tr>
+        <tr><th>Small knobs with a cable</th><td>When their CV jack (TIMBRE, FM, MORPH) is patched they are the stock attenuverters again, and the sequencer keeps its last setting.</td></tr>
+        <tr><th>Tap LEFT / RIGHT</th><td>Stock: LEFT steps through the green engines, RIGHT through the red. Tap both together to switch to stepping through all 24 (LEFT back, RIGHT forward), for the yellow engines.</td></tr>
+        <tr><th>Hold LEFT 1 s, release</th><td><b>NEW pattern</b> (the LEDs pulse green while you hold, then sweep).</td></tr>
+        <tr><th>Hold both 2 s</th><td>Stock CV calibration.</td></tr>
+        <tr><th>LEDs</th><td>The engine, in its bank colour; it blinks on every note. Moving a control shows its value for a second: envelope = yellow bar, density = green bar, length = yellow bar, speed = one LED (red for triplets).</td></tr>
+        <tr><th>TRIG</th><td>Clock in, 16ths. When the clock stops for 4 clock periods (0.5–4.5 s) the pattern goes back to step 1 and waits; plugging the cable in does the same. No cable: 130 BPM.</td></tr>
+        <tr><th>V/OCT</th><td>The key: 0 V (or nothing) = C minor, +1 semitone = C♯ minor, +7 = G minor… Taken on every step.</td></tr>
+        <tr><th>LEVEL</th><td>A VCA after the envelope: the sequence keeps playing.</td></tr>
+        <tr><th>MODEL · HARMO · OUT · AUX</th><td>Stock. MODEL CV is taken on each note.</td></tr>
+      </table>
+    </details>
+  </div>
+</section>
+
+<section class="block" id="how">
+  <div class="idx">03</div>
+  <div class="body">
+    <h2>How it plays</h2>
+    <ol class="steps tight">
+      <li><b>Harmony.</b> Each pattern has 1, 2 or 4 sections on minor-key chords (mostly i, iv, v, VI, III).</li>
+      <li><b>Melody.</b> A random walk over two octaves of the scale on top of them, landing on chord tones often.</li>
+      <li><b>Ranks.</b> Every step gets a rank; DENSITY plays the steps ranked below it, so turning it up adds notes without changing the ones you hear.</li>
+      <li><b>Accents.</b> Some steps are accented (a little louder and brighter, like the stock LEVEL accent).</li>
+      <li><b>Saved.</b> Engine, octave, fine tune, colour and the pattern come back at power-on.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="block" id="downloads">
+  <div class="idx">04</div>
+  <div class="body">
+    <h2>Downloads</h2>
+    <div class="dl">
+      <a href="downloads/SeqPlaits-v1.0.wav" download><b>SeqPlaits-v1.0.wav</b><span>Firmware for the module · 15.2 MB, 2:39 to flash</span></a>
+      <a href="../assets/seq-plaits-functions.jpg" download><b>Cheat sheet .jpg</b><span>Every control + the 24 engines</span></a>
+      <a href="downloads/SeqPlaits-v1.0.bin" download><b>SeqPlaits-v1.0.bin</b><span>Raw image for SWD / ST-Link (at 0x08008000)</span></a>
+    </div>
+    <details class="more"><summary>Checksums and version</summary>
+      <p class="note mono">wav a70574520ec26f882e317e9ed0fb998851f3a3c6413c4892633860093a631f6f<br>bin 52fdf393e54cc5668807edb086b27370d0665ed7927324f24d842ed9a7f85938</p>
+      <dl class="log">
+        <dt>v1.0</dt><dd>First release: the official Plaits 1.2 engines with a generative melody sequencer. Tested in a Cortex-M4 emulator: boot, panel, clock, save / restore, every engine (no added clipping: the modal and snare engines clip on loud accents exactly as stock Plaits does), the same CPU load as stock Plaits, 5 KB of stack to spare.</dd>
+      </dl>
+      <p>Built from the open-source Plaits firmware by Émilie Gillet (MIT). Not affiliated with Mutable Instruments.</p>
+    </details>
+  </div>
+</section>
+
+<section class="block" id="narti">
+  <div class="idx">05</div>
+  <div class="body">
+    <h2>By Narti Live</h2>
+    <p>Also: <a href="../">DUB STAB PLAITS</a>, dub techno chords for Plaits, and <a href="../monsoon/">MONSOON VHIKK</a> for the After Later Audio Monsoon.</p>
+    <div class="social">
+      <a href="https://www.instagram.com/narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
+        <b>Instagram</b><span>@narti_live</span></a>
+      <a href="https://www.youtube.com/@narti_live" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9.2v5.6l5-2.8z" fill="currentColor"/></svg>
+        <b>YouTube</b><span>@narti_live</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="../assets/site.js"></script>
+<script>
+// SEQ PLAITS flasher: plays the firmware WAV untouched and shows the progress.
+(function () {
+  var a = document.getElementById('sAudio'), play = document.getElementById('sPlay'), stop = document.getElementById('sStop');
+  var fill = document.getElementById('sFill'), time = document.getElementById('sTime'), dur = document.getElementById('sDur');
+  var status = document.getElementById('sStatus'), radios = document.querySelectorAll('input[name=sfw]');
+  function fmt(x) { x = Math.max(0, Math.floor(x)); return Math.floor(x / 60) + ':' + ('0' + x % 60).slice(-2); }
+  function lock(on) { for (var i = 0; i < radios.length; i++) radios[i].disabled = on; }
+  function picked() { for (var i = 0; i < radios.length; i++) if (radios[i].checked) return radios[i]; return radios[0]; }
+  for (var i = 0; i < radios.length; i++) radios[i].addEventListener('change', function () {
+    if (!a.paused) return;
+    a.src = picked().value; fill.style.width = '0'; time.textContent = '0:00';
+    dur.textContent = '2:39';
+    status.textContent = 'Ready: ' + picked().dataset.label + '.';
+  });
+  play.addEventListener('click', function () {
+    lock(true);
+    if (a.getAttribute('src') !== picked().value) a.src = picked().value;
+    a.currentTime = 0; status.textContent = 'Loading the firmware…';
+    var p = a.play();
+    if (p && p.catch) p.catch(function () { lock(false); status.textContent = 'The browser blocked playback. Press Play again.'; });
+  });
+  stop.addEventListener('click', function () {
+    a.pause(); a.currentTime = 0; fill.style.width = '0'; time.textContent = '0:00';
+    play.disabled = false; stop.disabled = true; lock(false);
+    status.textContent = 'Stopped. Power the module off and on with the left button held, then play again from the start.';
+  });
+  a.addEventListener('playing', function () { play.disabled = true; stop.disabled = false; status.textContent = 'Playing — don’t touch the computer or the module.'; });
+  a.addEventListener('timeupdate', function () {
+    var d = a.duration || 159;
+    fill.style.width = (100 * a.currentTime / d).toFixed(2) + '%'; time.textContent = fmt(a.currentTime);
+  });
+  a.addEventListener('ended', function () {
+    play.disabled = false; stop.disabled = true; lock(false);
+    status.textContent = 'Done. Plaits restarts on its own. If not: power off, hold the left button, power on and play again.';
+  });
+  a.addEventListener('error', function () { status.textContent = 'Could not load the file. Download the .wav and play it with QuickTime or VLC.'; });
+})();
+</script>
+</body>
+</html>

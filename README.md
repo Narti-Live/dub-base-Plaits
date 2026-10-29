@@ -5,6 +5,7 @@ one knob for the envelope, and a 1 V/oct root-note CV on AUX. Plus **Dub Stab Pl
 app that runs the same firmware code so you can try it on your phone.
 
 **Website:** https://narti-live.github.io/dub-base-Plaits/  
+**New — SEQ PLAITS:** the stock Plaits 1.2 engines + a generative sequencer: https://narti-live.github.io/dub-base-Plaits/seq/  
 **Video:** [DUB STAB PLAITS on YouTube](https://youtu.be/KDar2ZEt_Ak)  
 **By Narti Live** — [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
