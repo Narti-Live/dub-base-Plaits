@@ -9,11 +9,10 @@
 <meta name="theme-color" content="#05080d">
 <meta property="og:title" content="DUB STAB PLAITS — Plaits firmware">
 <meta property="og:description" content="Dub techno chords from Mutable Instruments Plaits. Clocked from TRIG, always in C minor.">
-<meta property="og:image" content="assets/panel.jpg">
+<meta property="og:image" content="https://narti-live.github.io/dub-base-Plaits/assets/plaits-functions.jpg">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/BarlowCondensed-Bold.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="assets/site.css?v=15">
-<link rel="stylesheet" href="assets/panelmap.css?v=15">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -130,12 +129,13 @@
   </div>
 </section>
 
-<section class="block split" id="panel">
+<section class="block" id="panel">
   <div class="idx">02</div>
   <div class="body">
     <h2>The panel</h2>
-    <p class="pm-lede">Every control, numbered. Hover or tap a number on the panel to see it in the list. The <a href="docs/manual/">visual manual</a> explains each one in full.</p>
-    <div id="pmList" class="pm-compact"></div>
+    <p class="pm-lede">What every knob, button and jack does in this firmware. Tap the picture to open it full size. The <a href="docs/manual/">visual manual</a> explains each control in more detail.</p>
+    <figure class="cheat"><a href="assets/plaits-functions.jpg?v=15" target="_blank" rel="noopener"><img src="assets/plaits-functions.jpg?v=15" width="2250" height="2940" alt="DUB STAB PLAITS: the Plaits panel with every function labelled — prev / next model, envelope, chord model LEDs, sound 1–3, length, density, speed, CV inputs, clock in, VCA, transpose, chords out, root CV out — and a table of what HARMONICS, TIMBRE and MORPH do on each of the 8 chord models"></a>
+      <figcaption><a href="assets/plaits-functions.jpg?v=15" download>Download the cheat sheet</a> · print it or keep it on your phone</figcaption></figure>
     <details class="more"><summary>More details</summary>
       <table class="spec">
         <tr><th>FREQUENCY</th><td>Attack, decay and filter envelope on one knob. Left = short dark pluck, noon = dub stab, right = long swell with a big filter sweep.</td></tr>
@@ -162,7 +162,7 @@
       </table>
     </details>
   </div>
-<figure class="shot panelfig" id="pmFig"><figcaption>Plaits running DUB STAB PLAITS v1.5 · drawn by the app</figcaption></figure>
+
 </section>
 
 <section class="block" id="models">
@@ -352,15 +352,5 @@
 </footer>
 
 <script src="assets/site.js"></script>
-<script src="assets/panelmap.js?v=15"></script>
-<script>
-(function () {
-  var fig = document.getElementById("pmFig"), list = document.getElementById("pmList"), sec = document.getElementById("panel");
-  PanelMap.mount({ figure: fig, list: list, compact: true });
-  var mq = window.matchMedia("(max-width: 980px)");
-  function place() { if (mq.matches) list.parentNode.insertBefore(fig, list); else sec.appendChild(fig); }
-  place(); if (mq.addEventListener) mq.addEventListener("change", place);
-})();
-</script>
 </body>
 </html>

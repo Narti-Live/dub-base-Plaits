@@ -122,6 +122,10 @@ footer p { max-width: 80ch; }
 @media print {
   .bar { display: none; } body { background: #fff; color: #000; } section.s { break-inside: avoid-page; }
 }
+.cheat { margin: 0; max-width: 980px; }
+.cheat img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); }
+.cheat figcaption { font-size: 14px; color: var(--dim); margin-top: 10px; }
+@media (max-width: 600px) { .cheat { margin: 0 -16px; } .cheat img { border-radius: 0; border-width: 1px 0; } .cheat figcaption { padding: 0 16px; } }
 </style>
 </head>
 <body>
@@ -168,6 +172,8 @@ footer p { max-width: 80ch; }
 
 <section class="s" id="panel">
   <div class="sh"><span class="k">02</span><h2>Every control</h2><p>Hover or tap a number on the panel and its explanation lights up in the list.</p></div>
+  <figure class="cheat"><a href="../../assets/plaits-functions.jpg?v=15" target="_blank" rel="noopener"><img src="../../assets/plaits-functions.jpg?v=15" width="2250" height="2940" alt="The Plaits panel with every DUB STAB PLAITS function labelled, and what HARMONICS, TIMBRE and MORPH do on each chord model"></a>
+    <figcaption>The cheat sheet · tap to open full size · <a href="../../assets/plaits-functions.jpg?v=15" download>download</a>. Below: the same controls, explained one by one.</figcaption></figure>
   <div class="pmgrid">
     <figure id="pmFig"><figcaption>The panel as drawn by the Dub Stab Plaits app, which runs the same code.</figcaption></figure>
     <div id="pmList"></div>

@@ -11,6 +11,9 @@ app that runs the same firmware code so you can try it on your phone.
 > It has been tested in an emulator and on a Plaits clone, not on every hardware revision. It is provided as is,
 > without warranty (see [LICENSE](LICENSE)). You can always go back by installing the official Plaits firmware WAV.
 
+![DUB STAB PLAITS: what every control does](assets/plaits-functions.jpg)
+
+
 | Download | |
 |---|---|
 | [`DubStab-Plaits-v1.5.wav`](downloads/DubStab-Plaits-v1.5.wav) | Firmware update for the module (play it into Plaits) |

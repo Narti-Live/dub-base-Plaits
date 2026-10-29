@@ -25,6 +25,8 @@ Send Plaits a clock and it plays generative dub techno stabs, **always in C mino
 
 ## 2 · Every control
 
+![What every control does](../assets/plaits-functions.jpg)
+
 ### Buttons, LEDs, big knobs
 
 | # | Control | Function |
