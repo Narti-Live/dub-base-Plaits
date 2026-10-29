@@ -5,6 +5,7 @@ one knob for the envelope, and a 1 V/oct root-note CV on AUX. Plus **Dub Stab Pl
 app that runs the same firmware code so you can try it on your phone.
 
 **Website:** https://narti-live.github.io/dub-base-Plaits/  
+**Video:** [DUB STAB PLAITS on YouTube](https://youtu.be/KDar2ZEt_Ak)  
 **By Narti Live** — [Instagram @narti_live](https://www.instagram.com/narti_live) · [YouTube @narti_live](https://www.youtube.com/@narti_live)
 
 > **Unofficial firmware — use at your own risk.** DUB STAB PLAITS is not made, tested or supported by Mutable Instruments.

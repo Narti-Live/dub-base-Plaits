@@ -12,7 +12,7 @@
 <meta property="og:image" content="https://narti-live.github.io/dub-base-Plaits/assets/plaits-functions.jpg">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/BarlowCondensed-Bold.woff" as="font" type="font/woff" crossorigin>
-<link rel="stylesheet" href="assets/site.css?v=15">
+<link rel="stylesheet" href="assets/site.css?v=16">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -28,6 +28,7 @@
   <nav class="top">
     <span class="mark">DUB STAB PLAITS</span>
     <span class="links">
+      <a href="#video">Video</a>
       <a href="#flash">Flash</a>
       <a href="#panel">Panel</a>
       <a href="#cv">CV</a>
@@ -47,6 +48,7 @@
       No effects inside: patch your own delay and reverb after it.</p>
     <div class="cta">
       <a class="btn solid" href="#flash">Flash from this page</a>
+      <a class="btn" href="#video">▶ Watch the video</a>
       <a class="btn" href="downloads/DubStab-Plaits-v1.5.wav" download>Firmware .wav</a>
       <a class="btn" href="downloads/DubStab-Plaits-v1.5.apk" download>Android app .apk</a>
       <a class="btn" href="#m4l">Max for Live</a>
@@ -70,6 +72,21 @@
 </header>
 
 <main>
+
+<section class="block" id="video">
+  <div class="idx">▶</div>
+  <div class="body">
+    <h2>Watch it</h2>
+    <p class="lede-s">DUB STAB PLAITS on the module: flashing, the chord models, the sequencer and a jam.</p>
+    <div class="yt" data-id="KDar2ZEt_Ak">
+      <button type="button" class="yt-play" aria-label="Play the video: DUB STAB PLAITS">
+        <img src="assets/video-thumb.jpg" alt="" loading="lazy" width="1280" height="720">
+        <span class="yt-btn" aria-hidden="true"></span>
+      </button>
+    </div>
+    <p class="yt-links"><a href="https://youtu.be/KDar2ZEt_Ak" target="_blank" rel="noopener">Watch on YouTube</a> · <a href="https://www.youtube.com/@narti_live?sub_confirmation=1" target="_blank" rel="noopener">Subscribe to @narti_live</a></p>
+  </div>
+</section>
 
 <section class="block flash" id="flash">
   <div class="idx">00</div>
@@ -352,5 +369,15 @@
 </footer>
 
 <script src="assets/site.js"></script>
+<script>
+document.querySelectorAll(".yt").forEach(function (w) {
+  w.querySelector(".yt-play").addEventListener("click", function () {
+    var f = document.createElement("iframe");
+    f.src = "https://www.youtube-nocookie.com/embed/" + w.dataset.id + "?autoplay=1&rel=0";
+    f.title = "DUB STAB PLAITS video"; f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; f.allowFullscreen = true;
+    w.innerHTML = ""; w.appendChild(f);
+  });
+});
+</script>
 </body>
 </html>
