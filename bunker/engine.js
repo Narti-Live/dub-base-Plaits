@@ -2146,11 +2146,7 @@ function makeFx_comp(SR) {
   var M = Math;
   var pstyle = 0.0;
   var pamount = 0.35;
-  var patk = 0.6;
-  var prel = 1.0;
-  var pratio = 0.4;
   var pmix = 1.0;
-  var pout = 0.0;
   var ptempo = 126.0;
   var rms = 0.0;
   var lpd1 = 0.0;
@@ -2159,15 +2155,13 @@ function makeFx_comp(SR) {
   var g2 = 0.0;
   var sth = 0.0;
   var smix = 1.0;
-  var sout = 0.0;
+  var pin = 0.0;
+  var pwet = 0.0;
   var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0;
-  function tick(in1, in2, in3, in4) { var ai, atk, beat, c1, c2, ca, dd, drv, g, gl, gr, k, knee, lvl, mk, ov, pi5, ratio, red, rel1, rel2, ri, ri4, st, w1, x, yl, yr;
-    
+  function tick(in1, in2, in3, in4) { var aol, aor, atk, c1, c2, ca, cm, dd, drv, g, gl, gr, k, knee, lvl, mg, ol, orr, ov, pi_, ratio, red, rel1, rel2, st, w1, x, yl, yr;
 
 
 
-
-         
 
 
 
@@ -2184,60 +2178,45 @@ st = floor(pstyle + 0.5);
 k = 1 - exp(-1 / (0.03 * sr));
 sth = sth + (-30 * pamount - sth) * k;
 smix = smix + (pmix - smix) * k;
-sout = sout + (pout * 6 - sout) * k;
 
 
 ratio = 4;
-atk = 0.003;
-rel1 = 0.3;
-rel2 = 0.3;
-w1 = 1;
+atk = 0.01;
+rel1 = 0.12;
+rel2 = 1.2;
+w1 = 0.6;
 knee = 6;
 drv = 0;
-if (st == 0) {
-	ratio = pratio < 0.34 ? 2 : (pratio < 0.67 ? 4 : 10);
-	ai = floor(patk * 5.99);
-	atk = ai == 0 ? 0.0001 : (ai == 1 ? 0.0003 : (ai == 2 ? 0.001 : (ai == 3 ? 0.003 : (ai == 4 ? 0.01 : 0.03))));
-	ri = floor(prel * 4.99);
-	rel1 = ri == 0 ? 0.1 : (ri == 1 ? 0.3 : (ri == 2 ? 0.6 : 1.2));
-	rel2 = rel1;
-	if (ri == 4) {
-		
-		rel1 = 0.12;
-		rel2 = 1.2;
-		w1 = 0.6;
-	}
-	knee = 6;
-} else if (st == 1) {
-	ri4 = floor(pratio * 3.99);
-	ratio = ri4 == 0 ? 4 : (ri4 == 1 ? 8 : (ri4 == 2 ? 12 : 20));
-	atk = 0.00002 * exp2(patk * 5.32);
-	rel1 = 0.05 * exp2(prel * 4.46);
-	rel2 = rel1;
+if (st == 1) {
+	ratio = 4;
+	atk = 0.0004;
+	rel1 = 0.2;
+	rel2 = 0.2;
+	w1 = 1;
 	knee = 2;
 	drv = 0.35;
 } else if (st == 2) {
-	ratio = 2 + 2 * pratio;
+	ratio = 3;
 	atk = 0.01;
 	rel1 = 0.06;
-	rel2 = 0.5 * exp2(prel * 3.32);
+	rel2 = 1.5;
 	w1 = 0.5;
 	knee = 12;
 } else if (st == 3) {
-	ratio = 4 + 6 * pratio;
-	atk = 0.001 * exp2(patk * 3.32);
-	beat = 60 / max(ptempo, 20);
-	pi5 = floor(prel * 4.99);
-	rel1 = beat * (pi5 == 0 ? 0.125 : (pi5 == 1 ? 0.25 : (pi5 == 2 ? 0.5 : (pi5 == 3 ? 0.75 : 1))));
+	ratio = 6;
+	atk = 0.003;
+	rel1 = 0.5 * 60 / max(ptempo, 20);
 	rel2 = rel1;
+	w1 = 1;
 	knee = 3;
-} else {
+} else if (st == 4) {
 	ratio = 20;
-	atk = 0.00002 * exp2(patk * 5.32);
-	rel1 = 0.05 * exp2(prel * 2.58);
-	rel2 = rel1;
+	atk = 0.00005;
+	rel1 = 0.1;
+	rel2 = 0.1;
+	w1 = 1;
 	knee = 1;
-	drv = 0.3 + 1.7 * pratio;
+	drv = 1;
 }
 
 
@@ -2273,23 +2252,41 @@ g1 = g1 + (red - g1) * (red > g1 ? ca : c1);
 g2 = g2 + (red - g2) * (red > g2 ? ca : c2);
 gr = w1 * g1 + (1 - w1) * g2;
 
-
-mk = min(12, -sth * (1 - 1 / ratio) * 0.3) + sout;
-g = exp2((mk - gr) / 6.020599913);
+g = exp2(-gr / 6.020599913);
 yl = in1 * g;
 yr = in2 * g;
 if (drv > 0) {
 	
 	dd = 1 + drv * (1 + gr / 6);
-	yl = tanh(yl * dd) / dd * (1 + drv * 0.5);
-	yr = tanh(yr * dd) / dd * (1 + drv * 0.5);
+	yl = tanh(yl * dd) / dd;
+	yr = tanh(yr * dd) / dd;
 }
-out1 = in1 + (yl - in1) * smix;
-out2 = in2 + (yr - in2) * smix;
+
+
+cm = 1 - exp(-1 / (1.5 * sr));
+pi_ = (in1 * in1 + in2 * in2) * 0.5;
+if (pin > 0.000001 || pi_ > 0.000001) {
+	pin = pin + (pi_ - pin) * cm;
+	pwet = pwet + ((yl * yl + yr * yr) * 0.5 - pwet) * cm;
+}
+mg = pwet > 0.0000000001 ? clamp(sqrt(pin / pwet), 0.5, 8) : 1;
+ol = in1 + (yl * mg - in1) * smix;
+orr = in2 + (yr * mg - in2) * smix;
+
+aol = abs(ol);
+aor = abs(orr);
+if (aol > 0.8) {
+	ol = (0.8 + 0.2 * tanh((aol - 0.8) / 0.2)) * (ol > 0 ? 1 : -1);
+}
+if (aor > 0.8) {
+	orr = (0.8 + 0.2 * tanh((aor - 0.8) / 0.2)) * (orr > 0 ? 1 : -1);
+}
+out1 = ol;
+out2 = orr;
 out3 = gr;
 out4 = lvl;
  return [out1, out2, out3, out4]; }
-  function set(name, v) { switch (name) { case 'pstyle': pstyle = v; break; case 'pamount': pamount = v; break; case 'patk': patk = v; break; case 'prel': prel = v; break; case 'pratio': pratio = v; break; case 'pmix': pmix = v; break; case 'pout': pout = v; break; case 'ptempo': ptempo = v; break; default: throw new Error("no param " + name); } }
+  function set(name, v) { switch (name) { case 'pstyle': pstyle = v; break; case 'pamount': pamount = v; break; case 'pmix': pmix = v; break; case 'ptempo': ptempo = v; break; default: throw new Error("no param " + name); } }
   return { tick: tick, set: set };
 }
 function make_bunker(outlet, jsarguments) {
