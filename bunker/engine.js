@@ -1090,7 +1090,7 @@ if (av6 > 0) {
 
 	
 	m = v6p0;
-	fa = 440 * exp2(v6p1);        
+	fa = 123.47 * exp2(v6p1);     
 
 	fb = fa * (3.66 + (1.48 + 0.4 * v6p5 - 3.66) * m);
 	ph6 = fract(ph6 + fa / sr);
@@ -1115,7 +1115,7 @@ if (av6 > 0) {
 	if (t > dec * 9 + 0.02) {
 		av6 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel6) * v6lvl * 0.2421;
+	x = x * (0.3 + 0.7 * vel6) * v6lvl * 0.1375;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -2569,8 +2569,8 @@ function reseed() { rngState = (Math.floor(Math.random() * 4294967295) ^ (Date.n
 // ------------------------------------------------------------------ key
 // Tonal tracks: TUNE (parameter 1) is a pitch. KEYLOCK 2 = it snaps to the notes
 // of the key, 1 = to semitones, 0 = free. Ranges (as the voices):
-//   kick E1..A#1, snare D3..D4, tom E2..E4, rim/cow A4..A5, SY A1..A5
-var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 440, 55, 55];
+//   kick E1..A#1, snare D3..D4, tom E2..E4, rim/cow B2..B3, SY A1..A5
+var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 123.47, 55, 55];
 var TUNE_OCT = [0.5, 1, 0, 0, 0, 2, 1, 4, 4];
 function tuneHz(t, v) { return TUNE_LO[t] * Math.pow(2, v * TUNE_OCT[t]); }
 function hzTune(t, f) { return Math.log(f / TUNE_LO[t]) / Math.LN2 / TUNE_OCT[t]; }

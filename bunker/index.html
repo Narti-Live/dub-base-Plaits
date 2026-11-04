@@ -224,7 +224,7 @@ footer a { color: var(--mist); }
 <footer>BUNKER by <a href="https://www.instagram.com/narti_live">Narti Live</a> · <a href="https://www.youtube.com/@narti_live">YouTube</a> · <a href="../">DUB STAB PLAITS</a> · <a href="../studio/">DUB STAB STUDIO</a> · Free, MIT license. Inspired by classic drum machines; not affiliated with Roland, MFB, Pearl, Elektron or Ableton.</footer>
 </div>
 
-<script src="voices.js?v=3"></script>
+<script src="voices.js?v=4"></script>
 <script>
 (function () {
   'use strict';
@@ -242,7 +242,7 @@ footer a { color: var(--mist); }
     ['Wave', 'Tune', 'Decay', 'Sweep', 'Sweep t', 'LFO rate', 'LFO dep', 'Noise'],
     ['Wave', 'Tune', 'Decay', 'Sweep', 'Sweep t', 'LFO rate', 'LFO dep', 'Noise']];
   var AMP = ['Level', 'Pan', 'Echo', 'Void', 'Filter'];
-  var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 440, 55, 55];
+  var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 123.47, 55, 55];
   var TUNE_OCT = [0.5, 1, 0, 0, 0, 2, 1, 4, 4];
   var SCALES = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 9, 10], [0, 1, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 8, 11]];
   var NOTE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -1066,7 +1066,7 @@ footer a { color: var(--mist); }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC || !('audioWorklet' in AC.prototype)) { document.querySelector('.start p').textContent = 'This browser cannot run BUNKER (no AudioWorklet). Try a recent Chrome, Edge, Firefox or Safari.'; return Promise.reject(); }
     ctx = new AC({ latencyHint: 'playback' });
-    startP = ctx.audioWorklet.addModule('engine.js?v=5').then(function () {
+    startP = ctx.audioWorklet.addModule('engine.js?v=6').then(function () {
       node = new AudioWorkletNode(ctx, 'bunker', { numberOfInputs: 0, outputChannelCount: [2] });
       analyser = ctx.createAnalyser(); analyser.fftSize = 4096; analyser.smoothingTimeConstant = 0.75;
       node.connect(analyser); analyser.connect(ctx.destination);
