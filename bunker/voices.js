@@ -632,11 +632,11 @@ if (av0 > 0) {
 
 	
 	m = v0p0;
-	f0 = 36.708 * exp2(v0p1 * 0.83333);
-	dec = 0.03 * exp2(v0p2 * 5.3);
-	swt = 0.004 * exp2(v0p4 * 5.2);
+	f0 = 41.203 * exp2(v0p1 * 0.5);
+	dec = 0.035 * exp2(v0p2 * 2.3);
+	swt = 0.005 * exp2(v0p4 * 3);
 	pe = exp(-t / swt);
-	f = f0 * exp2(v0p3 * 4 * pe);
+	f = f0 * exp2((0.5 + 3.5 * v0p3) * pe);
 	ph0 = fract(ph0 + f / sr);
 	s = sin(6.283185307179586 * ph0);
 	sh = 1 + 2.5 * m;
@@ -644,12 +644,12 @@ if (av0 > 0) {
 	ae = exp(-t / dec) * (1 + (0.35 * m + 0.8 * v0p7) * exp(-t / 0.014));
 	cl = v0p5 * ((1 - m) * sin(6.283185307179586 * 1650 * t) * exp(-t / 0.0012) * 0.7 + m * noise() * exp(-t / 0.0022) * 0.6);
 	x = s * ae + cl;
-	dg = 1 + 7 * v0p6;
+	dg = 1 + 5 * v0p6;
 	x = tanh(x * dg) / tanh(dg);
 	if (t > dec * 9 + 0.05) {
 		av0 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel0) * v0lvl * 0.6912;
+	x = x * (0.3 + 0.7 * vel0) * v0lvl * 0.6834;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -694,8 +694,8 @@ if (rumamt > 0.001) {
 	z1 = rd1.read(0.0533 * sr + rmd * (1 + sin(6.283185307179586 * fract(rmph + 0.25))));
 	z2 = rd2.read(0.0713 * sr + rmd * (1 + sin(6.283185307179586 * fract(rmph + 0.5))));
 	z3 = rd3.read(0.0897 * sr + rmd * (1 + sin(6.283185307179586 * fract(rmph + 0.75))));
-	rt = 0.3 * exp2(rumdec * 4.3);
-	rf = 45 * exp2(rumtone * 3.4);
+	rt = 0.4 * exp2(rumdec * 2.9);
+	rf = 50 * exp2(rumtone * 2);
 	rg = 1 - exp(-6.283185307179586 * rf * 1.6 / sr);
 	rq0 = rq0 + rg * (z0 - rq0);
 	rq1 = rq1 + rg * (z1 - rq1);
@@ -748,29 +748,29 @@ if (av1 > 0) {
 
 	
 	m = v1p0;
-	f0 = 146.83 * exp2(v1p1 * 1.16667);
+	f0 = 146.83 * exp2(v1p1);
 	f = f0 * exp2(v1p6 * 2 * exp(-t / 0.018));
 	ph1 = fract(ph1 + f / sr);
 	ph1b = fract(ph1b + f * 1.47 / sr);
 	tri = 4 * abs(ph1 - 0.5) - 1;
 	sb = sin(6.283185307179586 * ph1);
 	body = sb + (tri - sb) * m * 0.5 + v1p7 * sin(6.283185307179586 * ph1b) * (1 - 0.5 * m);
-	bdec = 0.03 * exp2(v1p2 * 4.3);
+	bdec = 0.03 * exp2(v1p2 * 2.5);
 	be = exp(-t / bdec);
 	n = noise();
-	nlf = 900 * exp2(v1p5 * 3.7);
+	nlf = 1200 * exp2(v1p5 * 2.5);
 	gl = 1 - exp(-6.283185307179586 * min(nlf * 2.2, 0.45 * sr) / sr);
 	nl1 = nl1 + gl * (n - nl1);
 	nh = nl1 - nh1;
 	nh1 = nh1 + (nl1 - nh1) * (1 - exp(-6.283185307179586 * (nlf * (0.35 + 0.4 * m)) / sr));
-	sdec = 0.03 * exp2(v1p4 * 4.3);
+	sdec = 0.025 * exp2(v1p4 * 2.6);
 	se = exp(-t / sdec);
 	x = body * be * (0.9 - 0.35 * v1p3) + nh * se * v1p3 * (1.4 + 0.6 * m);
 	x = tanh(x * 1.3);
 	if (t > max(bdec, sdec) * 9 + 0.03) {
 		av1 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel1) * v1lvl * 0.5941;
+	x = x * (0.3 + 0.7 * vel1) * v1lvl * 0.6145;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -821,10 +821,10 @@ if (av2 > 0) {
 	if (tb < 0) {
 		env = exp(-(t - gap * floor(t / gap)) / (0.0018 + 0.003 * v2p6));
 	} else {
-		env = exp(-tb / (0.02 + 0.5 * v2p2 * v2p2)) * (0.75 + 0.25 * v2p6);
+		env = exp(-tb / (0.02 + 0.25 * v2p2 * v2p2)) * (0.75 + 0.25 * v2p6);
 	}
-	env = env + v2p5 * 0.35 * exp(-t / (0.08 + 0.6 * v2p2)) * (t > 0.01 ? 1 : 0);
-	fc = (700 + 400 * m) * exp2(v2p1 * 2.3);
+	env = env + v2p5 * 0.35 * exp(-t / (0.06 + 0.3 * v2p2)) * (t > 0.01 ? 1 : 0);
+	fc = (900 + 300 * m) * exp2(v2p1 * 2);
 	g = tan(3.141592653589793 * min(fc, 0.42 * sr) / sr);
 	rq = 1 / (0.8 + v2p7 * 6 * (1 - 0.4 * m));
 	hh = 1 / (1 + rq * g + g * g);
@@ -835,10 +835,10 @@ if (av2 > 0) {
 	lp = g * bp + c2;
 	c2 = g * bp + lp;
 	x = tanh((bp * rq * 2.2 + hp * 0.25 * m) * env * (1 - 0.4 * v2p7));
-	if (tb > (0.02 + 0.5 * v2p2 * v2p2) * 9 + (0.08 + 0.6 * v2p2) * 6 * v2p5) {
+	if (tb > (0.02 + 0.25 * v2p2 * v2p2) * 9 + (0.06 + 0.3 * v2p2) * 6 * v2p5) {
 		av2 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel2) * v2lvl * 1.1444;
+	x = x * (0.3 + 0.7 * vel2) * v2lvl * 0.9346;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -887,7 +887,7 @@ if (av3 > 0) {
 	met = v3p4 * (1 - 0.6 * m);
 	mx = hb0 + hb1 + hb2 + hb3 + hb4 + hb5;
 	src = mx * 0.17 * met + noise() * (1 - met) * (0.6 + 0.4 * m);
-	fc = 6500 * exp2(v3p3 * 1.2 + (v3p1 - 0.5) * 0.8);
+	fc = 4200 * exp2(v3p3 * 1.4 + (v3p1 - 0.5) * 0.6);
 	g = tan(3.141592653589793 * min(fc, 0.42 * sr) / sr);
 	rq = 1 / (0.7 + v3p5 * 5);
 	hh = 1 / (1 + rq * g + g * g);
@@ -897,7 +897,7 @@ if (av3 > 0) {
 	lp = g * bp + a2_3;
 	a2_3 = g * bp + lp;
 	y = hp * (0.6 + 0.3 * m) + bp * rq * 1.2;
-	dec = 0.012 * exp2(v3p2 * 5);
+	dec = 0.01 * exp2(v3p2 * 3);
 	e = exp(-t / dec) * cg3 + v3p6 * exp(-t / 0.0015) * 0.8;
 	x = y * e;
 	if (v3p7 > 0.01) {
@@ -911,7 +911,7 @@ if (av3 > 0) {
 	if (t > dec * 9 + 0.02 || cg3 < 0.001) {
 		av3 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel3) * v3lvl * 0.6544;
+	x = x * (0.3 + 0.7 * vel3) * v3lvl * 0.677;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -962,7 +962,7 @@ if (av4 > 0) {
 	met = v4p4 * (1 - 0.6 * m);
 	mx = hb0 + hb1 + hb2 + hb3 + hb4 + hb5;
 	src = mx * 0.17 * met + noise() * (1 - met) * (0.6 + 0.4 * m);
-	fc = 6500 * exp2(v4p3 * 1.2 + (v4p1 - 0.5) * 0.8);
+	fc = 4200 * exp2(v4p3 * 1.4 + (v4p1 - 0.5) * 0.6);
 	g = tan(3.141592653589793 * min(fc, 0.42 * sr) / sr);
 	rq = 1 / (0.7 + v4p5 * 5);
 	hh = 1 / (1 + rq * g + g * g);
@@ -972,7 +972,7 @@ if (av4 > 0) {
 	lp = g * bp + a2_4;
 	a2_4 = g * bp + lp;
 	y = hp * (0.6 + 0.3 * m) + bp * rq * 1.2;
-	dec = 0.08 * exp2(v4p2 * 5);
+	dec = 0.06 * exp2(v4p2 * 2.4);
 	e = exp(-t / dec) * cg4 + v4p6 * exp(-t / 0.0015) * 0.8;
 	x = y * e;
 	if (v4p7 > 0.01) {
@@ -986,7 +986,7 @@ if (av4 > 0) {
 	if (t > dec * 9 + 0.02 || cg4 < 0.001) {
 		av4 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel4) * v4lvl * 0.9179;
+	x = x * (0.3 + 0.7 * vel4) * v4lvl * 0.8968;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -1030,20 +1030,20 @@ if (av5 > 0) {
 
 	
 	m = v5p0;
-	f0 = 61.735 * exp2(v5p1 * 3);
+	f0 = 82.407 * exp2(v5p1 * 2);
 	swt = 0.005 * exp2(v5p4 * 4.6);
 	f = f0 * exp2(v5p3 * 2 * exp(-t / swt) + m * 0.3 * exp(-t / 0.004));
 	ph5 = fract(ph5 + f / sr);
 	ph5b = fract(ph5b + f * (1.5 + 0.08 * m) / sr);
 	s = sin(6.283185307179586 * ph5) + v5p6 * 0.5 * sin(6.283185307179586 * ph5b) * exp(-t / 0.05);
-	dec = (0.05 + 0.35 * (1 - m)) * exp2(v5p2 * 3);
+	dec = (0.025 + 0.045 * (1 - m)) * exp2(v5p2 * 2);
 	x = s * exp(-t / dec) + v5p5 * noise() * exp(-t / (0.004 + 0.01 * (1 - m))) * 0.7;
 	dg = 1 + 5 * v5p7;
 	x = tanh(x * dg) / tanh(dg);
 	if (t > dec * 9 + 0.02) {
 		av5 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel5) * v5lvl * 0.2845;
+	x = x * (0.3 + 0.7 * vel5) * v5lvl * 0.2894;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -1087,7 +1087,7 @@ if (av6 > 0) {
 
 	
 	m = v6p0;
-	fa = 277.18 * exp2(v6p1 * 2);        
+	fa = 440 * exp2(v6p1);        
 
 	fb = fa * (3.66 + (1.48 + 0.4 * v6p5 - 3.66) * m);
 	ph6 = fract(ph6 + fa / sr);
@@ -1104,7 +1104,7 @@ if (av6 > 0) {
 	r1 = g * hp + bp;
 	lp = g * bp + r2;
 	r2 = g * bp + lp;
-	dec = (0.012 + 0.09 * m) * exp2(v6p2 * 3.5);
+	dec = (0.012 + 0.07 * m) * exp2(v6p2 * 2.8);
 	e = exp(-t / dec) * (1 - m * 0.5) + m * 0.5 * exp(-t / (dec * 0.12));
 	x = (bp * rq * 1.5 + hp * 0.2) * e + v6p4 * noise() * exp(-t / 0.0008) * 0.6;
 	dg = 1 + 5 * v6p7;
@@ -1112,7 +1112,7 @@ if (av6 > 0) {
 	if (t > dec * 9 + 0.02) {
 		av6 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel6) * v6lvl * 0.244;
+	x = x * (0.3 + 0.7 * vel6) * v6lvl * 0.2421;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -1161,17 +1161,17 @@ if (av7 > 0) {
 	lr = 0.5 * exp2(v7p5 * 6.3);
 	lph7 = fract(lph7 + lr / sr);
 	lf = lph7 < 0.5 ? 1 : -1;
-	f = 30.868 * exp2(v7p1 * 6 + swp * 4 * (1 - exp(-t / swt)) + lf * v7p6 * v7p6 * 1.5 + v7p7 * v7p7 * noise() * 0.8);
+	f = 55 * exp2(v7p1 * 4 + swp * 3 * (1 - exp(-t / swt)) + lf * v7p6 * v7p6 * 1.5 + v7p7 * v7p7 * noise() * 0.8);
 	sph7 = fract(sph7 + min(f, 0.45 * sr) / sr);
 	tri = 4 * abs(sph7 - 0.5) - 1;
 	sqr = sph7 < 0.5 ? 0.8 : -0.8;
 	s = tri + (sqr - tri) * v7p0;
-	dec = 0.03 * exp2(v7p2 * 6.2);
+	dec = 0.03 * exp2(v7p2 * 3.7);
 	x = (s + v7p7 * noise() * 0.6) * exp(-t / dec) * (1 - exp(-t / 0.0007));
 	if (t > dec * 9 + 0.02) {
 		av7 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel7) * v7lvl * 0.2993;
+	x = x * (0.3 + 0.7 * vel7) * v7lvl * 0.3036;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -1220,17 +1220,17 @@ if (av8 > 0) {
 	lr = 0.5 * exp2(v8p5 * 6.3);
 	lph8 = fract(lph8 + lr / sr);
 	lf = lph8 < 0.5 ? 1 : -1;
-	f = 30.868 * exp2(v8p1 * 6 + swp * 4 * (1 - exp(-t / swt)) + lf * v8p6 * v8p6 * 1.5 + v8p7 * v8p7 * noise() * 0.8);
+	f = 55 * exp2(v8p1 * 4 + swp * 3 * (1 - exp(-t / swt)) + lf * v8p6 * v8p6 * 1.5 + v8p7 * v8p7 * noise() * 0.8);
 	sph8 = fract(sph8 + min(f, 0.45 * sr) / sr);
 	tri = 4 * abs(sph8 - 0.5) - 1;
 	sqr = sph8 < 0.5 ? 0.8 : -0.8;
 	s = tri + (sqr - tri) * v8p0;
-	dec = 0.03 * exp2(v8p2 * 6.2);
+	dec = 0.03 * exp2(v8p2 * 3.7);
 	x = (s + v8p7 * noise() * 0.6) * exp(-t / dec) * (1 - exp(-t / 0.0007));
 	if (t > dec * 9 + 0.02) {
 		av8 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel8) * v8lvl * 0.2817;
+	x = x * (0.3 + 0.7 * vel8) * v8lvl * 0.2864;
 	
 	ax = abs(x);
 	if (ax > 0.6) {

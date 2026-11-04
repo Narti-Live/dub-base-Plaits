@@ -207,7 +207,7 @@ footer a { color: var(--mist); }
 <footer>BUNKER by <a href="https://www.instagram.com/narti_live">Narti Live</a> · <a href="https://www.youtube.com/@narti_live">YouTube</a> · <a href="../">DUB STAB PLAITS</a> · <a href="../studio/">DUB STAB STUDIO</a> · Free, MIT license. Inspired by classic drum machines; not affiliated with Roland, MFB, Pearl, Elektron or Ableton.</footer>
 </div>
 
-<script src="voices.js?v=1"></script>
+<script src="voices.js?v=2"></script>
 <script>
 (function () {
   'use strict';
@@ -225,8 +225,8 @@ footer a { color: var(--mist); }
     ['Wave', 'Tune', 'Decay', 'Sweep', 'Sweep t', 'LFO rate', 'LFO dep', 'Noise'],
     ['Wave', 'Tune', 'Decay', 'Sweep', 'Sweep t', 'LFO rate', 'LFO dep', 'Noise']];
   var AMP = ['Level', 'Pan', 'Echo', 'Void', 'Filter'];
-  var TUNE_LO = [36.708, 146.83, 0, 0, 0, 61.735, 277.18, 30.868, 30.868];
-  var TUNE_OCT = [0.83333, 1.16667, 0, 0, 0, 3, 2, 6, 6];
+  var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 440, 55, 55];
+  var TUNE_OCT = [0.5, 1, 0, 0, 0, 2, 1, 4, 4];
   var SCALES = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 9, 10], [0, 1, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 8, 11]];
   var NOTE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   var RUM = [['Amount', 'rumamt', 0], ['Decay', 'rumdec', 0.5], ['Tone', 'rumtone', 0.4], ['Drive', 'rumdrive', 0.4],
@@ -239,7 +239,7 @@ footer a { color: var(--mist); }
     'Off': [0, 0.5, 0.4, 0.4, 0.7, 0, 0.3, 0.4] };
 
   var S = null;              // the sequencer's state (from the engine)
-  var LS = 'bunker1';
+  var LS = 'bunker2';
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(LS)) || {}; } catch (e) { saved = {}; }
   var saveTimer = 0;
@@ -500,7 +500,7 @@ footer a { color: var(--mist); }
   var TIMES = ['1/16', '1/8T', '1/8', '1/8D', '1/4T', '1/4', '1/4D', '1/2', '1/2D'];
   var eb = document.getElementById('encEcho');
   fxEnc(eb, 'e_time', 'Time', 3 / 8, function (v) { post({ t: 'fx', fx: 'echo', p: 'ptime', v: Math.round(v * 8) }); }, function (v) { return TIMES[Math.round(v * 8)]; });
-  fxEnc(eb, 'e_fb', 'Feedback', 0.6 / 1.15, fxSet('echo', 'pfeedback', 1.15), function (v) { return Math.round(v * 115) + '%'; });
+  fxEnc(eb, 'e_fb', 'Feedback', 0.35 / 0.95, fxSet('echo', 'pfeedback', 0.95), function (v) { return Math.round(v * 95) + '%'; });
   fxEnc(eb, 'e_color', 'Color', 0.33, function (v) { post({ t: 'fx', fx: 'echo', p: 'pcolor', v: v * 2 - 1 }); }, function (v) { var c = Math.round((v * 2 - 1) * 100); return c < 0 ? 'dark ' + (-c) : c > 0 ? 'thin ' + c : '0'; });
   fxEnc(eb, 'e_drive', 'Drive', 0.4, fxSet('echo', 'pdrive'), pct);
   fxEnc(eb, 'e_wow', 'Wow', 0.3, fxSet('echo', 'pwow'), pct);
@@ -515,11 +515,11 @@ footer a { color: var(--mist); }
   document.getElementById('echoBtns').appendChild(throwB);
   var vb = document.getElementById('encVoid');
   fxEnc(vb, 'v_size', 'Size', 0.85, fxSet('void', 'psize'), pct, '#8a7dff');
-  fxEnc(vb, 'v_decay', 'Decay', 0.62, fxSet('void', 'pdecay'), function (v) { var rt = 0.6 * Math.pow(2, v * 6.05); return rt < 10 ? rt.toFixed(1) + ' s' : Math.round(rt) + ' s'; }, '#8a7dff');
+  fxEnc(vb, 'v_decay', 'Decay', 0.51, fxSet('void', 'pdecay', 0.75), function (v) { var rt = 0.6 * Math.pow(2, v * 0.75 * 6.05); return rt < 10 ? rt.toFixed(1) + ' s' : Math.round(rt) + ' s'; }, '#8a7dff');
   fxEnc(vb, 'v_dark', 'Dark', 0.6, fxSet('void', 'pdark'), pct, '#8a7dff');
   fxEnc(vb, 'v_mod', 'Motion', 0.4, fxSet('void', 'pmod'), pct, '#8a7dff');
   fxEnc(vb, 'v_pre', 'Pre', 0.1, fxSet('void', 'ppre'), function (v) { return Math.round(v * 250) + ' ms'; }, '#8a7dff');
-  fxEnc(vb, 'v_low', 'Low cut', 0.35, fxSet('void', 'plowcut'), function (v) { return Math.round(20 * Math.pow(2, v * 5)) + ' Hz'; }, '#8a7dff');
+  fxEnc(vb, 'v_low', 'Low cut', 0.6, fxSet('void', 'plowcut'), function (v) { return Math.round(20 * Math.pow(2, v * 5)) + ' Hz'; }, '#8a7dff');
   fxEnc(vb, 'v_width', 'Width', 1, fxSet('void', 'pwidth'), pct, '#8a7dff');
   fxEnc(vb, 'v_ret', 'Return', 0.7, function (v) { post({ t: 'ret', k: 'void', v: v }); }, pct, '#8a7dff');
   var frz = btn('Freeze', null); var frozen = 0;
@@ -680,7 +680,7 @@ footer a { color: var(--mist); }
   function drawEcho(now) {
     var W = cvE.width, H = cvE.height, g = gE;
     g.fillStyle = '#030404'; g.fillRect(0, 0, W, H);
-    var beats = BEATS[Math.round(FX.e_time * 8)], fb = FX.e_fb * 1.15, color = FX.e_color * 2 - 1, wow = FX.e_wow, spread = FX.e_spread;
+    var beats = BEATS[Math.round(FX.e_time * 8)], fb = FX.e_fb * 0.95, color = FX.e_color * 2 - 1, wow = FX.e_wow, spread = FX.e_spread;
     var span = 4;   // beats shown
     g.strokeStyle = 'rgba(233,241,255,.07)';
     for (var b = 0; b <= span * 4; b++) { var xx = 20 + b / (span * 4) * (W - 40); g.beginPath(); g.moveTo(xx, 20); g.lineTo(xx, H - 20); g.lineWidth = b % 4 === 0 ? 2 : 1; g.stroke(); }
@@ -707,7 +707,7 @@ footer a { color: var(--mist); }
   function drawVoid(now) {
     var W = cvV.width, H = cvV.height, g = gV;
     g.fillStyle = '#030404'; g.fillRect(0, 0, W, H);
-    var rt = 0.6 * Math.pow(2, FX.v_decay * 6.05), frozen_ = frozen, dark = FX.v_dark;
+    var rt = 0.6 * Math.pow(2, FX.v_decay * 0.75 * 6.05), frozen_ = frozen, dark = FX.v_dark;
     var span = Math.max(4, Math.min(40, rt * 1.4));
     var x0 = 20, w = W - 40, y0 = 30, h = H - 60;
     // decay curves: lows (white) and highs (violet, faster with DARK)
@@ -830,7 +830,7 @@ footer a { color: var(--mist); }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC || !('audioWorklet' in AC.prototype)) { document.querySelector('.start p').textContent = 'This browser cannot run BUNKER (no AudioWorklet). Try a recent Chrome, Edge, Firefox or Safari.'; return Promise.reject(); }
     ctx = new AC({ latencyHint: 'playback' });
-    startP = ctx.audioWorklet.addModule('engine.js?v=1').then(function () {
+    startP = ctx.audioWorklet.addModule('engine.js?v=2').then(function () {
       node = new AudioWorkletNode(ctx, 'bunker', { numberOfInputs: 0, outputChannelCount: [2] });
       analyser = ctx.createAnalyser(); analyser.fftSize = 4096; analyser.smoothingTimeConstant = 0.75;
       node.connect(analyser); analyser.connect(ctx.destination);
