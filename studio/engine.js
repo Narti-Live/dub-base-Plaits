@@ -1393,7 +1393,7 @@ function makeFx_fog(SR) {
   var pg = 1.0;
   var cl = 1000.0;
   var cr = 1000.0;
-  var sr, r48, out1 = 0, out2 = 0;
+  var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0;
   function tick(in1, in2, in3, in4) { var bpl, bpr, bscale, comp, dg, dl, dr, dv, dvr, fc, fq, fr, gl, gr, hl, hpl, hpr, hr, k, lpl, lpr, m, oct, pb, pf, ph, pos, pr, pt, px, q, q2, rb, ri, sg, sm, tcl, tcr, xl, xr, yl, yr;   
 
 
@@ -1541,7 +1541,10 @@ yr = tanh(yr * 0.9) / 0.9;
 
 out1 = in1 + (yl - in1) * smix;
 out2 = in2 + (yr - in2) * smix;
- return [out1, out2]; }
+
+out3 = cl;
+out4 = pg;
+ return [out1, out2, out3, out4]; }
   function set(name, v) { switch (name) { case 'pcut': pcut = v; break; case 'preso': preso = v; break; case 'pmode': pmode = v; break; case 'pdrive': pdrive = v; break; case 'pdrift': pdrift = v; break; case 'pdrate': pdrate = v; break; case 'ppump': ppump = v; break; case 'pprate': pprate = v; break; case 'pspread': pspread = v; break; case 'pmix': pmix = v; break; default: throw new Error("no param " + name); } }
   return { tick: tick, set: set };
 }
