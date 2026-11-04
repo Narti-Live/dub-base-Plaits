@@ -2141,6 +2141,157 @@ out4 = pg;
   function set(name, v) { switch (name) { case 'pcut': pcut = v; break; case 'preso': preso = v; break; case 'pmode': pmode = v; break; case 'pdrive': pdrive = v; break; case 'pdrift': pdrift = v; break; case 'pdrate': pdrate = v; break; case 'ppump': ppump = v; break; case 'pprate': pprate = v; break; case 'pspread': pspread = v; break; case 'pmix': pmix = v; break; default: throw new Error("no param " + name); } }
   return { tick: tick, set: set };
 }
+function makeFx_comp(SR) {
+  "use strict";
+  var M = Math;
+  var pstyle = 0.0;
+  var pamount = 0.35;
+  var patk = 0.6;
+  var prel = 1.0;
+  var pratio = 0.4;
+  var pmix = 1.0;
+  var pout = 0.0;
+  var ptempo = 126.0;
+  var rms = 0.0;
+  var lpd1 = 0.0;
+  var lpd2 = 0.0;
+  var g1 = 0.0;
+  var g2 = 0.0;
+  var sth = 0.0;
+  var smix = 1.0;
+  var sout = 0.0;
+  var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0;
+  function tick(in1, in2, in3, in4) { var ai, atk, beat, c1, c2, ca, dd, drv, g, gl, gr, k, knee, lvl, mk, ov, pi5, ratio, red, rel1, rel2, ri, ri4, st, w1, x, yl, yr;
+    
+
+
+
+
+         
+
+
+
+
+
+
+
+
+
+
+
+sr = SR;
+st = floor(pstyle + 0.5);
+k = 1 - exp(-1 / (0.03 * sr));
+sth = sth + (-30 * pamount - sth) * k;
+smix = smix + (pmix - smix) * k;
+sout = sout + (pout * 6 - sout) * k;
+
+
+ratio = 4;
+atk = 0.003;
+rel1 = 0.3;
+rel2 = 0.3;
+w1 = 1;
+knee = 6;
+drv = 0;
+if (st == 0) {
+	ratio = pratio < 0.34 ? 2 : (pratio < 0.67 ? 4 : 10);
+	ai = floor(patk * 5.99);
+	atk = ai == 0 ? 0.0001 : (ai == 1 ? 0.0003 : (ai == 2 ? 0.001 : (ai == 3 ? 0.003 : (ai == 4 ? 0.01 : 0.03))));
+	ri = floor(prel * 4.99);
+	rel1 = ri == 0 ? 0.1 : (ri == 1 ? 0.3 : (ri == 2 ? 0.6 : 1.2));
+	rel2 = rel1;
+	if (ri == 4) {
+		
+		rel1 = 0.12;
+		rel2 = 1.2;
+		w1 = 0.6;
+	}
+	knee = 6;
+} else if (st == 1) {
+	ri4 = floor(pratio * 3.99);
+	ratio = ri4 == 0 ? 4 : (ri4 == 1 ? 8 : (ri4 == 2 ? 12 : 20));
+	atk = 0.00002 * exp2(patk * 5.32);
+	rel1 = 0.05 * exp2(prel * 4.46);
+	rel2 = rel1;
+	knee = 2;
+	drv = 0.35;
+} else if (st == 2) {
+	ratio = 2 + 2 * pratio;
+	atk = 0.01;
+	rel1 = 0.06;
+	rel2 = 0.5 * exp2(prel * 3.32);
+	w1 = 0.5;
+	knee = 12;
+} else if (st == 3) {
+	ratio = 4 + 6 * pratio;
+	atk = 0.001 * exp2(patk * 3.32);
+	beat = 60 / max(ptempo, 20);
+	pi5 = floor(prel * 4.99);
+	rel1 = beat * (pi5 == 0 ? 0.125 : (pi5 == 1 ? 0.25 : (pi5 == 2 ? 0.5 : (pi5 == 3 ? 0.75 : 1))));
+	rel2 = rel1;
+	knee = 3;
+} else {
+	ratio = 20;
+	atk = 0.00002 * exp2(patk * 5.32);
+	rel1 = 0.05 * exp2(prel * 2.58);
+	rel2 = rel1;
+	knee = 1;
+	drv = 0.3 + 1.7 * pratio;
+}
+
+
+x = max(abs(in1), abs(in2));
+if (st == 3) {
+	
+	gl = 1 - exp(-6.283185307179586 * 150 / sr);
+	lpd1 = lpd1 + gl * ((in1 + in2) * 0.5 - lpd1);
+	lpd2 = lpd2 + gl * (lpd1 - lpd2);
+	x = abs(lpd2) * 2;
+}
+if (st == 2) {
+	rms = rms + (x * x - rms) * (1 - exp(-1 / (0.01 * sr)));
+	x = sqrt(rms * 2);
+}
+lvl = 6.020599913 * log2(max(x, 0.00001));
+
+
+ov = lvl - sth;
+red = 0;
+if (2 * ov > knee) {
+	red = ov;
+} else if (2 * ov > -knee) {
+	red = (ov + knee / 2) * (ov + knee / 2) / (2 * knee);
+}
+red = red * (1 - 1 / ratio);
+
+
+ca = 1 - exp(-1 / (atk * sr));
+c1 = 1 - exp(-1 / (rel1 * sr));
+c2 = 1 - exp(-1 / (rel2 * sr));
+g1 = g1 + (red - g1) * (red > g1 ? ca : c1);
+g2 = g2 + (red - g2) * (red > g2 ? ca : c2);
+gr = w1 * g1 + (1 - w1) * g2;
+
+
+mk = min(12, -sth * (1 - 1 / ratio) * 0.3) + sout;
+g = exp2((mk - gr) / 6.020599913);
+yl = in1 * g;
+yr = in2 * g;
+if (drv > 0) {
+	
+	dd = 1 + drv * (1 + gr / 6);
+	yl = tanh(yl * dd) / dd * (1 + drv * 0.5);
+	yr = tanh(yr * dd) / dd * (1 + drv * 0.5);
+}
+out1 = in1 + (yl - in1) * smix;
+out2 = in2 + (yr - in2) * smix;
+out3 = gr;
+out4 = lvl;
+ return [out1, out2, out3, out4]; }
+  function set(name, v) { switch (name) { case 'pstyle': pstyle = v; break; case 'pamount': pamount = v; break; case 'patk': patk = v; break; case 'prel': prel = v; break; case 'pratio': pratio = v; break; case 'pmix': pmix = v; break; case 'pout': pout = v; break; case 'ptempo': ptempo = v; break; default: throw new Error("no param " + name); } }
+  return { tick: tick, set: set };
+}
 function make_bunker(outlet, jsarguments) {
   var autowatch, inlets, outlets, module, post = function () {};
 // BUNKER — the drum machine's sequencer (Max js, ES5; also runs in the browser).
@@ -2502,12 +2653,14 @@ class BunkerProcessor extends AudioWorkletProcessor {
     this.fog = makeFx_fog(SR);
     this.dust = makeFx_dust(SR);
     this.glue = makeGlue(SR);
+    this.comp = makeFx_comp(SR);
+    this.cgr = 0; this.clvl = -100;
     this.echo.set('pmix', 1); this.echo.set('psend', 1);
     this.void_.set('pmix', 1);
     this.fog.set('pcut', 18000); this.fog.set('preso', 0.1); this.fog.set('pdrift', 0); this.fog.set('pmix', 1);
     this.dust.set('pcrackle', 0.2); this.dust.set('phiss', 0.15); this.dust.set('pwobble', 0.05); this.dust.set('pwear', 0.1); this.dust.set('pdrive', 0.2); this.dust.set('pfollow', 0.6);
     this.ret = { echo: 0.8, void: 0.7, master: 1.0, echo2void: 0.3 };
-    this.on = { fog: 1, dust: 1 };
+    this.on = { fog: 1, dust: 1, comp: 1 };
     this.ev = { trigs: [], play: {}, dump: null, base: [] };
     this.dirty = false;
     this.seq = make_bunker(function (o) {
@@ -2529,10 +2682,10 @@ class BunkerProcessor extends AudioWorkletProcessor {
     var s = this.seq;
     if (m.t === 'play') { this.playing = true; this.tick = 0; this.lastGrid = -1; }
     else if (m.t === 'stop') { this.playing = false; s.state(0); }
-    else if (m.t === 'bpm') { this.bpm = Math.max(60, Math.min(200, m.v)); s.tempo(this.bpm); this.echo.set('ptempo', this.bpm); this.drums.set('ptempo', this.bpm); }
+    else if (m.t === 'bpm') { this.bpm = Math.max(60, Math.min(200, m.v)); s.tempo(this.bpm); this.echo.set('ptempo', this.bpm); this.drums.set('ptempo', this.bpm); this.comp.set('ptempo', this.bpm); }
     else if (m.t === 'rum') this.drums.set(m.p, m.v);
     else if (m.t === 'seq') { var f = s[m.fn]; if (f) { f.apply(null, m.args); } }
-    else if (m.t === 'fx') { var fx = { echo: this.echo, void: this.void_, fog: this.fog, dust: this.dust }[m.fx]; fx.set(m.p, m.v); }
+    else if (m.t === 'fx') { var fx = { echo: this.echo, void: this.void_, fog: this.fog, dust: this.dust, comp: this.comp }[m.fx]; fx.set(m.p, m.v); }
     else if (m.t === 'ret') this.ret[m.k] = m.v;
     else if (m.t === 'glue') this.glue.amount = m.v;
     else if (m.t === 'on') this.on[m.k] = m.v ? 1 : 0;
@@ -2554,10 +2707,18 @@ class BunkerProcessor extends AudioWorkletProcessor {
         this.tick += tickInc;
       }
       var o = d.tick();
+      var dl = o[0], dr = o[1];
+      if (this.on.comp) {
+        // DRUM COMP on the dry drum bus (the sends to echo and void stay uncompressed)
+        var c = this.comp.tick(dl, dr, 0, 0);
+        dl = c[0]; dr = c[1];
+        if (c[2] > this.cgr) this.cgr = c[2];
+        if (c[3] > this.clvl) this.clvl = c[3];
+      }
       var e = this.echo.tick(o[2], o[3], 0, 0);
       var w = this.void_.tick(o[4] + e[0] * ret.echo2void, o[5] + e[1] * ret.echo2void, 0, 0);
-      var ml = o[0] + e[0] * ret.echo + w[0] * ret.void;
-      var mr = o[1] + e[1] * ret.echo + w[1] * ret.void;
+      var ml = dl + e[0] * ret.echo + w[0] * ret.void;
+      var mr = dr + e[1] * ret.echo + w[1] * ret.void;
       eL += e[0] * e[0]; vL += w[0] * w[0];
       var gg = this.glue.tick(ml, mr);
       ml *= gg; mr *= gg;
@@ -2577,9 +2738,9 @@ class BunkerProcessor extends AudioWorkletProcessor {
       this.flushIn = Math.floor(SR / 40);
       if (this.dirty) { this.dirty = false; this.seq.dump(); }
       this.port.postMessage({ trigs: this.ev.trigs, play: this.ev.play, dump: this.ev.dump, base: this.ev.base, peak: this.peak,
-        echo: this.lv.echo, void: this.lv.void, fogcut: this.fogcut, pump: this.pump, gr: this.glue.gr(), beat: this.tick / 480, playing: this.playing });
+        echo: this.lv.echo, void: this.lv.void, fogcut: this.fogcut, pump: this.pump, gr: this.glue.gr(), cgr: this.cgr, clvl: this.clvl, beat: this.tick / 480, playing: this.playing });
       this.ev = { trigs: [], play: {}, dump: null, base: [] };
-      this.peak = 0;
+      this.peak = 0; this.cgr = 0; this.clvl = -100;
     }
     return true;
   }

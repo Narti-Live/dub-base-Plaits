@@ -110,7 +110,8 @@ canvas.oled { display: block; width: 100%; height: auto; aspect-ratio: 560 / 250
 .fx { background: linear-gradient(180deg, #202124, #18191b); border: 1px solid #34363a; border-radius: 12px; padding: 12px; }
 .fx h3 { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; font: 700 16px/1 var(--display); letter-spacing: .22em; color: var(--bone); }
 .fx h3 span { font: 500 11px/1 var(--display); letter-spacing: .2em; color: var(--fog); }
-.fx h3 .r { margin-left: auto; display: flex; gap: 6px; }
+.fx h3 { flex-wrap: wrap; row-gap: 8px; }
+.fx h3 .r { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
 .fx canvas { display: block; width: 100%; height: 120px; border-radius: 8px; background: #050606; border: 1px solid #2b2d31; }
 .fx.big canvas { height: 170px; }
 .fx .encs { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 10px; }
@@ -136,6 +137,7 @@ footer a { color: var(--mist); }
   .trigs { grid-template-columns: repeat(8, minmax(0, 1fr)); }
 }
 @media (max-width: 520px) {
+  #encComp { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   .tracks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .encs { gap: 6px 2px; }
   .enc svg { width: 48px; height: 48px; }
@@ -202,6 +204,7 @@ footer a { color: var(--mist); }
 <div class="fxrow">
   <section class="fx" id="fxEcho"><h3>DUB ECHO <span>send · tape</span><span class="r" id="echoBtns"></span></h3><canvas id="cvEcho" width="760" height="240"></canvas><div class="encs" id="encEcho"></div></section>
   <section class="fx" id="fxVoid"><h3>VOID <span>send · dark space</span><span class="r" id="voidBtns"></span></h3><canvas id="cvVoid" width="760" height="240"></canvas><div class="encs" id="encVoid"></div></section>
+  <section class="fx big" id="fxComp" style="grid-column: 1 / -1"><h3>DRUM COMP <span>drum bus · five characters</span><span class="r" id="compBtns"></span></h3><canvas id="cvComp" width="1600" height="340"></canvas><div class="encs" id="encComp" style="grid-template-columns: repeat(6, minmax(0, 1fr))"></div><div class="tools"><span class="hint" id="compHint"></span></div></section>
   <section class="fx big" id="fxMaster" style="grid-column: 1 / -1"><h3>MASTER <span>glue · fog filter · dust</span><span class="r" id="masterBtns"></span></h3><canvas id="cvMaster" width="1600" height="340"></canvas><div class="encs" id="encMaster" style="grid-template-columns: repeat(auto-fill, minmax(70px, 1fr))"></div></section>
 </div>
 <footer>BUNKER by <a href="https://www.instagram.com/narti_live">Narti Live</a> · <a href="https://www.youtube.com/@narti_live">YouTube</a> · <a href="../">DUB STAB PLAITS</a> · <a href="../studio/">DUB STAB STUDIO</a> · Free, MIT license. Inspired by classic drum machines; not affiliated with Roland, MFB, Pearl, Elektron or Ableton.</footer>
@@ -540,6 +543,126 @@ footer a { color: var(--mist); }
   fxEnc(mb, 'm_tape', 'Tape', 0.2, fxSet('dust', 'pdrive'), pct, '#c9a36b');
   fxEnc(mb, 'm_vol', 'Master', 0.8, function (v) { post({ t: 'ret', k: 'master', v: v * 1.25 }); }, pct, '#eceef1');
 
+
+  // ================================================================ DRUM COMP
+  // Ranges per style from the classic units and mixing guides (docs/SOUND-RANGES.md).
+  var CSTYLES = ['Glue', 'Punch', 'Opto', 'Pump', 'Crush'];
+  var CHINT = [
+    'VCA bus compressor (SSL-style). Glues the kit together: aim for 1–4 dB, slow attack keeps the kick’s click.',
+    'FET (1176-style). Fast and gritty: brings the room and the hats forward, 3–6 dB.',
+    'Optical (LA-2A-style). Slow, smooth and round: the kit breathes without losing its edge.',
+    'Dub pump. Keyed by the low end (the kick): everything else breathes around it, release never longer than a beat.',
+    'Parallel crush (“all buttons”). Smashed copy under the dry kit: texture and density, blend with MIX.'];
+  var CPRESET = [
+    { c_amt: 0.4, c_atk: 0.75, c_rel: 1, c_ratio: 0.5, c_mix: 1, c_out: 0.5 },
+    { c_amt: 0.35, c_atk: 0.5, c_rel: 0.4, c_ratio: 0, c_mix: 1, c_out: 0.5 },
+    { c_amt: 0.4, c_atk: 0.5, c_rel: 0.3, c_ratio: 0.5, c_mix: 1, c_out: 0.5 },
+    { c_amt: 0.45, c_atk: 0.3, c_rel: 0.6, c_ratio: 0.5, c_mix: 1, c_out: 0.5 },
+    { c_amt: 0.6, c_atk: 0, c_rel: 0.4, c_ratio: 0.4, c_mix: 0.35, c_out: 0.5 }];
+  if (FX.c_style == null) { FX.c_style = 0; for (var ck in CPRESET[0]) FX[ck] = CPRESET[0][ck]; }
+  if (FX.c_on == null) FX.c_on = 1;
+  function cms(x) { return x < 0.001 ? Math.round(x * 1e6) + ' µs' : x < 1 ? (x * 1000 < 10 ? (x * 1000).toFixed(1) : Math.round(x * 1000)) + ' ms' : x.toFixed(1) + ' s'; }
+  var CK = [
+    { k: 'c_amt', p: 'pamount', n: function () { return FX.c_style === 2 ? 'Reduction' : 'Threshold'; }, f: function (v) { return (-30 * v).toFixed(1) + ' dB'; } },
+    { k: 'c_atk', p: 'patk', n: function () { return FX.c_style === 2 ? '' : 'Attack'; }, f: function (v) {
+        var st = FX.c_style;
+        if (st === 0) return ['0.1', '0.3', '1', '3', '10', '30'][Math.floor(v * 5.99)] + ' ms';
+        if (st === 3) return cms(0.001 * Math.pow(2, v * 3.32));
+        return cms(0.00002 * Math.pow(2, v * 5.32)); } },
+    { k: 'c_rel', p: 'prel', n: function () { return 'Release'; }, f: function (v) {
+        var st = FX.c_style;
+        if (st === 0) return ['0.1 s', '0.3 s', '0.6 s', '1.2 s', 'Auto'][Math.floor(v * 4.99)];
+        if (st === 1) return cms(0.05 * Math.pow(2, v * 4.46));
+        if (st === 2) return cms(0.5 * Math.pow(2, v * 3.32));
+        if (st === 3) return ['1/32', '1/16', '1/8', '3/16', '1/4'][Math.floor(v * 4.99)];
+        return cms(0.05 * Math.pow(2, v * 2.58)); } },
+    { k: 'c_ratio', p: 'pratio', n: function () { return FX.c_style === 4 ? 'Drive' : 'Ratio'; }, f: function (v) {
+        var st = FX.c_style;
+        if (st === 0) return v < 0.34 ? '2:1' : v < 0.67 ? '4:1' : '10:1';
+        if (st === 1) return ['4:1', '8:1', '12:1', '20:1'][Math.floor(v * 3.99)];
+        if (st === 2) return (2 + 2 * v).toFixed(1) + ':1';
+        if (st === 3) return (4 + 6 * v).toFixed(1) + ':1';
+        return Math.round(v * 100) + '%'; } },
+    { k: 'c_mix', p: 'pmix', n: function () { return 'Mix'; }, f: function (v) { return Math.round(v * 100) + '%'; } },
+    { k: 'c_out', p: 'pout', n: function () { return 'Out'; }, f: function (v) { var d = (v * 2 - 1) * 6; return (d > 0 ? '+' : '') + d.toFixed(1) + ' dB'; } }];
+  var cEncs = [], cb = document.getElementById('encComp');
+  CK.forEach(function (c) {
+    var o = { get: function () { return FX[c.k]; }, fmt: c.f, def: CPRESET[0][c.k], color: function () { return '#ff7a3d'; },
+              set: function (v) { FX[c.k] = v; saved.fx = FX; persist(); post({ t: 'fx', fx: 'comp', p: c.p, v: c.k === 'c_out' ? v * 2 - 1 : v }); } };
+    Object.defineProperty(o, 'n', { get: c.n });
+    var e = encoder(o); cb.appendChild(e); cEncs.push(e);
+    replay.push(function () { post({ t: 'fx', fx: 'comp', p: c.p, v: c.k === 'c_out' ? FX[c.k] * 2 - 1 : FX[c.k] }); });
+  });
+  replay.push(function () { post({ t: 'fx', fx: 'comp', p: 'pstyle', v: FX.c_style }); post({ t: 'on', k: 'comp', v: FX.c_on }); });
+  var cBtns = document.getElementById('compBtns'), cStyleBtns = [];
+  var cOn = btn('On', function () { FX.c_on = FX.c_on ? 0 : 1; cOn.setAttribute('aria-pressed', FX.c_on ? 'true' : 'false'); saved.fx = FX; persist(); post({ t: 'on', k: 'comp', v: FX.c_on }); });
+  cOn.setAttribute('aria-pressed', FX.c_on ? 'true' : 'false');
+  CSTYLES.forEach(function (n, i) {
+    var b = btn(n, function () {
+      FX.c_style = i; for (var k in CPRESET[i]) FX[k] = CPRESET[i][k];
+      saved.fx = FX; persist();
+      post({ t: 'fx', fx: 'comp', p: 'pstyle', v: i });
+      CK.forEach(function (c) { post({ t: 'fx', fx: 'comp', p: c.p, v: c.k === 'c_out' ? FX[c.k] * 2 - 1 : FX[c.k] }); });
+      showCompStyle();
+    });
+    cBtns.appendChild(b); cStyleBtns.push(b);
+  });
+  cBtns.appendChild(cOn);
+  function showCompStyle() {
+    cStyleBtns.forEach(function (b, i) { b.setAttribute('aria-pressed', i === FX.c_style ? 'true' : 'false'); });
+    cEncs.forEach(function (e, i) { e.redraw(); });
+    document.getElementById('compHint').textContent = CHINT[FX.c_style];
+  }
+  showCompStyle();
+
+  // the compressor's curve, and its gain reduction over the last few seconds
+  var cvC = document.getElementById('cvComp'), gC = cvC.getContext('2d'), grHist = new Float32Array(240), grPos = 0;
+  function compRatio() {
+    var v = FX.c_ratio, st = FX.c_style;
+    if (st === 0) return v < 0.34 ? 2 : v < 0.67 ? 4 : 10;
+    if (st === 1) return [4, 8, 12, 20][Math.floor(v * 3.99)];
+    if (st === 2) return 2 + 2 * v;
+    if (st === 3) return 4 + 6 * v;
+    return 20;
+  }
+  function drawComp() {
+    var W = cvC.width, H = cvC.height, g = gC;
+    g.fillStyle = '#030404'; g.fillRect(0, 0, W, H);
+    var on = FX.c_on, th = -30 * FX.c_amt, R = compRatio(), knee = [6, 2, 12, 3, 1][FX.c_style];
+    // left: transfer curve, input -42..0 dBFS against output
+    var x0 = 30, y0 = 20, s = H - 50;
+    function px(db) { return x0 + (db + 42) / 42 * s; }
+    function py(db) { return y0 + s - (db + 42) / 42 * s; }
+    g.strokeStyle = 'rgba(233,241,255,.07)'; g.fillStyle = 'rgba(233,241,255,.35)'; g.font = '500 20px "Barlow Condensed", sans-serif';
+    for (var d = -36; d <= 0; d += 12) { g.beginPath(); g.moveTo(px(d), y0); g.lineTo(px(d), y0 + s); g.moveTo(x0, py(d)); g.lineTo(x0 + s, py(d)); g.stroke(); g.fillText(d, px(d) + 4, y0 + s + 6); }
+    g.strokeStyle = 'rgba(233,241,255,.2)'; g.beginPath(); g.moveTo(px(-42), py(-42)); g.lineTo(px(0), py(0)); g.stroke();
+    function outDb(i) {
+      var ov = i - th, red = 0;
+      if (2 * ov > knee) red = ov; else if (2 * ov > -knee) red = (ov + knee / 2) * (ov + knee / 2) / (2 * knee);
+      return i - red * (1 - 1 / R);
+    }
+    g.beginPath();
+    for (var i = -42; i <= 0; i += 0.5) { var yv = on ? outDb(i) : i; if (i === -42) g.moveTo(px(i), py(yv)); else g.lineTo(px(i), py(yv)); }
+    g.strokeStyle = on ? '#ff7a3d' : 'rgba(233,241,255,.3)'; g.lineWidth = 3; g.stroke(); g.lineWidth = 1;
+    if (on) {
+      g.fillStyle = 'rgba(255,122,61,.35)'; g.fillRect(px(th) - 1, y0, 2, s);
+      var lv = Math.max(-42, Math.min(0, live.clvl));
+      if (live.clvl > -60) { g.fillStyle = '#ffad3b'; g.beginPath(); g.arc(px(lv), py(outDb(lv)), 9, 0, 6.2832); g.fill(); }
+    }
+    // right: gain reduction history, scrolling
+    var hx = x0 + s + 50, hw = W - hx - 30;
+    grHist[grPos] = on ? live.cgr : 0; grPos = (grPos + 1) % grHist.length;
+    g.strokeStyle = 'rgba(233,241,255,.07)'; g.fillStyle = 'rgba(233,241,255,.35)';
+    [0, 3, 6, 12].forEach(function (db) { var yy = y0 + db / 15 * s; g.beginPath(); g.moveTo(hx, yy); g.lineTo(hx + hw, yy); g.stroke(); g.fillText('-' + db, hx + hw + 4, yy - 10); });
+    g.beginPath(); g.moveTo(hx, y0);
+    for (var k = 0; k < grHist.length; k++) { var v = grHist[(grPos + k) % grHist.length]; g.lineTo(hx + k / (grHist.length - 1) * hw, y0 + Math.min(15, v) / 15 * s); }
+    g.lineTo(hx + hw, y0); g.closePath();
+    var grd = g.createLinearGradient(0, y0, 0, y0 + s); grd.addColorStop(0, 'rgba(255,122,61,.2)'); grd.addColorStop(1, 'rgba(255,122,61,.75)');
+    g.fillStyle = grd; g.fill();
+    g.fillStyle = '#ff7a3d'; g.font = '600 24px "Barlow Condensed", sans-serif';
+    g.fillText((on ? CSTYLES[FX.c_style].toUpperCase() : 'OFF') + '   GR -' + (on ? live.cgr : 0).toFixed(1) + ' dB', hx + 6, y0 + s - 10);
+  }
+
   // ================================================================ screen (OLED)
   var oled = document.getElementById('oled'), og = oled.getContext('2d');
   var preview = { env: null, spec: null, len: 1, dirty: true }, pvTimer = 0;
@@ -675,7 +798,7 @@ footer a { color: var(--mist); }
   var cvE = document.getElementById('cvEcho'), gE = cvE.getContext('2d');
   var cvV = document.getElementById('cvVoid'), gV = cvV.getContext('2d');
   var cvM = document.getElementById('cvMaster'), gM = cvM.getContext('2d');
-  var live = { echo: 0, void: 0, fogcut: 18000, pump: 1, gr: 1, beat: 0 };
+  var live = { echo: 0, void: 0, fogcut: 18000, pump: 1, gr: 1, beat: 0, cgr: 0, clvl: -100 };
   var BEATS = [0.25, 1 / 3, 0.5, 0.75, 2 / 3, 1, 1.5, 2, 3];
   function drawEcho(now) {
     var W = cvE.width, H = cvE.height, g = gE;
@@ -794,7 +917,7 @@ footer a { color: var(--mist); }
     var now = performance.now();
     m.trigs.forEach(function (tr) { ui.flash[tr[0]] = tr[1] / 127; trigAnim[tr[0]] = now; });
     for (var k in m.play) ui.play[k] = m.play[k];
-    live.echo = m.echo; live.void = m.void; live.fogcut = m.fogcut; live.pump = m.pump; live.gr = m.gr; live.beat = m.beat;
+    live.echo = m.echo; live.void = m.void; live.fogcut = m.fogcut; live.pump = m.pump; live.gr = m.gr; live.beat = m.beat; live.cgr = m.cgr || 0; live.clvl = m.clvl == null ? -100 : m.clvl;
     meter.style.width = Math.min(100, m.peak * 100).toFixed(0) + '%';
   }
 
@@ -802,7 +925,7 @@ footer a { color: var(--mist); }
   function frame(now) {
     // encoder values for the screen's bars
     encs.forEach(function (e, k) { var lab = e.querySelector('.v').textContent; e.setAttribute('data-v', e.classList.contains('off') ? 0 : encVal(k)); });
-    drawOled(now); drawEcho(now); drawVoid(now); drawMaster(now);
+    drawOled(now); drawEcho(now); drawVoid(now); drawComp(); drawMaster(now);
     for (var t = 0; t < 9; t++) {
       var l = trkEls[t].firstChild, f = ui.flash[t];
       l.style.background = f > 0.02 ? COLORS[t] : '#26282c';
@@ -830,7 +953,7 @@ footer a { color: var(--mist); }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC || !('audioWorklet' in AC.prototype)) { document.querySelector('.start p').textContent = 'This browser cannot run BUNKER (no AudioWorklet). Try a recent Chrome, Edge, Firefox or Safari.'; return Promise.reject(); }
     ctx = new AC({ latencyHint: 'playback' });
-    startP = ctx.audioWorklet.addModule('engine.js?v=2').then(function () {
+    startP = ctx.audioWorklet.addModule('engine.js?v=3').then(function () {
       node = new AudioWorkletNode(ctx, 'bunker', { numberOfInputs: 0, outputChannelCount: [2] });
       analyser = ctx.createAnalyser(); analyser.fftSize = 4096; analyser.smoothingTimeConstant = 0.75;
       node.connect(analyser); analyser.connect(ctx.destination);
