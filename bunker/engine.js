@@ -109,46 +109,46 @@ function makeBunkerVoices(SR) {
   var v5void = 0.12;
   var v5cut = 0.5;
   var v5trig = 0.0;
-  var v6p0 = 0.2;
+  var v6p0 = 0.4;
   var v6p1 = 0.5;
-  var v6p2 = 0.35;
-  var v6p3 = 0.5;
-  var v6p4 = 0.4;
-  var v6p5 = 0.5;
+  var v6p2 = 0.45;
+  var v6p3 = 0.45;
+  var v6p4 = 0.3;
+  var v6p5 = 0.35;
   var v6p6 = 0.15;
-  var v6p7 = 0.1;
+  var v6p7 = 0.0;
   var v6lvl = 0.85;
   var v6pan = 0.62;
-  var v6echo = 0.35;
+  var v6echo = 0.05;
   var v6void = 0.15;
   var v6cut = 0.5;
   var v6trig = 0.0;
-  var v7p0 = 0.0;
-  var v7p1 = 0.45;
-  var v7p2 = 0.4;
-  var v7p3 = 0.15;
-  var v7p4 = 0.45;
-  var v7p5 = 0.55;
+  var v7p0 = 0.3;
+  var v7p1 = 0.5;
+  var v7p2 = 0.35;
+  var v7p3 = 0.4;
+  var v7p4 = 0.35;
+  var v7p5 = 0.3;
   var v7p6 = 0.0;
-  var v7p7 = 0.05;
+  var v7p7 = 0.0;
   var v7lvl = 0.85;
-  var v7pan = 0.3;
-  var v7echo = 0.25;
-  var v7void = 0.2;
+  var v7pan = 0.35;
+  var v7echo = 0.0;
+  var v7void = 0.1;
   var v7cut = 0.5;
   var v7trig = 0.0;
-  var v8p0 = 1.0;
-  var v8p1 = 0.65;
-  var v8p2 = 0.3;
-  var v8p3 = 0.5;
+  var v8p0 = 0.15;
+  var v8p1 = 0.4;
+  var v8p2 = 0.35;
+  var v8p3 = 0.3;
   var v8p4 = 0.3;
-  var v8p5 = 0.75;
-  var v8p6 = 0.5;
-  var v8p7 = 0.0;
+  var v8p5 = 0.3;
+  var v8p6 = 0.3;
+  var v8p7 = 0.1;
   var v8lvl = 0.85;
-  var v8pan = 0.7;
+  var v8pan = 0.68;
   var v8echo = 0.3;
-  var v8void = 0.25;
+  var v8void = 0.15;
   var v8cut = 0.5;
   var v8trig = 0.0;
   var mvol = 1.0;
@@ -260,10 +260,18 @@ function makeBunkerVoices(SR) {
   var c2 = 0.0;
   var ph5 = 0.0;
   var ph5b = 0.0;
-  var ph6 = 0.0;
-  var ph6b = 0.0;
-  var r1 = 0.0;
-  var r2 = 0.0;
+  var rp0 = 0.0;
+  var rp1 = 0.0;
+  var rp2 = 0.0;
+  var rp3 = 0.0;
+  var rp4 = 0.0;
+  var rp5 = 0.0;
+  var rb1 = 0.0;
+  var rb2 = 0.0;
+  var bph1 = 0.0;
+  var bph2 = 0.0;
+  var gh6 = 0.0;
+  var gx6 = 0.0;
   var hp0 = 0.0;
   var hp1 = 0.0;
   var hp2 = 0.0;
@@ -278,10 +286,12 @@ function makeBunkerVoices(SR) {
   var gx3 = 0.0;
   var gh4 = 0.0;
   var gx4 = 0.0;
-  var lph7 = 0.0;
-  var sph7 = 0.0;
-  var lph8 = 0.0;
-  var sph8 = 0.0;
+  var sb1 = 0.0;
+  var sb2 = 0.0;
+  var gh7 = 0.0;
+  var gx7 = 0.0;
+  var pq1 = 0.0;
+  var pq2 = 0.0;
   var kenv = 0.0;
   var rmph = 0.0;
   var rq0 = 0.0;
@@ -305,7 +315,17 @@ function makeBunkerVoices(SR) {
   var rd2 = new Delay(24000);
   var rd3 = new Delay(24000);
   var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0, out5 = 0, out6 = 0, out7 = 0, out8 = 0;
-  function tick(in1, in2, in3, in4) { var ae, ax, bdec, be, body, bp, cl, cu, dec, dg, dk, dl, dr, e, el, env, er, f, f0, fa, fb, fc, g, gap, gl, gsel, hb0, hb1, hb2, hb3, hb4, hb5, hf, hh, hp, ht, kl, kr, lf, lp, lr, m, met, mx, n, nb, nh, nlf, pa, pe, rbeat, rdg, rf, rg, rg2, rgain, rhg, ri, rl, rmd, rmono, rpre, rq, rr, rs, rt, s, sb, sdec, se, sh, sn, sq, sqr, src, swp, swt, t, tb, tri, wl, wr, x, xl, xr, y, z0, z1, z2, z3;
+  function tick(in1, in2, in3, in4) { var ae, at, ax, bdec, be, bell, bf, body, bp, cl, cu, dec, dg, dk, dl, dr, e, el, env, er, f, f0, fc, fl, g, gap, gl, gs, gsel, hb0, hb1, hb2, hb3, hb4, hb5, hf, hh, hp, ht, kl, kr, lf, lp, m, met, mx, n, nb, nh, nlf, nz, pa, pe, rbeat, rdg, rf, rg, rg2, rgain, rhg, ri, rl, rmd, rmono, rpre, rq, rr, rs, rt, s, sb, sdec, se, sh, sph7, sph8, src, swt, t, tb, tri, wl, wr, x, xl, xr, y, z0, z1, z2, z3;
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1090,32 +1110,46 @@ if (av6 > 0) {
 
 	
 	m = v6p0;
-	fa = 123.47 * exp2(v6p1);     
-
-	fb = fa * (3.66 + (1.48 + 0.4 * v6p5 - 3.66) * m);
-	ph6 = fract(ph6 + fa / sr);
-	ph6b = fract(ph6b + fb / sr);
-	sq = (ph6 < 0.5 ? 1 : -1) + (ph6b < 0.5 ? 1 : -1);
-	sn = sin(6.283185307179586 * ph6) + sin(6.283185307179586 * ph6b);
-	src = sn + (sq * 0.5 - sn) * m + v6p6 * noise();
-	fc = fa * (3.7 - 1.0 * m) * exp2((v6p3 - 0.5) * 2);
+	rt = exp2((v6p1 - 0.5) * 1.0);
+	rp0 = fract(rp0 + 205.3 * 1.6 * rt / sr);
+	rp1 = fract(rp1 + 304.4 * 1.6 * rt / sr);
+	rp2 = fract(rp2 + 369.6 * 1.6 * rt / sr);
+	rp3 = fract(rp3 + 522.7 * 1.6 * rt / sr);
+	rp4 = fract(rp4 + 540 * 1.6 * rt / sr);
+	rp5 = fract(rp5 + 800 * 1.6 * rt / sr);
+	mx = (rp0 < 0.5 ? 1 : -1) + (rp1 < 0.5 ? 1 : -1) + (rp2 < 0.5 ? 1 : -1) + (rp3 < 0.5 ? 1 : -1) + (rp4 < 0.5 ? 1 : -1) + (rp5 < 0.5 ? 1 : -1);
+	src = mx * 0.17 * (1 - 0.45 * m) + noise() * (0.25 + 0.45 * m);
+	fc = 3000 * exp2(v6p3 * 1.6);
 	g = tan(3.141592653589793 * min(fc, 0.42 * sr) / sr);
-	rq = 1 / (1.5 + 2 * m);
+	rq = 1 / (1.2 + 1.5 * m);
 	hh = 1 / (1 + rq * g + g * g);
-	hp = (src - rq * r1 - g * r1 - r2) * hh;
-	bp = g * hp + r1;
-	r1 = g * hp + bp;
-	lp = g * bp + r2;
-	r2 = g * bp + lp;
-	dec = (0.012 + 0.07 * m) * exp2(v6p2 * 2.8);
-	e = exp(-t / dec) * (1 - m * 0.5) + m * 0.5 * exp(-t / (dec * 0.12));
-	x = (bp * rq * 1.5 + hp * 0.2) * e + v6p4 * noise() * exp(-t / 0.0008) * 0.6;
-	dg = 1 + 5 * v6p7;
-	x = tanh(x * dg) / tanh(dg);
-	if (t > dec * 9 + 0.02) {
+	hp = (src - rq * rb1 - g * rb1 - rb2) * hh;
+	bp = g * hp + rb1;
+	rb1 = g * hp + bp;
+	lp = g * bp + rb2;
+	rb2 = g * bp + lp;
+	y = hp * 0.5 + bp * rq * 1.3;
+	dec = 0.09 * exp2(v6p2 * 2.5);
+	e = 0.65 * exp(-t / dec) + 0.35 * exp(-t / (dec * 0.12));
+	
+	bf = 640 * rt * (1 + 0.12 * m);
+	bph1 = fract(bph1 + bf / sr);
+	bph2 = fract(bph2 + bf * 1.483 / sr);
+	bell = (sin(6.283185307179586 * bph1) + 0.7 * sin(6.283185307179586 * bph2)) * v6p4 * 0.35 * exp(-t / (dec * 0.55));
+	sh = 1 + v6p6 * 0.3 * sin(6.283185307179586 * 5.3 * t + 1.3);
+	x = (y * e + bell) * sh + v6p5 * noise() * exp(-t / 0.0012) * 0.7;
+	if (v6p7 > 0.01) {
+		gh6 = gh6 + (1 - v6p7 * 0.85) * 0.5;
+		if (gh6 >= 0.5) {
+			gh6 = gh6 - 0.5;
+			gx6 = floor(x * (40 - 36 * v6p7)) / (40 - 36 * v6p7);
+		}
+		x = gx6;
+	}
+	if (t > dec * 7 + 0.05) {
 		av6 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel6) * v6lvl * 0.1375;
+	x = x * (0.3 + 0.7 * vel6) * v6lvl * 0.5723;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -1159,22 +1193,39 @@ if (av7 > 0) {
 	t = tt7 / sr;
 
 	
-	swp = (v7p3 - 0.5) * 2;
-	swt = 0.01 * exp2(v7p4 * 7);
-	lr = 0.5 * exp2(v7p5 * 6.3);
-	lph7 = fract(lph7 + lr / sr);
-	lf = lph7 < 0.5 ? 1 : -1;
-	f = 55 * exp2(v7p1 * 4 + swp * 3 * (1 - exp(-t / swt)) + lf * v7p6 * v7p6 * 1.5 + v7p7 * v7p7 * noise() * 0.8);
-	sph7 = fract(sph7 + min(f, 0.45 * sr) / sr);
-	tri = 4 * abs(sph7 - 0.5) - 1;
-	sqr = sph7 < 0.5 ? 0.8 : -0.8;
-	s = tri + (sqr - tri) * v7p0;
-	dec = 0.03 * exp2(v7p2 * 3.7);
-	x = (s + v7p7 * noise() * 0.6) * exp(-t / dec) * (1 - exp(-t / 0.0007));
-	if (t > dec * 9 + 0.02) {
+	m = v7p0;
+	at = 0.002 * exp2(v7p4 * 3.6) * (1 - 0.6 * m);
+	dec = 0.012 * exp2(v7p2 * 2.3);
+	fl = 0.025 + 0.035 * (1 - v7p6);
+	e = (1 - exp(-t / at)) * exp(-t / dec);
+	if (t > fl) {
+		e = e + v7p6 * 0.75 * (1 - exp(-(t - fl) / at)) * exp(-(t - fl) / dec);
+	}
+	nz = noise();
+	gs = abs(nz) > 1 - 0.03 * (0.15 + v7p5) ? nz * 3 : 0;
+	src = noise() * (1 - 0.6 * v7p5) + gs;
+	fc = 3000 * exp2(v7p1 * 1.7) * (1 + 0.3 * m);
+	g = tan(3.141592653589793 * min(fc, 0.42 * sr) / sr);
+	rq = 1 / (0.8 + 2.5 * (1 - v7p3));
+	hh = 1 / (1 + rq * g + g * g);
+	hp = (src - rq * sb1 - g * sb1 - sb2) * hh;
+	bp = g * hp + sb1;
+	sb1 = g * hp + bp;
+	lp = g * bp + sb2;
+	sb2 = g * bp + lp;
+	x = (bp * rq * 1.6 + hp * v7p3 * 0.5) * e;
+	if (v7p7 > 0.01) {
+		gh7 = gh7 + (1 - v7p7 * 0.85) * 0.5;
+		if (gh7 >= 0.5) {
+			gh7 = gh7 - 0.5;
+			gx7 = floor(x * (40 - 36 * v7p7)) / (40 - 36 * v7p7);
+		}
+		x = gx7;
+	}
+	if (t > at * 3 + fl + dec * 9 + 0.02) {
 		av7 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel7) * v7lvl * 0.3036;
+	x = x * (0.3 + 0.7 * vel7) * v7lvl * 0.3334;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -1218,22 +1269,20 @@ if (av8 > 0) {
 	t = tt8 / sr;
 
 	
-	swp = (v8p3 - 0.5) * 2;
-	swt = 0.01 * exp2(v8p4 * 7);
-	lr = 0.5 * exp2(v8p5 * 6.3);
-	lph8 = fract(lph8 + lr / sr);
-	lf = lph8 < 0.5 ? 1 : -1;
-	f = 55 * exp2(v8p1 * 4 + swp * 3 * (1 - exp(-t / swt)) + lf * v8p6 * v8p6 * 1.5 + v8p7 * v8p7 * noise() * 0.8);
-	sph8 = fract(sph8 + min(f, 0.45 * sr) / sr);
-	tri = 4 * abs(sph8 - 0.5) - 1;
-	sqr = sph8 < 0.5 ? 0.8 : -0.8;
-	s = tri + (sqr - tri) * v8p0;
-	dec = 0.03 * exp2(v8p2 * 3.7);
-	x = (s + v8p7 * noise() * 0.6) * exp(-t / dec) * (1 - exp(-t / 0.0007));
+	m = v8p0;
+	f0 = 98 * exp2(v8p1) * exp2(floor(m * 3.99));
+	f = f0 * exp2(v8p3 * 0.8 * exp(-t / 0.008));
+	pq1 = fract(pq1 + f / sr);
+	pq2 = fract(pq2 + f * (1.5 + 1.2 * m) / sr);
+	s = sin(6.283185307179586 * pq1) + v8p4 * 0.35 * sin(12.566370614359172 * pq1) + v8p6 * 0.6 * sin(6.283185307179586 * pq2) * exp(-t / (0.02 + 0.04 * (1 - m)));
+	dec = (0.012 + 0.05 * (1 - m)) * exp2(v8p2 * 2.2);
+	x = s * exp(-t / dec) * (1 - exp(-t / 0.0004)) + v8p5 * noise() * exp(-t / (0.0015 + 0.006 * (1 - m))) * 0.8;
+	dg = 1 + 5 * v8p7;
+	x = tanh(x * dg) / tanh(dg);
 	if (t > dec * 9 + 0.02) {
 		av8 = 0;
 	}
-	x = x * (0.3 + 0.7 * vel8) * v8lvl * 0.2864;
+	x = x * (0.3 + 0.7 * vel8) * v8lvl * 0.2245;
 	
 	ax = abs(x);
 	if (ax > 0.6) {
@@ -2485,11 +2534,12 @@ inlets = 1;
 outlets = 5;
 
 var NT = 9, NS = 16, NP = 13;
-var NAMES = ["KICK", "SNARE", "CLAP", "CL HAT", "OP HAT", "TOM", "RIM", "SY A", "SY B"];
+var NAMES = ["KICK", "SNARE", "CLAP", "CL HAT", "OP HAT", "TOM", "RIDE", "SHAKER", "PERC"];
 var SCALES = [
   [0, 2, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 9, 10], [0, 1, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 8, 11]
 ];
 var STEP_TICKS = 120, GRID = 10;
+var VOICESET = 2;   // 2 = RIDE, SHAKER, PERC on tracks 7-9 (1 was RIM, SY A, SY B)
 
 // default sound + amp (level pan echo void cut), as the voice defaults
 var BASE_DEF = [
@@ -2499,9 +2549,9 @@ var BASE_DEF = [
   [0.3, 0.5, 0.25, 0.55, 0.7, 0.3, 0.2, 0.0, 0.85, 0.42, 0.0, 0.05, 0.5],
   [0.3, 0.5, 0.32, 0.5, 0.7, 0.3, 0.1, 0.0, 0.85, 0.58, 0.05, 0.1, 0.5],
   [0.3, 0.35, 0.22, 0.35, 0.4, 0.25, 0.3, 0.1, 0.85, 0.38, 0.1, 0.12, 0.5],
-  [0.2, 0.5, 0.35, 0.5, 0.4, 0.5, 0.15, 0.1, 0.85, 0.62, 0.35, 0.15, 0.5],
-  [0.0, 0.45, 0.4, 0.15, 0.45, 0.55, 0.0, 0.05, 0.85, 0.3, 0.25, 0.2, 0.5],
-  [1.0, 0.65, 0.3, 0.5, 0.3, 0.75, 0.5, 0.0, 0.85, 0.7, 0.3, 0.25, 0.5]
+  [0.4, 0.5, 0.45, 0.45, 0.3, 0.35, 0.15, 0.0, 0.85, 0.62, 0.05, 0.15, 0.5],
+  [0.3, 0.5, 0.35, 0.4, 0.35, 0.3, 0.0, 0.0, 0.85, 0.35, 0.0, 0.1, 0.5],
+  [0.15, 0.4, 0.35, 0.3, 0.3, 0.3, 0.3, 0.1, 0.85, 0.68, 0.3, 0.15, 0.5]
 ];
 // musical ranges for RANDOM SOUND: [min, max] per sound parameter
 var RAND_RANGE = [
@@ -2511,13 +2561,15 @@ var RAND_RANGE = [
   [[0, 1], [0.3, 0.8], [0.05, 0.45], [0.3, 0.9], [0.3, 1], [0, 0.6], [0, 0.6], [0, 0.3]],
   [[0, 1], [0.3, 0.8], [0.25, 0.7], [0.3, 0.9], [0.3, 1], [0, 0.6], [0, 0.4], [0, 0.3]],
   [[0, 1], [0.1, 0.7], [0.2, 0.7], [0.1, 0.7], [0.2, 0.7], [0, 0.5], [0, 0.7], [0, 0.4]],
-  [[0, 1], [0.2, 0.8], [0.2, 0.6], [0.2, 0.8], [0, 0.6], [0.2, 0.8], [0, 0.4], [0, 0.5]],
-  [[0, 1], [0.2, 0.75], [0.25, 0.6], [0, 1], [0.2, 0.8], [0.2, 0.9], [0, 0.8], [0, 0.4]],
-  [[0, 1], [0.2, 0.75], [0.2, 0.6], [0, 1], [0.2, 0.8], [0.2, 0.9], [0, 0.8], [0, 0.4]]
+  [[0, 1], [0.25, 0.75], [0.2, 0.7], [0.2, 0.8], [0, 0.6], [0.1, 0.6], [0, 0.5], [0, 0.3]],
+  [[0, 1], [0.2, 0.8], [0.15, 0.6], [0.1, 0.7], [0.1, 0.7], [0, 0.7], [0, 0.5], [0, 0.3]],
+  [[0, 1], [0.15, 0.85], [0.15, 0.65], [0, 0.6], [0.1, 0.7], [0.1, 0.7], [0, 0.6], [0, 0.4]]
 ];
 
 // hats by position in the beat: on the beat, 16th, offbeat, 16th
 var HATVEL = [85, 62, 108, 70];
+// shaker: soft on the beat, pushed on the offbeat 16ths
+var SHAKVEL = [70, 55, 95, 62];
 var STYLES = ["TECHNO", "DUB", "BROKEN", "TRIBAL", "ELECTRO"];
 // rank bias per style and track (16 steps), and how many hits
 var T4 = [3, 0, 0.2, 0.5, 3, 0, 0.3, 0.6, 3, 0, 0.2, 0.7, 3, 0.1, 0.4, 0.8];      // four to the floor
@@ -2528,14 +2580,16 @@ var OFF8 = [0.2, 0.9, 2, 0.9, 0.2, 0.9, 2, 0.9, 0.2, 0.9, 2, 0.9, 0.2, 0.9, 2, 0
 var OFFO = [0, 0, 2, 0.1, 0, 0, 2, 0.1, 0, 0, 2, 0.1, 0, 0, 2, 0.3];
 var SYNC = [0.1, 0.4, 0.3, 1.4, 0.2, 0.3, 1.2, 0.4, 0.1, 0.8, 0.3, 1.3, 0.2, 0.4, 1.0, 0.6];
 var ANY = [0.3, 0.7, 0.4, 0.9, 0.2, 1, 0.3, 0.8, 0.2, 0.6, 0.5, 1.1, 0.1, 0.9, 0.4, 0.7];
+var RIDE8 = [0.3, 0.1, 2, 0.1, 0.3, 0.1, 2, 0.1, 0.3, 0.1, 2, 0.1, 0.3, 0.1, 2, 0.2];   // offbeat ride
+var SHK = [1, 0.9, 1.3, 0.9, 1, 0.9, 1.3, 0.9, 1, 0.9, 1.3, 0.9, 1, 0.9, 1.3, 1];        // shaker 16ths
 var TRIB = [1.2, 0.3, 0.9, 0.5, 0.4, 1.1, 0.3, 0.9, 1.0, 0.4, 0.8, 0.6, 0.3, 1.2, 0.5, 0.9];
 var STYLE_DEF = [
   // [bias, hits, jitter] per track
-  [[T4, 4, 0.2], [BACK, 0, 0.5], [BACK, 2, 0.3], [OFF8, 8, 0.6], [OFFO, 4, 0.3], [ANY, 2, 1.0], [SYNC, 3, 0.9], [SYNC, 2, 1.0], [ANY, 0, 1]],
-  [[T4, 4, 0.2], [BACK, 0, 0.5], [BACK, 2, 0.6], [OFF8, 6, 0.8], [OFFO, 2, 0.4], [ANY, 1, 1.0], [SYNC, 4, 1.0], [SYNC, 2, 1.0], [ANY, 0, 1]],
-  [[BK, 4, 0.6], [BACK, 3, 0.6], [BACK, 1, 0.5], [OFF8, 10, 0.9], [OFFO, 2, 0.6], [ANY, 2, 1.0], [SYNC, 3, 1.0], [ANY, 2, 1.0], [ANY, 1, 1]],
-  [[T4, 4, 0.2], [BACK, 0, 0.5], [BACK, 1, 0.5], [OFF8, 8, 0.6], [OFFO, 2, 0.4], [TRIB, 6, 0.9], [TRIB, 5, 1.1], [SYNC, 2, 1.0], [ANY, 1, 1]],
-  [[EL, 4, 0.3], [BACK, 2, 0.3], [BACK, 0, 0.3], [OFF8, 14, 0.4], [OFFO, 1, 0.3], [ANY, 1, 1.0], [SYNC, 2, 1.0], [ANY, 3, 1.0], [SYNC, 2, 1]]
+  [[T4, 4, 0.2], [BACK, 0, 0.5], [BACK, 2, 0.3], [OFF8, 8, 0.6], [OFFO, 4, 0.3], [ANY, 2, 1.0], [RIDE8, 4, 0.4], [SHK, 12, 0.5], [SYNC, 2, 1.0]],
+  [[T4, 4, 0.2], [BACK, 0, 0.5], [BACK, 2, 0.6], [OFF8, 6, 0.8], [OFFO, 2, 0.4], [ANY, 1, 1.0], [RIDE8, 4, 0.5], [SHK, 16, 0.3], [SYNC, 2, 1.0]],
+  [[BK, 4, 0.6], [BACK, 3, 0.6], [BACK, 1, 0.5], [OFF8, 10, 0.9], [OFFO, 2, 0.6], [ANY, 2, 1.0], [RIDE8, 3, 0.9], [SHK, 9, 0.8], [ANY, 3, 1.0]],
+  [[T4, 4, 0.2], [BACK, 0, 0.5], [BACK, 1, 0.5], [OFF8, 8, 0.6], [OFFO, 2, 0.4], [TRIB, 6, 0.9], [RIDE8, 4, 0.6], [SHK, 14, 0.5], [TRIB, 4, 1.0]],
+  [[EL, 4, 0.3], [BACK, 2, 0.3], [BACK, 0, 0.3], [OFF8, 14, 0.4], [OFFO, 1, 0.3], [ANY, 1, 1.0], [RIDE8, 2, 0.6], [SHK, 6, 0.6], [SYNC, 2, 1.0]]
 ];
 
 // ------------------------------------------------------------------ state
@@ -2569,9 +2623,9 @@ function reseed() { rngState = (Math.floor(Math.random() * 4294967295) ^ (Date.n
 // ------------------------------------------------------------------ key
 // Tonal tracks: TUNE (parameter 1) is a pitch. KEYLOCK 2 = it snaps to the notes
 // of the key, 1 = to semitones, 0 = free. Ranges (as the voices):
-//   kick E1..A#1, snare D3..D4, tom E2..E4, rim/cow B2..B3, SY A1..A5
-var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 123.47, 55, 55];
-var TUNE_OCT = [0.5, 1, 0, 0, 0, 2, 1, 4, 4];
+//   kick E1..A#1, snare D3..D4, tom E2..E4, perc G2..G3 (+ octaves from its morph)
+var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 0, 0, 98];
+var TUNE_OCT = [0.5, 1, 0, 0, 0, 2, 0, 0, 1];
 function tuneHz(t, v) { return TUNE_LO[t] * Math.pow(2, v * TUNE_OCT[t]); }
 function hzTune(t, f) { return Math.log(f / TUNE_LO[t]) / Math.LN2 / TUNE_OCT[t]; }
 function tonal(t) { return TUNE_OCT[t] > 0; }
@@ -2619,10 +2673,12 @@ function generate(t) {
     st.on = 1;
     st.vel = rand() < 0.3 ? 127 : 84 + Math.floor(rand() * 28);
     if (t === 3) st.vel = HATVEL[idx[i] % 4] - Math.floor(rand() * 10);
-    if ((t === 3 || t === 4 || t === 6 || t === 5) && rand() < 0.22) st.chance = 50 + Math.floor(rand() * 3) * 10;
+    if (t === 7) st.vel = SHAKVEL[idx[i] % 4] - Math.floor(rand() * 10);
+    if (t === 6) st.vel = 92 + Math.floor(rand() * 20);
+    if ((t === 3 || t === 4 || t === 5 || t === 6 || t === 7 || t === 8) && rand() < 0.22) st.chance = 50 + Math.floor(rand() * 3) * 10;
     if (t === 3 && rand() < 0.12) st.rat = 2;
-    if (t === 7 || t === 8 || (t === 5 && G.style === 3)) {
-      // melodic synth drums: root, 5th, 7th, octave of the key
+    if (t === 8 || (t === 5 && G.style === 3)) {
+      // melodic percussion: root, 5th, 7th, octave of the key
       var degs = [0, 0, 4, 6, 7, 2], d = degs[Math.floor(rand() * degs.length)];
       var sc = SCALES[G.scale], o = Math.floor(d / 7), m = d - 7 * o;
       var baseNote = Math.round(noteOfTune(t, bp[t][1]));
@@ -2764,7 +2820,7 @@ function randsound(t) {
   else for (var k = 0; k < NT; k++) randSound(k);
 }
 function clear(t) { t = clampI(t, 0, NT - 1); for (var i = 0; i < NS; i++) steps[t][i] = emptyStep(); changed(t); }
-function dump() { outlet(3, "dump", JSON.stringify({ bp: bp, steps: steps, len: len, mt: mt, G: G })); }
+function dump() { outlet(3, "dump", JSON.stringify({ vs: VOICESET, bp: bp, steps: steps, len: len, mt: mt, G: G })); }
 function load(json) {
   var d = typeof json === "string" ? JSON.parse(json) : json;
   if (d.bp) bp = d.bp;
@@ -2772,6 +2828,10 @@ function load(json) {
   if (d.len) len = d.len;
   if (d.mt) mt = d.mt;
   if (d.G) for (var k in d.G) G[k] = d.G[k];
+  if (d.vs !== VOICESET) {
+    // saved with the old RIM / SY A / SY B voices: keep the patterns, reset those three sounds
+    for (var o = 6; o < NT; o++) { bp[o] = BASE_DEF[o].slice(); for (var q = 0; q < NS; q++) steps[o][q].lk = {}; }
+  }
   for (var t = 0; t < NT; t++) { sent[t] = []; sendBase(t); changed(t); }
 }
 function noteName(t, v) {

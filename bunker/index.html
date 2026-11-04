@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BUNKER — drum machine by Narti Live</title>
 <meta name="author" content="Narti Live">
-<meta name="description" content="BUNKER by Narti Live: a drum machine in your browser. 808 to 909 morphing drums, Tanzbär-style toms and cowbell, two Syncussion-style synth drums, kick rumble, parameter locks, dub echo and a dark space. Free.">
+<meta name="description" content="BUNKER by Narti Live: a drum machine in your browser. 808 to 909 morphing drums, ride, shaker, conga to clave percussion, kick rumble, parameter locks, dub echo and a dark space. Free.">
 <meta name="theme-color" content="#0b0c0d">
 <meta property="og:title" content="BUNKER — drum machine by Narti Live">
 <meta property="og:description" content="808 ↔ 909 morphing drums, kick rumble, parameter locks, dub echo, a dark space. In the browser, free.">
@@ -164,7 +164,7 @@ footer a { color: var(--mist); }
 <div class="start" id="start">
   <div class="box">
     <h1>BUNKER</h1>
-    <p>A drum machine for the dark rooms: 808 ↔ 909 morphing drums, Tanzbär-style toms and cowbell, two Syncussion-style synth drums, kick rumble, parameter locks, dub echo and a dark space. Everything stays in key.</p>
+    <p>A drum machine for the dark rooms: 808 ↔ 909 morphing drums, a Tanzbär-style tom, a ride, a shaker, conga to clave percussion, kick rumble, parameter locks, dub echo and a dark space. Everything stays in key.</p>
     <button id="go" type="button">Power on</button>
     <small>Headphones or a real system recommended. Desktop browsers run it best.</small>
   </div>
@@ -224,12 +224,12 @@ footer a { color: var(--mist); }
 <footer>BUNKER by <a href="https://www.instagram.com/narti_live">Narti Live</a> · <a href="https://www.youtube.com/@narti_live">YouTube</a> · <a href="../">DUB STAB PLAITS</a> · <a href="../studio/">DUB STAB STUDIO</a> · <a href="../vault/">VAULT FM synth</a> · Free, MIT license. Inspired by classic drum machines; not affiliated with Roland, MFB, Pearl, Elektron or Ableton.</footer>
 </div>
 
-<script src="voices.js?v=4"></script>
+<script src="voices.js?v=5"></script>
 <script>
 (function () {
   'use strict';
   // ================================================================ model
-  var NAMES = ['KICK', 'SNARE', 'CLAP', 'CL HAT', 'OP HAT', 'TOM', 'RIM', 'SY A', 'SY B'];
+  var NAMES = ['KICK', 'SNARE', 'CLAP', 'CL HAT', 'OP HAT', 'TOM', 'RIDE', 'SHAKER', 'PERC'];
   var COLORS = ['#ff4a3d', '#ff8a3d', '#ffc23d', '#3dd6ff', '#3d9dff', '#5cff8a', '#c38bff', '#ff5cc8', '#ff7ae0'];
   var PNAMES = [
     ['808·909', 'Tune', 'Decay', 'Sweep', 'Bend', 'Click', 'Drive', 'Punch'],
@@ -238,12 +238,12 @@ footer a { color: var(--mist); }
     ['808·909', 'Tune', 'Decay', 'Tone', 'Metal', 'Reso', 'Click', 'Grit'],
     ['808·909', 'Tune', 'Decay', 'Tone', 'Metal', 'Reso', 'Click', 'Grit'],
     ['Tom·Conga', 'Tune', 'Decay', 'Bend', 'Bend t', 'Noise', 'Ring', 'Drive'],
-    ['Rim·Cow', 'Tune', 'Decay', 'Tone', 'Click', 'Interval', 'Noise', 'Drive'],
-    ['Wave', 'Tune', 'Decay', 'Sweep', 'Sweep t', 'LFO rate', 'LFO dep', 'Noise'],
-    ['Wave', 'Tune', 'Decay', 'Sweep', 'Sweep t', 'LFO rate', 'LFO dep', 'Noise']];
+    ['808·909', 'Tune', 'Decay', 'Tone', 'Bell', 'Ping', 'Shimmer', 'Grit'],
+    ['Shaker·Maraca', 'Tune', 'Decay', 'Tone', 'Attack', 'Grain', 'Flam', 'Grit'],
+    ['Conga·Clave', 'Tune', 'Decay', 'Bend', 'Tone', 'Slap', 'Ring', 'Drive']];
   var AMP = ['Level', 'Pan', 'Echo', 'Void', 'Filter'];
-  var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 123.47, 55, 55];
-  var TUNE_OCT = [0.5, 1, 0, 0, 0, 2, 1, 4, 4];
+  var TUNE_LO = [41.203, 146.83, 0, 0, 0, 82.407, 0, 0, 98];
+  var TUNE_OCT = [0.5, 1, 0, 0, 0, 2, 0, 0, 1];
   var SCALES = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 9, 10], [0, 1, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 8, 11]];
   var NOTE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   var RUM = [['Amount', 'rumamt', 0], ['Decay', 'rumdec', 0.5], ['Tone', 'rumtone', 0.4], ['Drive', 'rumdrive', 0.4],
@@ -287,16 +287,18 @@ footer a { color: var(--mist); }
     return Math.log(440 * Math.pow(2, (m - 69) / 12) / TUNE_LO[t]) / Math.LN2 / TUNE_OCT[t];
   }
   function noteName(t, v) {
-    var f = tuneHz(t, snapTune(t, v)), m = Math.round(midiOf(f));
+    var f = tuneHz(t, snapTune(t, v));
+    if (t === 8) f *= Math.pow(2, Math.floor(paramVal(8, 0) * 3.99));   // PERC: its morph moves it up in octaves
+    var m = Math.round(midiOf(f));
     return NOTE[((m % 12) + 12) % 12] + (Math.floor(m / 12) - 1) + ' · ' + (f < 100 ? f.toFixed(1) : Math.round(f)) + ' Hz';
   }
   function fmtParam(t, i, v) {
     if (i === 1 && TUNE_OCT[t]) return noteName(t, v).split(' · ')[0];
-    if (i === 0 && t <= 4) return v < 0.03 ? '808' : v > 0.97 ? '909' : Math.round(v * 100) + '% 909';
+    if (i === 0 && (t <= 4 || t === 6)) return v < 0.03 ? '808' : v > 0.97 ? '909' : Math.round(v * 100) + '% 909';
     if (i === 0 && t === 5) return v < 0.5 ? 'tom ' + Math.round((1 - v) * 100) : 'conga ' + Math.round(v * 100);
-    if (i === 0 && t === 6) return v < 0.5 ? 'rim ' + Math.round((1 - v) * 100) : 'cow ' + Math.round(v * 100);
-    if (i === 0 && t >= 7) return v < 0.1 ? 'tri' : v > 0.9 ? 'square' : Math.round(v * 100) + '%';
-    if (i === 3 && t >= 7) { var s = Math.round((v - 0.5) * 200); return s === 0 ? 'none' : (s > 0 ? '+' : '') + s; }
+    if (i === 0 && t === 7) return v < 0.5 ? 'shaker ' + Math.round((1 - v) * 100) : 'maraca ' + Math.round(v * 100);
+    if (i === 0 && t === 8) return ['low conga', 'conga', 'woodblock', 'clave'][Math.floor(v * 3.99)];
+    if (i === 2 && t === 6) return (0.4 * Math.pow(2, v * 2.5)).toFixed(1) + ' s';
     if (i === 4 && t === 2) return (1 + Math.floor(v * 4.99)) + 'x';
     if (i === 9) { var p = Math.round((v - 0.5) * 200); return p === 0 ? 'C' : (p < 0 ? 'L' + (-p) : 'R' + p); }
     if (i === 12) { if (v < 0.48) return 'LP ' + fmtHz(18000 * Math.pow(2, -(0.48 - v) * 14)); if (v > 0.52) return 'HP ' + fmtHz(20 * Math.pow(2, (v - 0.52) * 16)); return 'off'; }
@@ -685,7 +687,7 @@ footer a { color: var(--mist); }
     { n: 'Glue', fixed: 'VCA bus · 4:1 · attack 10 ms · release auto', lo: 2, hi: 4, amt: 0.43, mix: 1, knee: 6, ratio: 4,
       use: 'Use on the whole kit, always on if you like: it holds the drums together without taking the kick’s click (10 ms attack lets it through).' },
     { n: 'Punch', fixed: 'FET · 4:1 · attack 0.4 ms · release 200 ms', lo: 3, hi: 6, amt: 0.42, mix: 1, knee: 2, ratio: 4,
-      use: 'Use when hats, rim and room should come forward and the kit should feel tighter and grittier.' },
+      use: 'Use when hats, ride and shaker should come forward and the kit should feel tighter and grittier.' },
     { n: 'Opto', fixed: 'optical · 3:1 · attack 10 ms · release 60 ms + 1.5 s', lo: 2, hi: 4, amt: 0.39, mix: 1, knee: 12, ratio: 3,
       use: 'Use for slow, round, smooth levelling: dub and deep tracks where the drums should breathe, not bite.' },
     { n: 'Pump', fixed: 'keyed by the kick · 6:1 · attack 3 ms · release 1/8 note', lo: 6, hi: 10, amt: 0.45, mix: 1, knee: 3, ratio: 6,
@@ -1066,7 +1068,7 @@ footer a { color: var(--mist); }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC || !('audioWorklet' in AC.prototype)) { document.querySelector('.start p').textContent = 'This browser cannot run BUNKER (no AudioWorklet). Try a recent Chrome, Edge, Firefox or Safari.'; return Promise.reject(); }
     ctx = new AC({ latencyHint: 'playback' });
-    startP = ctx.audioWorklet.addModule('engine.js?v=6').then(function () {
+    startP = ctx.audioWorklet.addModule('engine.js?v=7').then(function () {
       node = new AudioWorkletNode(ctx, 'bunker', { numberOfInputs: 0, outputChannelCount: [2] });
       analyser = ctx.createAnalyser(); analyser.fftSize = 4096; analyser.smoothingTimeConstant = 0.75;
       node.connect(analyser); analyser.connect(ctx.destination);
