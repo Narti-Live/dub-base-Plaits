@@ -304,8 +304,8 @@ function makeBunkerVoices(SR) {
   var rd1 = new Delay(24000);
   var rd2 = new Delay(24000);
   var rd3 = new Delay(24000);
-  var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0, out5 = 0, out6 = 0;
-  function tick(in1, in2, in3, in4) { var ae, ax, bdec, be, body, bp, cl, cu, dec, dg, dk, dl, dr, e, el, env, er, f, f0, fa, fb, fc, g, gap, gl, gsel, hb0, hb1, hb2, hb3, hb4, hb5, hf, hh, hp, ht, lf, lp, lr, m, met, mx, n, nb, nh, nlf, pa, pe, rbeat, rdg, rf, rg, rg2, rgain, rhg, ri, rl, rmd, rmono, rpre, rq, rr, rs, rt, s, sb, sdec, se, sh, sn, sq, sqr, src, swp, swt, t, tb, tri, wl, wr, x, xl, xr, y, z0, z1, z2, z3;
+  var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0, out5 = 0, out6 = 0, out7 = 0, out8 = 0;
+  function tick(in1, in2, in3, in4) { var ae, ax, bdec, be, body, bp, cl, cu, dec, dg, dk, dl, dr, e, el, env, er, f, f0, fa, fb, fc, g, gap, gl, gsel, hb0, hb1, hb2, hb3, hb4, hb5, hf, hh, hp, ht, kl, kr, lf, lp, lr, m, met, mx, n, nb, nh, nlf, pa, pe, rbeat, rdg, rf, rg, rg2, rgain, rhg, ri, rl, rmd, rmono, rpre, rq, rr, rs, rt, s, sb, sdec, se, sh, sn, sq, sqr, src, swp, swt, t, tb, tri, wl, wr, x, xl, xr, y, z0, z1, z2, z3;
 
 
 
@@ -733,6 +733,8 @@ if (rumamt > 0.001) {
 	dr = dr + 0.45 * tanh((rmono + (rhr - rmono) * rumwidth) * rgain / 0.45);
 }
 
+kl = dl;
+kr = dr;
 
 
 if (v1trig != tl1) {
@@ -1266,7 +1268,9 @@ out3 = el;
 out4 = er;
 out5 = wl;
 out6 = wr;
- return [out1, out2, out3, out4, out5, out6]; }
+out7 = kl * mvol;
+out8 = kr * mvol;
+ return [out1, out2, out3, out4, out5, out6, out7, out8]; }
   function set(name, v) { switch (name) { case 'v0p0': v0p0 = v; break; case 'v0p1': v0p1 = v; break; case 'v0p2': v0p2 = v; break; case 'v0p3': v0p3 = v; break; case 'v0p4': v0p4 = v; break; case 'v0p5': v0p5 = v; break; case 'v0p6': v0p6 = v; break; case 'v0p7': v0p7 = v; break; case 'v0lvl': v0lvl = v; break; case 'v0pan': v0pan = v; break; case 'v0echo': v0echo = v; break; case 'v0void': v0void = v; break; case 'v0cut': v0cut = v; break; case 'v0trig': v0trig = v; break; case 'v1p0': v1p0 = v; break; case 'v1p1': v1p1 = v; break; case 'v1p2': v1p2 = v; break; case 'v1p3': v1p3 = v; break; case 'v1p4': v1p4 = v; break; case 'v1p5': v1p5 = v; break; case 'v1p6': v1p6 = v; break; case 'v1p7': v1p7 = v; break; case 'v1lvl': v1lvl = v; break; case 'v1pan': v1pan = v; break; case 'v1echo': v1echo = v; break; case 'v1void': v1void = v; break; case 'v1cut': v1cut = v; break; case 'v1trig': v1trig = v; break; case 'v2p0': v2p0 = v; break; case 'v2p1': v2p1 = v; break; case 'v2p2': v2p2 = v; break; case 'v2p3': v2p3 = v; break; case 'v2p4': v2p4 = v; break; case 'v2p5': v2p5 = v; break; case 'v2p6': v2p6 = v; break; case 'v2p7': v2p7 = v; break; case 'v2lvl': v2lvl = v; break; case 'v2pan': v2pan = v; break; case 'v2echo': v2echo = v; break; case 'v2void': v2void = v; break; case 'v2cut': v2cut = v; break; case 'v2trig': v2trig = v; break; case 'v3p0': v3p0 = v; break; case 'v3p1': v3p1 = v; break; case 'v3p2': v3p2 = v; break; case 'v3p3': v3p3 = v; break; case 'v3p4': v3p4 = v; break; case 'v3p5': v3p5 = v; break; case 'v3p6': v3p6 = v; break; case 'v3p7': v3p7 = v; break; case 'v3lvl': v3lvl = v; break; case 'v3pan': v3pan = v; break; case 'v3echo': v3echo = v; break; case 'v3void': v3void = v; break; case 'v3cut': v3cut = v; break; case 'v3trig': v3trig = v; break; case 'v4p0': v4p0 = v; break; case 'v4p1': v4p1 = v; break; case 'v4p2': v4p2 = v; break; case 'v4p3': v4p3 = v; break; case 'v4p4': v4p4 = v; break; case 'v4p5': v4p5 = v; break; case 'v4p6': v4p6 = v; break; case 'v4p7': v4p7 = v; break; case 'v4lvl': v4lvl = v; break; case 'v4pan': v4pan = v; break; case 'v4echo': v4echo = v; break; case 'v4void': v4void = v; break; case 'v4cut': v4cut = v; break; case 'v4trig': v4trig = v; break; case 'v5p0': v5p0 = v; break; case 'v5p1': v5p1 = v; break; case 'v5p2': v5p2 = v; break; case 'v5p3': v5p3 = v; break; case 'v5p4': v5p4 = v; break; case 'v5p5': v5p5 = v; break; case 'v5p6': v5p6 = v; break; case 'v5p7': v5p7 = v; break; case 'v5lvl': v5lvl = v; break; case 'v5pan': v5pan = v; break; case 'v5echo': v5echo = v; break; case 'v5void': v5void = v; break; case 'v5cut': v5cut = v; break; case 'v5trig': v5trig = v; break; case 'v6p0': v6p0 = v; break; case 'v6p1': v6p1 = v; break; case 'v6p2': v6p2 = v; break; case 'v6p3': v6p3 = v; break; case 'v6p4': v6p4 = v; break; case 'v6p5': v6p5 = v; break; case 'v6p6': v6p6 = v; break; case 'v6p7': v6p7 = v; break; case 'v6lvl': v6lvl = v; break; case 'v6pan': v6pan = v; break; case 'v6echo': v6echo = v; break; case 'v6void': v6void = v; break; case 'v6cut': v6cut = v; break; case 'v6trig': v6trig = v; break; case 'v7p0': v7p0 = v; break; case 'v7p1': v7p1 = v; break; case 'v7p2': v7p2 = v; break; case 'v7p3': v7p3 = v; break; case 'v7p4': v7p4 = v; break; case 'v7p5': v7p5 = v; break; case 'v7p6': v7p6 = v; break; case 'v7p7': v7p7 = v; break; case 'v7lvl': v7lvl = v; break; case 'v7pan': v7pan = v; break; case 'v7echo': v7echo = v; break; case 'v7void': v7void = v; break; case 'v7cut': v7cut = v; break; case 'v7trig': v7trig = v; break; case 'v8p0': v8p0 = v; break; case 'v8p1': v8p1 = v; break; case 'v8p2': v8p2 = v; break; case 'v8p3': v8p3 = v; break; case 'v8p4': v8p4 = v; break; case 'v8p5': v8p5 = v; break; case 'v8p6': v8p6 = v; break; case 'v8p7': v8p7 = v; break; case 'v8lvl': v8lvl = v; break; case 'v8pan': v8pan = v; break; case 'v8echo': v8echo = v; break; case 'v8void': v8void = v; break; case 'v8cut': v8cut = v; break; case 'v8trig': v8trig = v; break; case 'mvol': mvol = v; break; case 'rumamt': rumamt = v; break; case 'rumdec': rumdec = v; break; case 'rumtone': rumtone = v; break; case 'rumdrive': rumdrive = v; break; case 'rumduck': rumduck = v; break; case 'rumgroove': rumgroove = v; break; case 'rummotion': rummotion = v; break; case 'rumwidth': rumwidth = v; break; case 'ptempo': ptempo = v; break; default: throw new Error("no param " + name); } }
   return { tick: tick, set: set };
 }
@@ -2289,6 +2293,176 @@ out4 = lvl;
   function set(name, v) { switch (name) { case 'pstyle': pstyle = v; break; case 'pamount': pamount = v; break; case 'pmix': pmix = v; break; case 'ptempo': ptempo = v; break; default: throw new Error("no param " + name); } }
   return { tick: tick, set: set };
 }
+function makeFx_sat(SR) {
+  "use strict";
+  var M = Math;
+  var ptype = 0.0;
+  var pdrive = 0.4;
+  var ptone = 0.75;
+  var pmix = 1.0;
+  var sdr = 0.4;
+  var ston = 0.75;
+  var smix = 1.0;
+  var hl = 0.0;
+  var hr = 0.0;
+  var cnt = 0.0;
+  var bits = 12.0;
+  var tl1 = 0.0;
+  var tl2 = 0.0;
+  var tr1 = 0.0;
+  var tr2 = 0.0;
+  var pl1 = 0.0;
+  var pl2 = 0.0;
+  var pr1 = 0.0;
+  var pr2 = 0.0;
+  var dcl = 0.0;
+  var dcr = 0.0;
+  var dcxl = 0.0;
+  var dcxr = 0.0;
+  var pin = 0.0;
+  var pwet = 0.0;
+  var work = 0.0;
+  var pki = 0.0;
+  var pko = 0.0;
+  var sr, r48, out1 = 0, out2 = 0, out3 = 0;
+  function tick(in1, in2, in3, in4) { var aol, aor, b, cm, cp, dw, fc, g, gp, gt, k, mg, ol, orr, pi_, q, rate, tf, ty, ul, ur, xl, xr, yl, yr;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sr = SR;
+ty = floor(ptype + 0.5);
+k = 1 - exp(-1 / (0.03 * sr));
+sdr = sdr + (pdrive - sdr) * k;
+ston = ston + (ptone - ston) * k;
+smix = smix + (pmix - smix) * k;
+
+xl = in1;
+xr = in2;
+yl = xl;
+yr = xr;
+if (ty == 0) {
+	
+	g = exp2(sdr * 12 / 6.0206);
+	yl = tanh(xl * g + 0.08) - tanh(0.08);
+	yr = tanh(xr * g + 0.08) - tanh(0.08);
+	fc = 18000 * exp2(-sdr * 1.2);
+	gt = 1 - exp(-6.283185307179586 * min(fc, 0.45 * sr) / sr);
+	tl1 = tl1 + gt * (yl - tl1);
+	tr1 = tr1 + gt * (yr - tr1);
+	yl = tl1;
+	yr = tr1;
+} else if (ty == 1) {
+	
+	g = exp2(sdr * 18 / 6.0206);
+	ul = clamp(xl * g * 0.66, -1, 1);
+	ur = clamp(xr * g * 0.66, -1, 1);
+	yl = (ul - ul * ul * ul / 3) * 1.5;
+	yr = (ur - ur * ur * ur / 3) * 1.5;
+} else if (ty == 2) {
+	
+	g = exp2(sdr * 15 / 6.0206);
+	ul = tanh(xl * g);
+	ur = tanh(xr * g);
+	yl = ul + 0.25 * ul * ul;
+	yr = ur + 0.25 * ur * ur;
+} else if (ty == 3) {
+	
+	rate = 26040 * exp2(-sdr * 1.1);
+	cnt = cnt + rate / sr;
+	if (cnt >= 1) {
+		cnt = cnt - 1;
+		b = 12 - 6 * sdr;
+		q = exp2(b - 1);
+		hl = floor(clamp(xl * 1.2, -1, 1) * q + 0.5) / q;
+		hr = floor(clamp(xr * 1.2, -1, 1) * q + 0.5) / q;
+	}
+	yl = hl;
+	yr = hr;
+} else {
+	
+	g = exp2(sdr * 30 / 6.0206);
+	ul = xl * g;
+	ur = xr * g;
+	yl = ul > 0 ? min(ul, 0.55) : -tanh(-ul * 1.5) * 0.85;
+	yr = ur > 0 ? min(ur, 0.55) : -tanh(-ur * 1.5) * 0.85;
+}
+
+dcl = yl - dcxl + 0.9995 * dcl;
+dcxl = yl;
+dcr = yr - dcxr + 0.9995 * dcr;
+dcxr = yr;
+yl = dcl;
+yr = dcr;
+
+tf = 2000 * exp2(ston * 3.17);
+gp = 1 - exp(-6.283185307179586 * min(tf, 0.45 * sr) / sr);
+pl1 = pl1 + gp * (yl - pl1);
+pl2 = pl2 + gp * (pl1 - pl2);
+pr1 = pr1 + gp * (yr - pr1);
+pr2 = pr2 + gp * (pr1 - pr2);
+yl = pl2;
+yr = pr2;
+
+
+cm = 1 - exp(-1 / (1.5 * sr));
+pi_ = (in1 * in1 + in2 * in2) * 0.5;
+if (pin > 0.000001 || pi_ > 0.000001) {
+	pin = pin + (pi_ - pin) * cm;
+	pwet = pwet + ((yl * yl + yr * yr) * 0.5 - pwet) * cm;
+}
+mg = pwet > 0.0000000001 ? clamp(sqrt(pin / pwet), 0.25, 4) : 1;
+
+
+cp = exp(-1 / (1.5 * sr));
+pki = max(max(abs(in1), abs(in2)), pki * cp);
+pko = max(max(abs(yl), abs(yr)) * mg, pko * cp);
+mg = mg * clamp(sqrt(pko / max(pki, 0.000001)), 0.5, 1);
+ol = in1 + (yl * mg - in1) * smix;
+orr = in2 + (yr * mg - in2) * smix;
+aol = abs(ol);
+aor = abs(orr);
+if (aol > 0.8) {
+	ol = (0.8 + 0.2 * tanh((aol - 0.8) / 0.2)) * (ol > 0 ? 1 : -1);
+}
+if (aor > 0.8) {
+	orr = (0.8 + 0.2 * tanh((aor - 0.8) / 0.2)) * (orr > 0 ? 1 : -1);
+}
+
+dw = abs(yl * mg - in1);
+work = max(dw, work * 0.9995);
+out1 = ol;
+out2 = orr;
+out3 = work;
+ return [out1, out2, out3]; }
+  function set(name, v) { switch (name) { case 'ptype': ptype = v; break; case 'pdrive': pdrive = v; break; case 'ptone': ptone = v; break; case 'pmix': pmix = v; break; default: throw new Error("no param " + name); } }
+  return { tick: tick, set: set };
+}
 function make_bunker(outlet, jsarguments) {
   var autowatch, inlets, outlets, module, post = function () {};
 // BUNKER — the drum machine's sequencer (Max js, ES5; also runs in the browser).
@@ -2651,13 +2825,14 @@ class BunkerProcessor extends AudioWorkletProcessor {
     this.dust = makeFx_dust(SR);
     this.glue = makeGlue(SR);
     this.comp = makeFx_comp(SR);
-    this.cgr = 0; this.clvl = -100;
+    this.sat = makeFx_sat(SR); this.satFocus = 0; this.swork = 0;
+    this.cgr = 0; this.clvl = -100; this.swork = 0;
     this.echo.set('pmix', 1); this.echo.set('psend', 1);
     this.void_.set('pmix', 1);
     this.fog.set('pcut', 18000); this.fog.set('preso', 0.1); this.fog.set('pdrift', 0); this.fog.set('pmix', 1);
     this.dust.set('pcrackle', 0.2); this.dust.set('phiss', 0.15); this.dust.set('pwobble', 0.05); this.dust.set('pwear', 0.1); this.dust.set('pdrive', 0.2); this.dust.set('pfollow', 0.6);
     this.ret = { echo: 0.8, void: 0.7, master: 1.0, echo2void: 0.3 };
-    this.on = { fog: 1, dust: 1, comp: 1 };
+    this.on = { fog: 1, dust: 1, comp: 1, sat: 1 };
     this.ev = { trigs: [], play: {}, dump: null, base: [] };
     this.dirty = false;
     this.seq = make_bunker(function (o) {
@@ -2682,10 +2857,11 @@ class BunkerProcessor extends AudioWorkletProcessor {
     else if (m.t === 'bpm') { this.bpm = Math.max(60, Math.min(200, m.v)); s.tempo(this.bpm); this.echo.set('ptempo', this.bpm); this.drums.set('ptempo', this.bpm); this.comp.set('ptempo', this.bpm); }
     else if (m.t === 'rum') this.drums.set(m.p, m.v);
     else if (m.t === 'seq') { var f = s[m.fn]; if (f) { f.apply(null, m.args); } }
-    else if (m.t === 'fx') { var fx = { echo: this.echo, void: this.void_, fog: this.fog, dust: this.dust, comp: this.comp }[m.fx]; fx.set(m.p, m.v); }
+    else if (m.t === 'fx') { var fx = { echo: this.echo, void: this.void_, fog: this.fog, dust: this.dust, comp: this.comp, sat: this.sat }[m.fx]; fx.set(m.p, m.v); }
     else if (m.t === 'ret') this.ret[m.k] = m.v;
     else if (m.t === 'glue') this.glue.amount = m.v;
     else if (m.t === 'on') this.on[m.k] = m.v ? 1 : 0;
+    else if (m.t === 'satfocus') this.satFocus = m.v | 0;
     else if (m.t === 'audition') {
       // tapping a track pad plays it (counts down from the top, apart from the sequencer's counter)
       this.aud = ((this.aud || 0) + 1) % 100000;
@@ -2705,6 +2881,14 @@ class BunkerProcessor extends AudioWorkletProcessor {
       }
       var o = d.tick();
       var dl = o[0], dr = o[1];
+      if (this.on.sat) {
+        // DRIVE before the compressor: the whole kit, the kick (+ rumble) only, or all but the kick
+        var f = this.satFocus, kl = o[6], kr = o[7], s;
+        if (f === 0) { s = this.sat.tick(dl, dr, 0, 0); dl = s[0]; dr = s[1]; }
+        else if (f === 1) { s = this.sat.tick(kl, kr, 0, 0); dl = dl - kl + s[0]; dr = dr - kr + s[1]; }
+        else { s = this.sat.tick(dl - kl, dr - kr, 0, 0); dl = kl + s[0]; dr = kr + s[1]; }
+        if (s[2] > this.swork) this.swork = s[2];
+      }
       if (this.on.comp) {
         // DRUM COMP on the dry drum bus (the sends to echo and void stay uncompressed)
         var c = this.comp.tick(dl, dr, 0, 0);
@@ -2735,9 +2919,9 @@ class BunkerProcessor extends AudioWorkletProcessor {
       this.flushIn = Math.floor(SR / 40);
       if (this.dirty) { this.dirty = false; this.seq.dump(); }
       this.port.postMessage({ trigs: this.ev.trigs, play: this.ev.play, dump: this.ev.dump, base: this.ev.base, peak: this.peak,
-        echo: this.lv.echo, void: this.lv.void, fogcut: this.fogcut, pump: this.pump, gr: this.glue.gr(), cgr: this.cgr, clvl: this.clvl, beat: this.tick / 480, playing: this.playing });
+        echo: this.lv.echo, void: this.lv.void, fogcut: this.fogcut, pump: this.pump, gr: this.glue.gr(), cgr: this.cgr, clvl: this.clvl, swork: this.swork, beat: this.tick / 480, playing: this.playing });
       this.ev = { trigs: [], play: {}, dump: null, base: [] };
-      this.peak = 0; this.cgr = 0; this.clvl = -100;
+      this.peak = 0; this.cgr = 0; this.clvl = -100; this.swork = 0;
     }
     return true;
   }

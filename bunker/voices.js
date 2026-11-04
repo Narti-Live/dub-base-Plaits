@@ -303,8 +303,8 @@ function makeBunkerVoices(SR) {
   var rd1 = new Delay(24000);
   var rd2 = new Delay(24000);
   var rd3 = new Delay(24000);
-  var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0, out5 = 0, out6 = 0;
-  function tick(in1, in2, in3, in4) { var ae, ax, bdec, be, body, bp, cl, cu, dec, dg, dk, dl, dr, e, el, env, er, f, f0, fa, fb, fc, g, gap, gl, gsel, hb0, hb1, hb2, hb3, hb4, hb5, hf, hh, hp, ht, lf, lp, lr, m, met, mx, n, nb, nh, nlf, pa, pe, rbeat, rdg, rf, rg, rg2, rgain, rhg, ri, rl, rmd, rmono, rpre, rq, rr, rs, rt, s, sb, sdec, se, sh, sn, sq, sqr, src, swp, swt, t, tb, tri, wl, wr, x, xl, xr, y, z0, z1, z2, z3;
+  var sr, r48, out1 = 0, out2 = 0, out3 = 0, out4 = 0, out5 = 0, out6 = 0, out7 = 0, out8 = 0;
+  function tick(in1, in2, in3, in4) { var ae, ax, bdec, be, body, bp, cl, cu, dec, dg, dk, dl, dr, e, el, env, er, f, f0, fa, fb, fc, g, gap, gl, gsel, hb0, hb1, hb2, hb3, hb4, hb5, hf, hh, hp, ht, kl, kr, lf, lp, lr, m, met, mx, n, nb, nh, nlf, pa, pe, rbeat, rdg, rf, rg, rg2, rgain, rhg, ri, rl, rmd, rmono, rpre, rq, rr, rs, rt, s, sb, sdec, se, sh, sn, sq, sqr, src, swp, swt, t, tb, tri, wl, wr, x, xl, xr, y, z0, z1, z2, z3;
 
 
 
@@ -732,6 +732,8 @@ if (rumamt > 0.001) {
 	dr = dr + 0.45 * tanh((rmono + (rhr - rmono) * rumwidth) * rgain / 0.45);
 }
 
+kl = dl;
+kr = dr;
 
 
 if (v1trig != tl1) {
@@ -1265,7 +1267,9 @@ out3 = el;
 out4 = er;
 out5 = wl;
 out6 = wr;
- return [out1, out2, out3, out4, out5, out6]; }
+out7 = kl * mvol;
+out8 = kr * mvol;
+ return [out1, out2, out3, out4, out5, out6, out7, out8]; }
   function set(name, v) { switch (name) { case 'v0p0': v0p0 = v; break; case 'v0p1': v0p1 = v; break; case 'v0p2': v0p2 = v; break; case 'v0p3': v0p3 = v; break; case 'v0p4': v0p4 = v; break; case 'v0p5': v0p5 = v; break; case 'v0p6': v0p6 = v; break; case 'v0p7': v0p7 = v; break; case 'v0lvl': v0lvl = v; break; case 'v0pan': v0pan = v; break; case 'v0echo': v0echo = v; break; case 'v0void': v0void = v; break; case 'v0cut': v0cut = v; break; case 'v0trig': v0trig = v; break; case 'v1p0': v1p0 = v; break; case 'v1p1': v1p1 = v; break; case 'v1p2': v1p2 = v; break; case 'v1p3': v1p3 = v; break; case 'v1p4': v1p4 = v; break; case 'v1p5': v1p5 = v; break; case 'v1p6': v1p6 = v; break; case 'v1p7': v1p7 = v; break; case 'v1lvl': v1lvl = v; break; case 'v1pan': v1pan = v; break; case 'v1echo': v1echo = v; break; case 'v1void': v1void = v; break; case 'v1cut': v1cut = v; break; case 'v1trig': v1trig = v; break; case 'v2p0': v2p0 = v; break; case 'v2p1': v2p1 = v; break; case 'v2p2': v2p2 = v; break; case 'v2p3': v2p3 = v; break; case 'v2p4': v2p4 = v; break; case 'v2p5': v2p5 = v; break; case 'v2p6': v2p6 = v; break; case 'v2p7': v2p7 = v; break; case 'v2lvl': v2lvl = v; break; case 'v2pan': v2pan = v; break; case 'v2echo': v2echo = v; break; case 'v2void': v2void = v; break; case 'v2cut': v2cut = v; break; case 'v2trig': v2trig = v; break; case 'v3p0': v3p0 = v; break; case 'v3p1': v3p1 = v; break; case 'v3p2': v3p2 = v; break; case 'v3p3': v3p3 = v; break; case 'v3p4': v3p4 = v; break; case 'v3p5': v3p5 = v; break; case 'v3p6': v3p6 = v; break; case 'v3p7': v3p7 = v; break; case 'v3lvl': v3lvl = v; break; case 'v3pan': v3pan = v; break; case 'v3echo': v3echo = v; break; case 'v3void': v3void = v; break; case 'v3cut': v3cut = v; break; case 'v3trig': v3trig = v; break; case 'v4p0': v4p0 = v; break; case 'v4p1': v4p1 = v; break; case 'v4p2': v4p2 = v; break; case 'v4p3': v4p3 = v; break; case 'v4p4': v4p4 = v; break; case 'v4p5': v4p5 = v; break; case 'v4p6': v4p6 = v; break; case 'v4p7': v4p7 = v; break; case 'v4lvl': v4lvl = v; break; case 'v4pan': v4pan = v; break; case 'v4echo': v4echo = v; break; case 'v4void': v4void = v; break; case 'v4cut': v4cut = v; break; case 'v4trig': v4trig = v; break; case 'v5p0': v5p0 = v; break; case 'v5p1': v5p1 = v; break; case 'v5p2': v5p2 = v; break; case 'v5p3': v5p3 = v; break; case 'v5p4': v5p4 = v; break; case 'v5p5': v5p5 = v; break; case 'v5p6': v5p6 = v; break; case 'v5p7': v5p7 = v; break; case 'v5lvl': v5lvl = v; break; case 'v5pan': v5pan = v; break; case 'v5echo': v5echo = v; break; case 'v5void': v5void = v; break; case 'v5cut': v5cut = v; break; case 'v5trig': v5trig = v; break; case 'v6p0': v6p0 = v; break; case 'v6p1': v6p1 = v; break; case 'v6p2': v6p2 = v; break; case 'v6p3': v6p3 = v; break; case 'v6p4': v6p4 = v; break; case 'v6p5': v6p5 = v; break; case 'v6p6': v6p6 = v; break; case 'v6p7': v6p7 = v; break; case 'v6lvl': v6lvl = v; break; case 'v6pan': v6pan = v; break; case 'v6echo': v6echo = v; break; case 'v6void': v6void = v; break; case 'v6cut': v6cut = v; break; case 'v6trig': v6trig = v; break; case 'v7p0': v7p0 = v; break; case 'v7p1': v7p1 = v; break; case 'v7p2': v7p2 = v; break; case 'v7p3': v7p3 = v; break; case 'v7p4': v7p4 = v; break; case 'v7p5': v7p5 = v; break; case 'v7p6': v7p6 = v; break; case 'v7p7': v7p7 = v; break; case 'v7lvl': v7lvl = v; break; case 'v7pan': v7pan = v; break; case 'v7echo': v7echo = v; break; case 'v7void': v7void = v; break; case 'v7cut': v7cut = v; break; case 'v7trig': v7trig = v; break; case 'v8p0': v8p0 = v; break; case 'v8p1': v8p1 = v; break; case 'v8p2': v8p2 = v; break; case 'v8p3': v8p3 = v; break; case 'v8p4': v8p4 = v; break; case 'v8p5': v8p5 = v; break; case 'v8p6': v8p6 = v; break; case 'v8p7': v8p7 = v; break; case 'v8lvl': v8lvl = v; break; case 'v8pan': v8pan = v; break; case 'v8echo': v8echo = v; break; case 'v8void': v8void = v; break; case 'v8cut': v8cut = v; break; case 'v8trig': v8trig = v; break; case 'mvol': mvol = v; break; case 'rumamt': rumamt = v; break; case 'rumdec': rumdec = v; break; case 'rumtone': rumtone = v; break; case 'rumdrive': rumdrive = v; break; case 'rumduck': rumduck = v; break; case 'rumgroove': rumgroove = v; break; case 'rummotion': rummotion = v; break; case 'rumwidth': rumwidth = v; break; case 'ptempo': ptempo = v; break; default: throw new Error("no param " + name); } }
   return { tick: tick, set: set };
 }
