@@ -21,7 +21,7 @@ app that runs the same firmware code so you can try it on your phone.
 | [`DubStab-Plaits-v1.5.wav`](downloads/DubStab-Plaits-v1.5.wav) | Firmware update for the module (play it into Plaits) |
 | [`DubStab-Plaits-v1.5.apk`](downloads/DubStab-Plaits-v1.5.apk) | Android app (Android 8+), with tape echo + reverb |
 | [`DubStab-Plaits-v1.5-Cm-DEEP.wav`](downloads/DubStab-Plaits-v1.5-Cm-DEEP.wav) · [`.apk`](downloads/DubStab-Plaits-v1.5-Cm-DEEP.apk) | **C minor DEEP**: open dub techno chords (m7, m9, stacked 4ths, sus, fifths), no major chords |
-| [`DubStab-M4L-v1.0.zip`](downloads/DubStab-M4L-v1.0.zip) | Max for Live devices: Dub Stab MIDI, Dub Stab Synth, Dub Stab Plaits (root, four minor scales, minor chords only) |
+| [`DubStab-M4L-v2.0.zip`](downloads/DubStab-M4L-v2.0.zip) | 10 Max for Live devices: **Hypno** (polymeter), **Roller** (bassline), **Pulse** (drums), **Dub Echo**, **Void**, **Dust**, **Fog**, plus Dub Stab MIDI / Synth / Plaits · [demo](downloads/DubStab-M4L-v2.0-demo.mp3) |
 
 Also: the [visual manual](https://narti-live.github.io/dub-base-Plaits/docs/manual/), [`MANUAL.md`](docs/MANUAL.md) and the raw `.bin` image for SWD / ST-Link in [`downloads/`](downloads/) (app at `0x08008000`). Beta versions for testers are on the website (password protected).
 

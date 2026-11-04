@@ -389,3 +389,8 @@ details.more[open] > summary { color: var(--bone); margin-bottom: 14px; }
 .yt-btn::after { content: ""; position: absolute; left: 34px; top: 18px; border-left: 22px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent; }
 .yt-play:focus-visible { outline: 3px solid var(--bone); outline-offset: -3px; }
 .yt-links { margin-top: 12px; font-size: 17px; }
+/* M4L v2 */
+.m4l-h { font: 600 22px/1.1 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--bone); margin: 30px 0 10px; }
+.m4l-h span { font-size: 14px; letter-spacing: .14em; color: var(--fog); margin-left: 10px; }
+.m4l-shots.four { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 1160px; }
+@media (max-width: 900px) { .m4l-shots.four { grid-template-columns: 1fr 1fr; } }
