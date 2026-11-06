@@ -1432,8 +1432,13 @@ if (typeof module !== "undefined") module.exports = {
 }
 
 // KRYPTA (browser) — AudioWorklet processor: clock, four sequencer modes (STEP / TURING /
-// METROPOLIS from vault.js, DUB from dubstab.js), chord -> drone (root + three chord tones),
+// METROPOLIS from vault.js, DUB from dubstab.js) or DRONE (no sequencer: one held chord that can evolve),
+// chord -> drone (root + three chord tones),
 // the KRYPTA voice, and a scope feed for the screen.
+
+var KRYPTA_SCALES = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 9, 10], [0, 1, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 8, 11], [0, 3, 5, 7, 10]];
+// DRONE chord shapes: semitones above the root, each snapped into the key
+var DRONE_SHAPES = [[7, 12, 19], [3, 7, 10], [2, 7, 12], [7, 14, 19], [7, 10, 15], [12, 19, 24]];
 
 class KryptaProcessor extends AudioWorkletProcessor {
   constructor() {
@@ -1441,7 +1446,9 @@ class KryptaProcessor extends AudioWorkletProcessor {
     var self = this, SR = sampleRate;
     this.SR = SR;
     this.v = makeKrypta(SR);
-    this.mode = 0;            // 0 STEP 1 TURING 2 METROPOLIS 3 DUB
+    this.mode = 0;            // 0 STEP 1 TURING 2 METROPOLIS 3 DUB 4 DRONE
+    this.root = 0; this.scale = 0; this.userEnv = 0.5;
+    this.dr = { deg: 0, shape: 0, evolve: 2, chance: 60, on: false, nextAt: 0 };
     this.oct = -12;           // drones sit an octave under the sequencer
     this.hold = 0;            // 1: a new chord only retunes, the envelope does not restart
     this.cnt = 1; this.offAt = -1; this.now = 0;
@@ -1459,6 +1466,8 @@ class KryptaProcessor extends AudioWorkletProcessor {
       var a = Array.prototype.slice.call(arguments, 1);
       if (o === 0) self.midiByte(a[0]);
       else if (o === 4) self.ev.dubpat = a.slice(1).join(' ');
+      else if (o === 2) self.ev.dubchord = a.slice(1).join(' ');
+      else if (o === 3) self.dub.seed(a[0]);
     }, ['dubstab.js', 'midi']);
     this.bpm = 126; this.playing = false; this.tick = 0; this.lastGrid = -1;
     this.vault.res(480); this.vault.tempo(this.bpm); this.dub.res(480); this.dub.tempo(this.bpm);
@@ -1486,31 +1495,56 @@ class KryptaProcessor extends AudioWorkletProcessor {
     for (var i = 0; i < 3; i++) if (iv[i] == null) iv[i] = iv.length ? iv[iv.length - 1] + 12 * (i - iv.length + 1) : d[i];
     var f = 440 * Math.pow(2, (root + this.oct - 69) / 12);
     this.v.set('pnote', f); this.v.set('pi1', Math.min(36, iv[0])); this.v.set('pi2', Math.min(36, iv[1])); this.v.set('pi3', Math.min(36, iv[2]));
-    if (!this.hold || !this.gateOn) {
+    if ((!this.hold && this.mode !== 4) || !this.gateOn) {
       this.v.set('pgate', (this.cnt++ % 300000) * 256 + Math.max(1, Math.min(127, vel)));
       this.gateOn = true;
     }
-    if (this.mode !== 3) this.offAt = this.now + gt / 480 * 60 / this.bpm * this.SR;
+    if (this.mode === 4) this.offAt = -1;
+    else if (this.mode !== 3) this.offAt = this.now + gt / 480 * 60 / this.bpm * this.SR;
     else this.offAt = -1;
     this.ev.notes.push(ns.map(function (n) { return n; }));
     this.pend = [];
   }
+  // ---- DRONE: the chord held, in key; EVOLVE moves it to another degree every few bars (CHANCE %)
+  inKey(n) { var sc = KRYPTA_SCALES[this.scale] || KRYPTA_SCALES[0]; return sc.indexOf((((n - this.root) % 12) + 12) % 12) >= 0; }
+  snap(n) { return this.inKey(n) ? n : (this.inKey(n - 1) ? n - 1 : n + 1); }
+  droneChord() {
+    var sc = KRYPTA_SCALES[this.scale] || KRYPTA_SCALES[0], d = this.dr.deg, L = sc.length;
+    var root = 48 + this.root + 12 * Math.floor(d / L) + sc[((d % L) + L) % L], self = this;
+    this.pend = [[root, 100, 0]];
+    DRONE_SHAPES[this.dr.shape].forEach(function (iv) { self.pend.push([self.snap(root + iv), 100, 0]); });
+    this.flushChord();
+  }
+  droneEnv() { this.v.set('penv', this.dr.on && this.userEnv < 0.66 ? 0.97 : this.userEnv); }
+  droneStart() { this.dr.on = true; this.droneEnv(); this.droneChord(); this.dr.nextAt = this.tick + this.dr.evolve * 4 * 480; }
+  droneStop() { if (!this.dr.on) return; this.dr.on = false; this.gateOff(); this.droneEnv(); }
+  droneStep(force) {
+    var opts = [0, 0, 3, 4, 5, 6, 2].filter(function (x) { return x !== this.dr.deg; }, this);
+    if (force || Math.random() * 100 < this.dr.chance) { this.dr.deg = opts[Math.floor(Math.random() * opts.length)]; this.droneChord(); this.ev.drone = this.dr.deg; }
+  }
   gateOff() { this.v.set('pgate', (this.cnt++ % 300000) * 256); this.gateOn = false; }
   message(m) {
     var self = this;
-    if (m.t === 'play') { this.playing = true; this.tick = 0; this.lastGrid = -1; }
-    else if (m.t === 'stop') { this.playing = false; this.vault.state(0); this.dub.state(0); this.gateOff(); this.offAt = -1; }
+    if (m.t === 'play') { this.playing = true; this.tick = 0; this.lastGrid = -1; if (this.mode === 4) this.droneStart(); }
+    else if (m.t === 'stop') { this.playing = false; this.vault.state(0); this.dub.state(0); this.droneStop(); this.gateOff(); this.offAt = -1; }
+    else if (m.t === 'p' && m.p === 'penv') { this.userEnv = m.v; this.droneEnv(); }
+    else if (m.t === 'drone') {
+      var c = this.dr.deg !== m.deg || this.dr.shape !== m.shape;
+      this.dr.deg = m.deg | 0; this.dr.shape = Math.max(0, Math.min(DRONE_SHAPES.length - 1, m.shape | 0)); this.dr.evolve = m.evolve | 0; this.dr.chance = m.chance;
+      if (this.dr.on && (c || m.next)) { if (m.next) this.droneStep(true); else this.droneChord(); }
+      this.dr.nextAt = this.tick + Math.max(1, this.dr.evolve) * 4 * 480;
+    }
     else if (m.t === 'bpm') { this.bpm = Math.max(40, Math.min(220, m.v)); this.vault.tempo(this.bpm); this.dub.tempo(this.bpm); }
     else if (m.t === 'p') this.v.set(m.p, m.v);
     else if (m.t === 'seq') { var f = this.vault[m.fn]; if (f) f.apply(null, m.args); }
     else if (m.t === 'dub') { var g = this.dub[m.fn]; if (g) g.apply(null, m.args); }
-    else if (m.t === 'mode') { this.mode = m.v | 0; if (this.mode < 3) this.vault.mode(this.mode); this.vault.state(0); this.dub.state(0); this.lastGrid = -1; }
+    else if (m.t === 'mode') { this.droneStop(); this.gateOff(); this.mode = m.v | 0; if (this.mode === 4 && this.playing) this.droneStart(); if (this.mode < 3) this.vault.mode(this.mode); this.vault.state(0); this.dub.state(0); this.lastGrid = -1; }
     else if (m.t === 'oct') this.oct = m.v | 0;
     else if (m.t === 'hold') this.hold = m.v ? 1 : 0;
-    else if (m.t === 'key') { this.vault.key(m.root, m.scale); this.dub.root(m.root); this.dub.scale(m.scale > 3 ? 0 : m.scale); }
+    else if (m.t === 'key') { this.root = m.root; this.scale = m.scale; if (this.dr.on) this.droneChord(); this.vault.key(m.root, m.scale); this.dub.root(m.root); this.dub.scale(m.scale > 3 ? 0 : m.scale); }
     else if (m.t === 'seed') { this.seedN = (this.seedN || 0) + 1; this.v.set('pseed', this.seedN); }
     else if (m.t === 'audition') {
-      this.vault.noteNames(m.deg, -1);
+      this.vault.noteNames(m.deg, m.ch == null ? -1 : m.ch);
       JSON.parse(this.ev.chord || '[60]').forEach(function (n) { self.pend.push([n, 110, 480]); });
       this.flushChord();
     }
@@ -1525,7 +1559,8 @@ class KryptaProcessor extends AudioWorkletProcessor {
         var g = Math.floor(this.tick / 10) * 10;
         if (g !== this.lastGrid) {
           this.lastGrid = g;
-          if (this.mode < 3) this.vault.ticks(g); else if (g % 20 === 0) this.dub.ticks(g);
+          if (this.mode < 3) this.vault.ticks(g); else if (this.mode === 3) { if (g % 20 === 0) this.dub.ticks(g); }
+          else if (this.dr.on && this.dr.evolve > 0 && this.tick >= this.dr.nextAt) { this.dr.nextAt += this.dr.evolve * 4 * 480; this.droneStep(); }
           this.flushChord();
         }
         this.tick += tickInc;
@@ -1543,9 +1578,10 @@ class KryptaProcessor extends AudioWorkletProcessor {
       if (this.dirty) { this.dirty = false; this.vault.dump(); }
       var sc = new Float32Array(1024);
       for (var k = 0; k < 1024; k++) sc[k] = this.scope[(this.sp + k) % 1024];
-      this.port.postMessage({ notes: this.ev.notes, pos: this.ev.pos, reg: this.ev.reg, dump: this.ev.dump, dubpat: this.ev.dubpat,
-        env: this.env, lv: this.lv, rv: this.rv, shp: this.shp, peak: this.peak, scope: sc, beat: this.tick / 480, playing: this.playing }, [sc.buffer]);
-      this.ev = { notes: [], pos: null, reg: null, dump: null, dubpat: null, chord: this.ev.chord };
+      this.port.postMessage({ notes: this.ev.notes, pos: this.ev.pos, reg: this.ev.reg, dump: this.ev.dump, dubpat: this.ev.dubpat, dubchord: this.ev.dubchord,
+        env: this.env, lv: this.lv, rv: this.rv, shp: this.shp, peak: this.peak, scope: sc, beat: this.tick / 480, playing: this.playing,
+        drone: this.dr.on ? { deg: this.dr.deg, left: this.dr.evolve > 0 ? Math.max(0, (this.dr.nextAt - this.tick) / (this.dr.evolve * 4 * 480)) : -1 } : null }, [sc.buffer]);
+      this.ev = { notes: [], pos: null, reg: null, dump: null, dubpat: null, dubchord: null, chord: this.ev.chord };
       this.peak = 0;
     }
     return true;

@@ -121,6 +121,11 @@ canvas.oled { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 76
 .dc.acc::after { height: 70%; opacity: 1; }
 .dc.cur { box-shadow: 0 0 0 2px var(--bone), 0 0 12px rgba(255,255,255,.3); }
 .dc.beyond { opacity: .22; }
+.dronebox { background: #171715; border: 1px solid #2a2a26; border-radius: 3px; padding: 18px 16px 14px; margin-bottom: 8px; }
+.dchord { font: 700 clamp(28px, 6vw, 46px)/1 var(--display); color: var(--acc); letter-spacing: .08em; }
+.dmeta { font-size: 15px; color: var(--mist); margin: 8px 0 12px; }
+.dbar { height: 4px; background: #262622; border-radius: 2px; overflow: hidden; }
+.dbar div { height: 100%; width: 0; background: var(--acc); transition: width .2s linear; }
 .dubchord { font: 700 22px/1 var(--display); color: var(--acc2); letter-spacing: .06em; min-height: 26px; margin: 6px 0; }
 .side { background: linear-gradient(180deg, #1c1c19, #161614); border: 1px solid #36352f; border-radius: 3px; padding: 12px; }
 .side h4 { margin: 0 0 8px; font: 700 13px/1 var(--display); letter-spacing: .22em; color: var(--bone); }
@@ -157,7 +162,7 @@ footer a { color: var(--mist); }
 <div class="start" id="start">
   <div class="box">
     <h1>KRYPTA</h1>
-    <p>A stereo drone voice for the deep end. Nine algorithms, chords that never leave the key, a frequency shifter, a metallic DUNGEON and a diffuse REFLEKTA space, and four ways to sequence it: STEP, TURING, METROPOLIS and DUB.</p>
+    <p>A stereo drone voice for the deep end. Nine algorithms, chords that never leave the key, a frequency shifter, a metallic DUNGEON and a diffuse REFLEKTA space. Sequence it (STEP, TURING, METROPOLIS, DUB) or let it just drone (DRONE).</p>
     <button id="go" type="button">Power on</button>
     <small>Headphones or a real system recommended — a lot of it lives under 100 Hz.</small>
   </div>
@@ -194,6 +199,7 @@ footer a { color: var(--mist); }
       <button class="mode" role="tab" data-m="1" type="button">TURING</button>
       <button class="mode" role="tab" data-m="2" type="button">METROPOLIS</button>
       <button class="mode" role="tab" data-m="3" type="button">DUB</button>
+      <button class="mode" role="tab" data-m="4" type="button">DRONE</button>
     </div>
     <div class="grow"></div>
     <div class="rnd"><span class="lbl">Random</span>
@@ -209,6 +215,7 @@ footer a { color: var(--mist); }
       <div id="stepView"><div class="steps" id="steps"></div></div>
       <div id="turView" hidden><div class="reg" id="regbits"></div><p class="hint" id="turHint"></p></div>
       <div id="metView" hidden><div class="stages" id="stages"></div></div>
+      <div id="droneView" hidden><div class="dronebox"><div class="dchord" id="dchord">—</div><div class="dmeta" id="dmeta"></div><div class="dbar"><div id="dbar"></div></div></div></div>
       <div id="dubView" hidden><div class="dub" id="dubcells"></div><div class="dubchord" id="dubchord"></div></div>
       <canvas class="kb" id="kb" width="1600" height="110" aria-label="Keyboard: the notes of the key, and what plays"></canvas>
       <p class="hint" id="seqHint"></p>
@@ -216,7 +223,7 @@ footer a { color: var(--mist); }
     <div class="side"><h4 id="sideTitle">STEP</h4><div class="knobs" id="sideEncs"></div><div class="tools" id="sideTools"></div></div>
   </div>
 </div>
-<footer><b>Get it:</b> <a href="../downloads/Krypta-M4L-v1.0.zip" download>Max for Live devices (instrument + audio effect)</a> · <a href="../downloads/KRYPTA-v1.0.apk" download>Android app (.apk)</a><br>KRYPTA by <a href="https://www.instagram.com/narti_live">Narti Live</a> · <a href="../vault/">VAULT FM synth</a> · <a href="../bunker/">BUNKER drum machine</a> · <a href="../">DUB STAB PLAITS</a> · Free, MIT license. Original code, inspired by the idea of multi-algorithm stereo drone modules such as the Vhikk X; not affiliated with Forge TME, fors, Elektron or Ableton.</footer>
+<footer><b>Get it:</b> <a href="../downloads/Krypta-M4L-v1.1.zip" download>Max for Live devices (instrument + audio effect)</a> · <a href="../downloads/KRYPTA-v1.0.apk" download>Android app (.apk)</a><br>KRYPTA by <a href="https://www.instagram.com/narti_live">Narti Live</a> · <a href="../vault/">VAULT FM synth</a> · <a href="../bunker/">BUNKER drum machine</a> · <a href="../">DUB STAB PLAITS</a> · Free, MIT license. Original code, inspired by the idea of multi-algorithm stereo drone modules such as the Vhikk X; not affiliated with Forge TME, fors, Elektron or Ableton.</footer>
 </div>
 
 <script>
@@ -421,6 +428,7 @@ footer a { color: var(--mist); }
     b.addEventListener('click', function () {
       var r = b.dataset.r;
       if (r === 'sound') { randomSound(); return; }
+      if (mode() === 4) { if (r === 'all') randomSound(); if (r !== 'rhythm') { setDR('shape', Math.floor(Math.random() * 6)); setDR('deg', [0, 0, 3, 4, 5][Math.floor(Math.random() * 5)]); } else setDR('evolve', DEVOLVE[1 + Math.floor(Math.random() * 5)]); bindSide(); drawDrone(); return; }
       if (mode() === 3) { if (r === 'all') randomSound(); newDub(r); return; }
       if (r === 'all') { randomSound(); seq('randomize', 'all'); return; }
       if (r === 'rhythm' && S) seq('randomize', S.G.mode === 1 ? 'turing' : S.G.mode === 2 ? 'metro' : 'rhythm');
@@ -439,6 +447,19 @@ footer a { color: var(--mist); }
     else if (what === 'chords') setD('voicing', Math.floor(Math.random() * 5));
     else setD('seed', 1 + Math.floor(Math.random() * 99998));
     bindSide();
+  }
+  // DRONE: no sequencer, one held chord in key; EVOLVE moves it every few bars
+  var DR = saved.dr || { deg: 0, shape: 0, evolve: 2, chance: 60 };
+  var DSHAPES = ['Open fifth', 'Minor 7', 'Sus', 'Dub stack', 'Deep m9', 'Octaves'];
+  var DSEMI = [[7, 12, 19], [3, 7, 10], [2, 7, 12], [7, 14, 19], [7, 10, 15], [12, 19, 24]];
+  var DEVOLVE = [0, 1, 2, 4, 8, 16];
+  var ROMAN = ['i', 'ii', 'III', 'iv', 'v', 'VI', 'VII'];
+  function sendDR(next) { post({ t: 'drone', deg: DR.deg, shape: DR.shape, evolve: DR.evolve, chance: DR.chance, next: !!next }); }
+  function setDR(k, v) { DR[k] = v; saved.dr = DR; persist(); sendDR(); }
+  function droneNotes(deg) {
+    var sc = scale(), L = sc.length, root = 48 + G.root + 12 * Math.floor(deg / L) + sc[((deg % L) + L) % L];
+    function ik(n) { return sc.indexOf((((n - G.root) % 12) + 12) % 12) >= 0; }
+    return [root].concat(DSEMI[DR.shape].map(function (iv) { var n = root + iv; return ik(n) ? n : (ik(n - 1) ? n - 1 : n + 1); }));
   }
   var M = saved.mode || 0;
   function mode() { return M; }
@@ -494,6 +515,14 @@ footer a { color: var(--mist); }
     }
     document.getElementById('dubchord').textContent = live.dubchord || (live.chord ? [0].concat(live.chord.iv).map(function (x) { return nm(live.chord.root + x); }).join('  ') : '');
   }
+  function drawDrone() {
+    var ns = droneNotes(live.drone ? live.drone.deg : DR.deg).map(function (n) { return nm(n + G.reg); });
+    document.getElementById('dchord').textContent = ns.join('  ');
+    document.getElementById('dmeta').textContent = ROMAN[(((live.drone ? live.drone.deg : DR.deg) % 7) + 7) % 7] + ' · ' + DSHAPES[DR.shape] + ' · ' +
+      (DR.evolve ? 'evolves every ' + DR.evolve + (DR.evolve > 1 ? ' bars' : ' bar') + ' (' + DR.chance + ' %)' : 'static') + (playing ? '' : ' — press PLAY');
+    var left = live.drone && live.drone.left >= 0 ? live.drone.left : -1;
+    document.getElementById('dbar').style.width = left < 0 ? '0%' : ((1 - left) * 100).toFixed(1) + '%';
+  }
   function drawSeq() {
     var m = mode();
     modeBtns.forEach(function (b) { b.setAttribute('aria-selected', +b.dataset.m === m ? 'true' : 'false'); });
@@ -501,13 +530,16 @@ footer a { color: var(--mist); }
     document.getElementById('turView').hidden = m !== 1;
     document.getElementById('metView').hidden = m !== 2;
     document.getElementById('dubView').hidden = m !== 3;
+    document.getElementById('droneView').hidden = m !== 4;
     var hints = ['Tap a step to switch it on (you hear its chord). Hold a step (or right-click) to edit its note, octave, chord, length, velocity and chance. The lowest note is the drone’s root; the others become its three chord tones.',
       'TURING: a shifting 16-bit register writes the melody. Turn CHANGE down to lock a loop you like. Every note lands in the key.',
       'METROPOLIS: 8 stages. Each has a note (−/+), a number of pulses (squares) and a gate: REST, SINGLE (first pulse), MULTI (every pulse), HOLD (one long note).',
-      'DUB: the DUB STAB sequencer — generative dub techno chord stabs, always in key. DENSITY sets how many steps play, VOICING the chord family; NEW gives a new pattern. Bright = accent.'];
+      'DUB: the DUB STAB sequencer — generative dub techno chord stabs, always in key. DENSITY sets how many steps play, VOICING the chord family; NEW gives a new pattern. Bright = accent.',
+      'DRONE: no sequencer. PLAY holds one chord in key and it keeps sounding. ENV in the SWELL range sets the fade-in; PLUCK / LONG become a plain held drone. EVOLVE moves the chord to another degree every few bars (CHANCE %), with a slow glide.'];
     document.getElementById('seqHint').textContent = hints[m];
     document.getElementById('turHint').textContent = m === 1 ? 'The register shifts one place each step; the lit bits are the loop. CHANGE 0 % = locked loop, 100 % = new every time.' : '';
     if (m === 3) { drawDub(); return; }
+    if (m === 4) { drawDrone(); return; }
     if (!S) return;
     if (m === 0) for (var s = 0; s < 16; s++) {
       var st = S.steps[s], b = stepEls[s], root = degMidi(st.deg + st.oct * scale().length) + G.reg;
@@ -532,6 +564,15 @@ footer a { color: var(--mist); }
   function bindSide() {
     var m = mode(), title = document.getElementById('sideTitle'), tl = document.getElementById('sideTools'); tl.innerHTML = '';
     for (var i = 0; i < 6; i++) sideEncs[i].bind({});
+    if (m === 4) {
+      title.textContent = 'DRONE';
+      seqEnc(0, 'Degree', function () { return DR.deg / 6; }, function (v) { setDR('deg', Math.round(v * 6)); }, function (v) { return ROMAN[Math.round(v * 6)]; });
+      seqEnc(1, 'Shape', function () { return DR.shape / 5; }, function (v) { setDR('shape', Math.round(v * 5)); }, function (v) { return DSHAPES[Math.round(v * 5)]; });
+      seqEnc(2, 'Evolve', function () { return DEVOLVE.indexOf(DR.evolve) / 5; }, function (v) { setDR('evolve', DEVOLVE[Math.round(v * 5)]); }, function (v) { var e = DEVOLVE[Math.round(v * 5)]; return e ? e + (e > 1 ? ' bars' : ' bar') : 'off'; });
+      seqEnc(3, 'Chance', function () { return DR.chance / 100; }, function (v) { setDR('chance', Math.round(v * 100)); }, pct);
+      tl.appendChild(btn('Next chord', function () { start().then(function () { if (!playing) setPlay(true); sendDR(true); }); }));
+      return;
+    }
     if (m === 3) {
       title.textContent = 'DUB STAB';
       seqEnc(0, 'Density', function () { return D.density / 16; }, function (v) { setD('density', Math.round(v * 16)); }, function (v) { return Math.round(v * 16) + ' / 16'; });
@@ -616,7 +657,7 @@ footer a { color: var(--mist); }
     // header
     txt(g, String(a + 1).padStart(2, '0'), 30, 64, 58, ACC, 700);
     txt(g, ALG[a].n, 102, 64, 58, INK, 700);
-    txt(g, (['STEP', 'TURING', 'METROPOLIS', 'DUB'][mode()]) + '  ·  ' + NOTE[G.root] + ' ' + scaleSel.options[scaleSel.selectedIndex].text + (V.hold ? '  ·  HOLD' : ''), W - 30, 38, 24, 'rgba(240,238,230,.55)', 600, 'right');
+    txt(g, (['STEP', 'TURING', 'METROPOLIS', 'DUB', 'DRONE'][mode()]) + '  ·  ' + NOTE[G.root] + ' ' + scaleSel.options[scaleSel.selectedIndex].text + (V.hold ? '  ·  HOLD' : ''), W - 30, 38, 24, 'rgba(240,238,230,.55)', 600, 'right');
     var pk = Math.max(live.lv, live.rv);
     txt(g, playing ? (pk > 0.001 ? (20 * Math.log10(pk)).toFixed(1) + ' dBFS' : '—') : 'stopped', W - 30, 66, 24, 'rgba(240,238,230,.4)', 500, 'right');
     // stereo scope with persistence (mid up, side across)
@@ -668,7 +709,7 @@ footer a { color: var(--mist); }
       var px = x0 + 10, py = by + 40, pw = cw - 20, ph = bh - 76;
       g.save(); g.beginPath(); g.rect(x0 + 1, by + 30, cw - 2, bh - 32); g.clip();
       if (name === 'ENV') {
-        var ev = P.penv, inf = envInfo(ev);
+        var ev = mode() === 4 && P.penv < 0.66 ? 0.97 : P.penv, inf = envInfo(ev);
         g.beginPath();
         if (inf[0] === 'DRONE') { g.moveTo(px, py + ph); g.lineTo(px + pw * 0.15, py + 4); g.lineTo(px + pw, py + 4); }
         else if (inf[0] === 'PLUCK' || inf[0] === 'LONG') { g.moveTo(px, py + ph); g.lineTo(px + 3, py + 4); for (i = 0; i <= 40; i++) g.lineTo(px + 3 + i / 40 * (pw - 3), py + 4 + (ph - 4) * (1 - Math.exp(-i / 40 * (inf[0] === 'PLUCK' ? 6 - ev * 9 : 4.6 - (ev - 0.33) * 6)))); }
@@ -718,6 +759,7 @@ footer a { color: var(--mist); }
     var whites = []; for (i = 0; i < n; i++) if ([1, 3, 6, 8, 10].indexOf((lo + i) % 12) < 0) whites.push(lo + i);
     var ww = W / whites.length, sc = scale(), held = {};
     live.held.forEach(function (x) { held[x[0] + G.reg] = 1; });
+    if (mode() === 4 && playing && live.chord) { held[live.chord.root] = 1; live.chord.iv.forEach(function (x) { held[live.chord.root + x] = 1; }); }
     function inKey(m) { return sc.indexOf((((m - G.root) % 12) + 12) % 12) >= 0; }
     whites.forEach(function (m, j) {
       var x = j * ww; g.fillStyle = held[m] ? ACC : inKey(m) ? '#d9d7cf' : '#55544d'; g.fillRect(x + 1, 0, ww - 2, H);
@@ -745,6 +787,8 @@ footer a { color: var(--mist); }
     if (m.reg) live.reg = m.reg;
     if (m.dubpat != null) live.dubpat = m.dubpat;
     if (m.dubchord != null) live.dubchord = m.dubchord;
+    live.drone = m.drone;
+    if (m.drone && m.drone.deg !== DR.deg) { DR.deg = m.drone.deg; saved.dr = DR; persist(); if (mode() === 4) sideEncs[0].redraw(); }
     live.env = m.env || 0; live.lv = m.lv || 0; live.rv = m.rv || 0; live.shp = m.shp || 0; live.scope = m.scope;
     meter.style.width = Math.min(100, m.peak / 0.62 * 100).toFixed(0) + '%';
   }
@@ -754,6 +798,7 @@ footer a { color: var(--mist); }
     drawOled(now); drawKb(); drawTiles(now);
     var m = mode(), p = live.pos;
     if (m === 3) drawDub();
+    else if (m === 4) { if (now - (ui.dT || 0) > 200) { ui.dT = now; drawDrone(); } }
     else if (S) {
       if (m === 0) { var cur = playing && p[0] === 0 ? p[1] : -1; if (cur !== lastPos) { stepEls.forEach(function (b, i) { b.classList.toggle('cur', i === cur); }); lastPos = cur; } }
       if (m === 1) { var r = live.reg[0], L = live.reg[1]; for (var i = 0; i < 16; i++) { bitEls[i].classList.toggle('one', !!((r >> (15 - i)) & 1)); bitEls[i].classList.toggle('out', (15 - i) >= L); } }
@@ -772,11 +817,11 @@ footer a { color: var(--mist); }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC || !('audioWorklet' in AC.prototype)) { document.querySelector('.start p').textContent = 'This browser cannot run KRYPTA (no AudioWorklet). Try a recent Chrome, Edge, Firefox or Safari.'; return Promise.reject(); }
     ctx = new AC({ latencyHint: 'playback' });
-    startP = ctx.audioWorklet.addModule('engine.js?v=1').then(function () {
+    startP = ctx.audioWorklet.addModule('engine.js?v=2').then(function () {
       node = new AudioWorkletNode(ctx, 'krypta', { numberOfInputs: 1, outputChannelCount: [2] });
       node.connect(ctx.destination);
       node.port.onmessage = function (e) { onEngine(e.data); };
-      post({ t: 'bpm', v: G.bpm }); sendG(); sendD();
+      post({ t: 'bpm', v: G.bpm }); sendG(); sendD(); sendDR();
       if (saved.seq) seq('load', saved.seq);
       post({ t: 'mode', v: M });
       Object.keys(PD).forEach(sendP);
