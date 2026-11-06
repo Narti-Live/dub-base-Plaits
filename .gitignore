@@ -2,3 +2,7 @@ app/keys/
 app/build/
 firmware/build*/
 __pycache__/
+android/app/src/main/assets/
+android/app/build/
+android/.gradle/
+android/build/

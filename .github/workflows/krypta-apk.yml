@@ -1,0 +1,40 @@
+name: KRYPTA APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['android/**', 'krypta/**', 'vault/**', 'bunker/**', '.github/workflows/krypta-apk.yml']
+permissions:
+  contents: write
+concurrency: { group: krypta-apk, cancel-in-progress: true }
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: Web app into the APK's assets
+        run: |
+          A=android/app/src/main/assets
+          rm -rf $A && mkdir -p $A/assets
+          cp -r krypta vault bunker $A/
+          cp -r assets/fonts assets/favicon.svg $A/assets/
+          rm -f $A/krypta/sw.js
+      - name: Build
+        working-directory: android
+        run: gradle --no-daemon assembleDebug
+      - name: Commit the APK
+        run: |
+          mkdir -p downloads
+          cp android/app/build/outputs/apk/debug/app-debug.apk downloads/KRYPTA-v1.0.apk
+          git config user.name "krypta-apk-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add downloads/KRYPTA-v1.0.apk
+          git commit -m "KRYPTA APK built by GitHub Actions [skip ci]" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        with: { name: KRYPTA-apk, path: android/app/build/outputs/apk/debug/app-debug.apk }
