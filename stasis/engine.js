@@ -27,6 +27,26 @@ var SCALE = [0, 2, 3, 5, 7, 8, 10];               // G natural minor (from G)
 var WEIGHT = [6, 1.3, 3.2, 1.6, 4.5, 2.2, 2];       // root, 2, b3, 4, 5, b6, b7
 var GROOT = 31;                                     // G1 (MIDI)
 
+// HARMONY: one knob through six stations, each blending into the next.
+//   w: chance of each of the 12 semitones above G; r: the 4 partials of a swell (ratios); dt: detune in cents;
+//   mic: random offset in semitones (microtones); df: the drone's second tone (ratio)
+var M5 = 1.4983;
+var STATIONS = [
+  { name: 'G minor',    w: [6, 0, 1.3, 3.2, 0, 1.6, 0, 4.5, 2.2, 0, 2, 0], r: [1, 1, 2, 0.5],          dt: 3,  mic: 0,    df: M5 },
+  { name: 'detune',     w: [6, 0, 1.3, 3.2, 0, 1.6, 0, 4.5, 2.2, 0, 2, 0], r: [1, 1, 2, 0.5],          dt: 34, mic: 0,    df: M5 },
+  { name: 'fifths',     w: [8, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0],            r: [1, M5, 2, 0.5 * M5],    dt: 12, mic: 0,    df: M5 },
+  { name: 'octaves',    w: [10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],           r: [1, 2, 4, 0.5],          dt: 6,  mic: 0,    df: 2 },
+  { name: 'microtonal', w: [6, 0, 1.3, 3.2, 0, 1.6, 0, 4.5, 2.2, 0, 2, 0], r: [1, 1.031, 2.04, 0.493],   dt: 18, mic: 0.5,  df: M5 * 1.024 },
+  { name: 'atonal',     w: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],            r: [1, 1.37, 2.756, 0.532],  dt: 30, mic: 6,    df: 1.4142 }
+];
+function harmony(a) {   // a 0..1 -> the blend of the two nearest stations
+  var x = Math.max(0, Math.min(0.99999, a)) * (STATIONS.length - 1), i = Math.floor(x), f = x - i, A = STATIONS[i], B = STATIONS[Math.min(STATIONS.length - 1, i + 1)], k;
+  var h = { w: [], r: [], dt: A.dt + (B.dt - A.dt) * f, mic: A.mic + (B.mic - A.mic) * f, df: Math.exp(Math.log(A.df) + (Math.log(B.df) - Math.log(A.df)) * f) };
+  for (k = 0; k < 12; k++) h.w.push(A.w[k] + (B.w[k] - A.w[k]) * f);
+  for (k = 0; k < 4; k++) h.r.push(Math.exp(Math.log(A.r[k]) + (Math.log(B.r[k]) - Math.log(A.r[k])) * f));
+  return h;
+}
+
 // ---------------------------------------------------------------- wavetables (4 shapes x 9 band limits)
 var TBL = 2048, NSH = 4, MIPS = 9, MIPH = [256, 128, 64, 32, 16, 8, 4, 2, 1];
 var TABLES = [];
@@ -214,16 +234,16 @@ class Stasis extends AudioWorkletProcessor {
     // drone
     D.drone = Math.pow(p('drone'), 2) * 0.22;
     D.droot = mtof(GROOT + 12 * Math.round(p('dOct') * 2));  // G1 / G2 / G3
-    var a = D.atonal, fifthR = Math.pow(2, lerp(7, 6 + 0.37, Math.min(1, a * 1.3)) / 12);   // fifth -> sharp-of-tritone, microtonal
-    D.dfifth = fifthR; D.fifth = p('fifth');
-    D.beat = 0.03 + 1.6 * Math.pow(p('beat'), 2);           // Hz
+    var a = D.atonal; if (this.harmA !== a || !D.harm) { D.harm = harmony(a); this.harmA = a; if (Math.abs(a - (this.memA || 0)) > 0.04) { this.memory = []; this.memA = a; } }
+    D.dfifth = D.harm.df; D.fifth = p('fifth');
+    D.beat = 0.03 + 1.6 * Math.pow(p('beat'), 2) + D.harm.dt * 0.02;   // Hz: the detune station beats faster
     D.dshape = clamp(p('dShape') * 3 + L[1] * depth * 0.4, 0, 2.999);
     D.move = p('movement'); D.sub = Math.pow(p('sub'), 2) * 0.9; D.upper = p('upper') * (0.5 + 0.5 * L[3]);
     // texture
     D.wind = Math.pow(p('wind'), 2) * 1.6; D.wTone = 150 * Math.pow(2, p('windTone') * 4.5 + (gx - 0.5)); D.wMove = p('windMove');
     D.crackle = Math.pow(p('crackle'), 2) * (1 + gy); D.metal = Math.pow(p('metal'), 2) * (0.7 + 0.6 * gy);
     D.mFb = 0.9 + 0.095 * p('metalDecay'); D.rumble = Math.pow(p('rumble'), 2) * 3.5; D.texture = p('texture');
-    D.mDelL = sr / (mtof(GROOT + 12) * Math.pow(2, a * 0.31)); D.mDelR = sr / (mtof(GROOT + 19) * Math.pow(2, -a * 0.23));
+    var am = Math.max(0, (a - 0.6) / 0.4); D.mDelL = sr / (mtof(GROOT + 12) * Math.pow(2, am * 0.31)); D.mDelR = sr / (mtof(GROOT + 19) * Math.pow(2, -am * 0.23));
     // filter
     var ft = p('fType');
     D.fLP = clamp(1 - ft * 2, 0, 1); D.fBP = 1 - Math.abs(ft * 2 - 1); D.fHP = clamp(ft * 2 - 1, 0, 1);
@@ -252,14 +272,13 @@ class Stasis extends AudioWorkletProcessor {
     var D = this.D, mem = this.memory, n;
     if (mem.length >= 3 && Math.random() < D.repeat * 0.8) n = mem[Math.floor(Math.random() * mem.length)];
     else {
-      var tot = 0, i, r; for (i = 0; i < 7; i++) tot += WEIGHT[i];
-      r = Math.random() * tot; for (i = 0; i < 7; i++) { r -= WEIGHT[i]; if (r <= 0) break; }
-      n = GROOT + 12 * D.oct + 12 * Math.floor(Math.random() * D.range) + SCALE[Math.min(6, i)];
+      var W = D.harm.w, tot = 0, i, r; for (i = 0; i < 12; i++) tot += W[i];
+      r = Math.random() * tot; for (i = 0; i < 12; i++) { r -= W[i]; if (r <= 0) break; }
+      n = GROOT + 12 * D.oct + 12 * Math.floor(Math.random() * D.range) + Math.min(11, i);
       mem.push(n); if (mem.length > 8) mem.shift();
     }
-    // atonal: drift off the scale (microtonal at first, anywhere at 100 %)
-    var a = D.atonal;
-    if (a > 0) n += (Math.random() * 2 - 1) * (a * 0.6 + a * a * 5.4) + (Math.random() < a * a ? Math.round(Math.random() * 11 - 5) : 0);
+    // microtonal / atonal stations: drift off the grid
+    if (D.harm.mic > 0) n += (Math.random() * 2 - 1) * D.harm.mic;
     return n;
   }
   spawn() {
@@ -270,9 +289,8 @@ class Stasis extends AudioWorkletProcessor {
       for (i = 0; i < 8; i++) if (V[i].stage === 2 && V[i].env < bestE) { bestE = V[i].env; best = i; }
       if (best < 0 || active > D.voices) return;
     }
-    var v = V[best], midi = this.pickNote(), f = mtof(midi), a = D.atonal, sp = D.spread / 1200;
-    var inh = Math.pow(a, 1.5);
-    var rat = [1, Math.pow(2, sp), lerp(2, 2.756, inh) * Math.pow(2, -sp * 0.5), lerp(0.5, 0.532, inh)];
+    var v = V[best], midi = this.pickNote(), f = mtof(midi), hr = D.harm, sp = (D.spread + hr.dt) / 1200;
+    var rat = [hr.r[0] * Math.pow(2, -sp * 0.25), hr.r[1] * Math.pow(2, sp * 0.75), hr.r[2] * Math.pow(2, -sp * 0.5), hr.r[3] * Math.pow(2, sp * 0.3)];
     for (i = 0; i < 4; i++) v.f[i] = f * rat[i];
     v.midi = midi; v.on = true; v.stage = v.env > 0.001 ? 0 : 0; v.t = 0;
     v.atk = D.atk * (0.7 + Math.random() * 0.6); v.hold = D.atk * (0.3 + Math.random() * 1.2);
@@ -297,7 +315,7 @@ class Stasis extends AudioWorkletProcessor {
         for (i = 0; i < 8; i++) {
           var v = V[i]; if (!v.on) continue;
           v.vib += v.vibr * 6.283 * 64 / sr;
-          var cents = Math.sin(v.vib) * (4 + 10 * D.atonal) / 1200;
+          var cents = Math.sin(v.vib) * (4 + 2 * D.harm.mic + D.harm.dt * 0.15) / 1200;
           var w = Math.pow(2, cents);
           for (j = 0; j < 4; j++) v.inc[j] = v.f[j] * w / sr;
           v.lpk = 1 - Math.exp(-2 * Math.PI * Math.min(sr * 0.4, v.f[0] * (1.5 + 10 * D.bright)) / sr);

@@ -1,5 +1,5 @@
 // STASIS offline cache
-var C = 'stasis-v2', FILES = ['./', 'index.html', 'engine.js?v=2', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
+var C = 'stasis-v3', FILES = ['./', 'index.html', 'engine.js?v=3', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
   'fonts/BarlowCondensed-Medium.woff', 'fonts/BarlowCondensed-SemiBold.woff', 'fonts/BarlowCondensed-Bold.woff'];
 self.addEventListener('install', function (e) { e.waitUntil(caches.open(C).then(function (c) { return c.addAll(FILES); })); self.skipWaiting(); });
 self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== C; }).map(function (k) { return caches.delete(k); })); })); });

@@ -16,7 +16,7 @@
 :root {
   --bg: #050706; --line: #26302e; --fog: #6f7b78; --mist: #a9b4b1; --bone: #dfe4e1; --ice: #9fd2dc; --ice2: #5f97a3; --ember: #c8643f;
   --display: "Barlow Condensed", "Arial Narrow", sans-serif; --mono: ui-monospace, "SF Mono", "Roboto Mono", Menlo, monospace;
-  --k: clamp(46px, min(10.5vw, 8.2vh), 84px); --gap: clamp(6px, 1.2vh, 12px);
+  --k: clamp(54px, min(8.6vw, 21vh), 150px); --gap: clamp(6px, 1.2vh, 12px);
   color-scheme: dark;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -24,8 +24,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); c
 body { background: radial-gradient(1100px 700px at 30% -20%, #14201f 0%, var(--bg) 60%) var(--bg); }
 button { font: inherit; color: inherit; }
 .app { height: 100vh; padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
-  display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1fr) minmax(0, 0.62fr); grid-template-rows: auto minmax(0, 1fr) auto auto;
-  grid-template-areas: "top top" "screen guide" "knobs hands" "scenes hands"; max-width: 1400px; margin: 0 auto; }
+  display: grid; gap: var(--gap); grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr) minmax(0, 0.75fr); grid-template-rows: auto clamp(64px, 15vh, 140px) minmax(0, 1fr);
+  grid-template-areas: "top top top" "screen screen screen" "guide knobs hands"; max-width: 1500px; margin: 0 auto; }
 @supports (height: 100dvh) { .app { height: 100dvh; } }
 
 .top { grid-area: top; display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -47,28 +47,28 @@ button { font: inherit; color: inherit; }
 .guidebox { grid-area: guide; min-height: 0; display: flex; align-items: stretch; justify-content: center; }
 canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; touch-action: none; cursor: crosshair; background: #020303; border: 1px solid #1b2422; }
 
-.knobs { grid-area: knobs; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 4px; background: linear-gradient(180deg, #0d1110, #0a0d0c); border: 1px solid #1d2624; border-radius: 3px; padding: 4px 2px; }
+.knobs { grid-area: knobs; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-content: space-evenly; gap: 0 4px; background: linear-gradient(180deg, #0d1110, #0a0d0c); border: 1px solid #1d2624; border-radius: 3px; padding: 4px 2px; }
 .enc { display: grid; justify-items: center; gap: 1px; user-select: none; -webkit-user-select: none; touch-action: none; cursor: ns-resize; outline: none; padding: 3px 0; border-radius: 3px; min-width: 0; }
-.enc .n { font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--bone); white-space: nowrap; }
+.enc .n { font: 600 clamp(11px, calc(var(--k) * 0.15), 15px)/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--bone); white-space: nowrap; }
 .enc svg { width: var(--k); height: var(--k); overflow: visible; }
-.enc .v { font: 500 10px/1.1 var(--mono); color: var(--ice); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-.enc .r { font: 500 9px/1 var(--mono); color: var(--fog); white-space: nowrap; }
+.enc .v { font: 500 clamp(10px, calc(var(--k) * 0.13), 14px)/1.1 var(--mono); color: var(--ice); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.enc .r { font: 500 clamp(9px, calc(var(--k) * 0.11), 12px)/1 var(--mono); color: var(--fog); white-space: nowrap; }
 .enc:focus-visible { box-shadow: 0 0 0 2px var(--ice2); }
 
-.hands { grid-area: hands; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--gap); align-items: center; }
-.big .enc svg { width: calc(var(--k) * 1.35); height: calc(var(--k) * 1.35); }
+.hands { grid-area: hands; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); align-content: space-evenly; justify-items: center; }
+.hands .acts { width: 100%; }
+.big .enc svg { width: calc(var(--k) * 1.3); height: calc(var(--k) * 1.3); }
+.big .enc .v { color: var(--bone); font-size: clamp(12px, calc(var(--k) * 0.16), 17px); }
+.stations { display: flex; justify-content: space-between; gap: 2px; font: 500 9px/1 var(--mono); color: var(--fog); margin-top: 3px; width: 100%; }
+.stations span.on { color: var(--ice); }
 .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.act { min-height: calc(var(--k) * 0.62); border-radius: 2px; border: 1px solid #2a3533; background: #0a0d0c; color: var(--bone); font: 700 13px/1 var(--display); letter-spacing: .16em; cursor: pointer; touch-action: manipulation; padding: 4px; }
+.act { min-height: calc(var(--k) * 0.6); border-radius: 2px; border: 1px solid #2a3533; background: #0a0d0c; color: var(--bone); font: 700 13px/1 var(--display); letter-spacing: .16em; cursor: pointer; touch-action: manipulation; padding: 4px; }
 .act small { display: block; font: 500 9px/1.2 var(--mono); letter-spacing: .04em; color: var(--fog); margin-top: 3px; }
 .act.rnd { color: var(--ice); }
+.act.mem { grid-column: span 2; }
+.act.mem.saved { background: var(--ice); color: #000; }
 .act[aria-pressed="true"] { background: var(--ice); color: #041014; border-color: var(--ice); }
 .act[aria-pressed="true"] small { color: #10343c; }
-.scenes { grid-area: scenes; display: grid; grid-template-columns: auto repeat(8, minmax(0, 1fr)); gap: 4px; align-items: center; }
-.scenes .lab { font: 500 9px/1.2 var(--mono); letter-spacing: .14em; color: var(--fog); }
-.sc { height: clamp(30px, 5vh, 40px); border-radius: 2px; border: 1px solid #2a3432; background: #0a0d0c; color: var(--mist); font: 700 14px/1 var(--display); cursor: pointer; touch-action: manipulation; }
-.sc.cur { border-color: var(--ice); color: var(--ice); box-shadow: 0 0 0 1px var(--ice) inset; }
-.sc.saved { background: var(--ice); color: #000; }
-
 .start { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px; background: radial-gradient(700px 500px at 50% 40%, rgba(20,32,31,.94), rgba(3,4,4,.98)); }
 .start[hidden] { display: none; }
 .start .box { max-width: 560px; text-align: center; display: grid; gap: 16px; }
@@ -80,25 +80,23 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
 
 /* phone, portrait */
 @media (max-width: 760px) and (orientation: portrait) {
-  .app { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(60px, 1fr) auto auto auto;
-    grid-template-areas: "top top" "screen screen" "guide hands" "knobs knobs" "scenes scenes"; }
-  .guidebox { height: min(46vw, 30vh); }
-  .hands { grid-template-columns: 1fr; justify-items: center; align-content: center; }
-  .acts { width: 100%; }
+  :root { --k: clamp(48px, min(18.5vw, 12vh), 100px); }
+  .app { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto clamp(44px, 8vh, 90px) auto minmax(0, 1fr);
+    grid-template-areas: "top top" "screen screen" "guide hands" "knobs knobs"; }
+  .guidebox { height: min(47vw, 30vh); }
   .safe { display: none; }
   .logo b { font-size: 22px; }
-  .scenes .lab { display: none; } .scenes { grid-template-columns: repeat(8, minmax(0, 1fr)); }
 }
 /* phone, landscape (short) */
 @media (max-height: 520px) and (orientation: landscape) {
   :root { --k: clamp(40px, 13vh, 64px); }
-  .app { grid-template-columns: auto minmax(0, 1fr) minmax(0, 0.8fr); grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas: "top top top" "guide knobs hands" "guide scenes scenes"; }
+  .app { grid-template-columns: auto minmax(0, 1fr) minmax(0, 0.7fr); grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "top top top" "guide knobs hands"; }
   .screen { display: none; }
   .guidebox { height: 100%; }
   .safe { display: none; }
   .knobs { align-content: center; }
-  .enc .r, .act small { display: none; }
+  .enc .r, .act small, .stations { display: none; }
   .guidebox { width: min(42vw, calc(100vh - 70px)); }
 }
 </style>
@@ -106,7 +104,7 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
 <body>
 <div class="start" id="start"><div class="box">
   <h1>STASIS</h1>
-  <p>Slow swells, drones, wind, metal and dust that never repeat and never follow a tempo. G minor, or nowhere at all. One page: eight macros, a guide, your hands.</p>
+  <p>Slow swells, drones, wind, metal and dust that never repeat and never follow a tempo. One page: eight macros, a guide, and one harmony knob from G minor through detune, fifths, octaves and microtones to atonal.</p>
   <button id="go" type="button">AWAKEN</button>
   <small>Constant loudness, never above −3 dBFS. Start with your mixer channel down, then bring it up.<br>Original code, inspired by the idea of cloud-oscillator modules (Synthesis Technology E352) and the dark ambient tradition; not affiliated with Synthesis Technology, Cryo Chamber or Elektron. <a href="https://www.instagram.com/narti_live">Narti Live</a>, MIT license.</small>
 </div></div>
@@ -128,9 +126,9 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
       <button class="act" id="swl" type="button">SWELL<small>one more now</small></button>
       <button class="act" id="frz" type="button" aria-pressed="false">FREEZE<small>hold the room</small></button>
       <button class="act" id="kick" type="button" aria-pressed="false">KICK SPACE<small>cut below 120 Hz</small></button>
+      <button class="act mem" id="mem" type="button">MEMORY<small>tap: glide back · hold: store</small></button>
     </div>
   </div>
-  <div class="scenes" id="scenes"><span class="lab">SCENE<br>hold=store</span></div>
 </div>
 
 <script>
@@ -152,21 +150,10 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
   ];
   var DEF = { timbre: 0.3, density: 0.45, motion: 0.45, texture: 0.35, filter: 0.55, space: 0.55, drone: 0.45, register: 0.4, atonal: 0, gx: 0.35, gy: 0.4, kick: 0 };
   var KEYS = Object.keys(DEF);       // same order as the engine
-  var FACTORY = [
-    ['Cold storage', {}],
-    ['Sunken choir', { timbre: 0.62, density: 0.3, motion: 0.3, texture: 0.15, filter: 0.45, space: 0.85, drone: 0.35, register: 0.6, gx: 0.45, gy: 0.25 }],
-    ['Iron lung', { timbre: 0.9, density: 0.5, motion: 0.55, texture: 0.8, filter: 0.7, space: 0.5, drone: 0.6, register: 0.3, gx: 0.25, gy: 0.55 }],
-    ['Deep station', { timbre: 0.15, density: 0.2, motion: 0.25, texture: 0.4, filter: 0.3, space: 0.6, drone: 0.75, register: 0.05, gx: 0.15, gy: 0.2 }],
-    ['Ash wind', { timbre: 0.35, density: 0.45, motion: 0.75, texture: 0.6, filter: 0.5, space: 0.55, drone: 0.4, register: 0.45, gx: 0.55, gy: 0.6 }],
-    ['Glass catacomb', { timbre: 0.42, density: 0.6, motion: 0.4, texture: 0.2, filter: 0.72, space: 0.75, drone: 0.2, register: 0.85, gx: 0.7, gy: 0.35 }],
-    ['Static tomb', { timbre: 0.8, density: 0.55, motion: 0.85, texture: 0.75, filter: 0.88, space: 0.45, drone: 0.5, register: 0.5, atonal: 0.5, gx: 0.3, gy: 0.75 }],
-    ['Void bloom', { timbre: 0.55, density: 0.75, motion: 0.7, texture: 0.3, filter: 0.6, space: 1, drone: 0.3, register: 0.55, atonal: 0.9, gx: 0.6, gy: 0.85 }]
-  ];
   var LS = 'stasis2', saved = {};
   try { saved = JSON.parse(localStorage.getItem(LS)) || {}; } catch (e) { saved = {}; }
   function persist() { try { localStorage.setItem(LS, JSON.stringify(saved)); } catch (e) {} }
   var V = Object.assign({}, DEF, saved.p || {});
-  var scenes = saved.scenes || FACTORY.map(function (f) { return { name: f[0], p: Object.assign({}, DEF, f[1]) }; });
   var node = null, ctx = null, an = null, awake = false, live = { v: [], lane: [0, 0, 0, 0], wx: V.gx, wy: V.gy, ev: 0, next: 0, frz: 0, fade: 0 };
   var touched = { k: null, t: 0 }, GLIDE = 12;
   function post(m) { if (node) node.port.postMessage(m); }
@@ -220,17 +207,22 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
     var r = document.createElement('div'); r.className = 'r'; r.textContent = d[2]; e.appendChild(r);
     box.appendChild(e); encs.push(e);
   });
-  var big = encoder({ n: 'Tonal › Atonal', get: function () { return V.atonal; }, set: function (v) { setP('atonal', v); }, def: 0,
-    fmt: function (v) { return v < 0.01 ? 'G minor' : v < 0.35 ? 'microtonal' : v < 0.7 ? 'unstable' : 'atonal'; },
-    color: function () { return V.atonal > 0.5 ? '#c8643f' : '#9fd2dc'; }, touch: function () { touched.k = 'atonal'; touched.t = performance.now(); } });
+  var STN = ['G minor', 'detune', 'fifths', 'octaves', 'microtonal', 'atonal'];
+  function harmName(v) { var x = v * 5, i = Math.round(x); return Math.abs(x - i) < 0.15 ? STN[i] : STN[Math.floor(x)] + ' › ' + STN[Math.min(5, Math.floor(x) + 1)]; }
+  var big = encoder({ n: 'Harmony', get: function () { return V.atonal; }, set: function (v) { setP('atonal', v); }, def: 0,
+    fmt: harmName,
+    color: function () { return V.atonal > 0.7 ? '#c8643f' : '#9fd2dc'; }, touch: function () { touched.k = 'atonal'; touched.t = performance.now(); } });
   document.getElementById('bigknob').appendChild(big);
+  var stEl = document.createElement('div'); stEl.className = 'stations'; stEl.innerHTML = ['min', 'det', '5th', 'oct', 'µ', 'atn'].map(function (n) { return '<span>' + n + '</span>'; }).join('');
+  big.appendChild(stEl);
+  function drawStations() { var i = Math.round(V.atonal * 5); Array.prototype.forEach.call(stEl.children, function (c, j) { c.classList.toggle('on', j === i); }); }
 
   // ---- hands
   function randomize() {
     var p = {};
     MACROS.forEach(function (d) { p[d[0]] = 0.08 + Math.random() * 0.84; });
     p.gx = 0.15 + Math.random() * 0.65; p.gy = 0.15 + Math.random() * 0.7;
-    glideTo(p, GLIDE); toast('gliding ' + GLIDE + ' s'); curScene = -1; drawScenes();
+    glideTo(p, GLIDE); toast('gliding ' + GLIDE + ' s');
   }
   document.getElementById('rnd').addEventListener('click', function () { start().then(randomize); });
   document.getElementById('swl').addEventListener('click', function () { start().then(function () { if (!awake) setAwake(true); post({ t: 'spawn' }); }); });
@@ -240,21 +232,12 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
   function drawKick() { kickB.setAttribute('aria-pressed', V.kick > 0.5 ? 'true' : 'false'); }
   kickB.addEventListener('click', function () { setP('kick', V.kick > 0.5 ? 0 : 1); drawKick(); });
 
-  // ---- scenes: tap = glide there (12 s), hold = store
-  var scBox = document.getElementById('scenes'), scBtns = [], curScene = saved.scene == null ? -1 : saved.scene;
-  scenes.forEach(function (sc, i) {
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'sc'; b.textContent = i + 1; b.title = sc.name;
-    var t = 0, held = false;
-    b.addEventListener('pointerdown', function () { held = false; t = setTimeout(function () { held = true; scenes[i] = { name: 'Stored ' + (i + 1), p: Object.assign({}, V) }; saved.scenes = scenes; persist(); b.title = scenes[i].name; b.classList.add('saved'); setTimeout(function () { b.classList.remove('saved'); }, 500); toast('stored in ' + (i + 1)); }, 900); });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { b.addEventListener(ev, function () { clearTimeout(t); }); });
-    b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-    b.addEventListener('click', function () {
-      if (held) return;
-      start().then(function () { var p = Object.assign({}, scenes[i].p); delete p.kick; glideTo(p, GLIDE); curScene = i; saved.scene = i; persist(); drawScenes(); toast((i + 1) + ' · ' + scenes[i].name); });
-    });
-    scBox.appendChild(b); scBtns.push(b);
-  });
-  function drawScenes() { scBtns.forEach(function (b, i) { b.classList.toggle('cur', i === curScene); }); }
+  // ---- one memory: tap = glide back to it (12 s), hold 1 s = store the sound as it is now
+  var memB = document.getElementById('mem'), mem = saved.mem || Object.assign({}, DEF), mt = 0, mHeld = false;
+  memB.addEventListener('pointerdown', function () { mHeld = false; mt = setTimeout(function () { mHeld = true; mem = Object.assign({}, V); saved.mem = mem; persist(); memB.classList.add('saved'); setTimeout(function () { memB.classList.remove('saved'); }, 500); toast('stored'); }, 900); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { memB.addEventListener(ev, function () { clearTimeout(mt); }); });
+  memB.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  memB.addEventListener('click', function () { if (mHeld) return; start().then(function () { var p = Object.assign({}, mem); delete p.kick; glideTo(p, GLIDE); toast('back to memory'); }); });
 
   var wakeB = document.getElementById('wake');
   function setAwake(a) { awake = a; wakeB.setAttribute('aria-pressed', a ? 'true' : 'false'); wakeB.querySelector('span').textContent = a ? 'AWAKE' : 'SLEEPING'; post({ t: 'awake', v: a }); }
@@ -327,14 +310,14 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
     Object.keys(orbs).forEach(function (id) {
       var ob = orbs[id]; if (!seen[id]) { ob.env *= 0.9; if (ob.env < 0.01) { delete orbs[id]; return; } }
       var x = ob.x * W + Math.sin(t * 0.13 + ob.ph) * 20 * u, y = yOf(ob.m) + Math.cos(t * 0.09 + ob.ph) * 5 * u, e = ob.env, r = (8 + 44 * e) * u;
-      var col = V.atonal > 0.5 ? '200,140,110' : '159,210,220', gr = g.createRadialGradient(x, y, 0, x, y, r * 1.6);
+      var col = V.atonal > 0.7 ? '200,140,110' : '159,210,220', gr = g.createRadialGradient(x, y, 0, x, y, r * 1.6);
       gr.addColorStop(0, 'rgba(' + col + ',' + (0.65 * e + 0.05) + ')'); gr.addColorStop(0.35, 'rgba(' + col + ',' + (0.18 * e) + ')'); gr.addColorStop(1, 'rgba(' + col + ',0)');
       g.fillStyle = gr; g.beginPath(); g.arc(x, y, r * 1.6, 0, 6.283); g.fill();
       g.fillStyle = 'rgba(223,228,225,' + (0.25 + 0.6 * e) + ')'; g.beginPath(); g.arc(x, y, (2 + 2.5 * e) * u, 0, 6.283); g.fill();
       if (e > 0.25) { g.font = '600 ' + Math.round(12 * u) + 'px ui-monospace, monospace'; g.fillStyle = 'rgba(223,228,225,' + (e * 0.7) + ')'; g.fillText(nm(ob.m), x + 8 * u, y - 8 * u); }
     });
     g.font = '500 ' + Math.round(11 * u) + 'px ui-monospace, monospace'; g.fillStyle = 'rgba(169,180,177,.75)';
-    g.fillText((V.atonal < 0.01 ? 'G MINOR' : 'ATONAL ' + pct(V.atonal)) + '  ·  ' + (awake ? 'SWELLS ' + live.ev + '  ·  NEXT ' + Math.max(0, live.next).toFixed(1) + 's' : 'SLEEPING'), 26 * u, 16 * u);
+    g.fillText(harmName(V.atonal).toUpperCase() + '  ·  ' + (awake ? 'SWELLS ' + live.ev + '  ·  NEXT ' + Math.max(0, live.next).toFixed(1) + 's' : 'SLEEPING'), 26 * u, 16 * u);
     var lw = Math.min(180 * u, W * 0.28), lx = W - lw - 10 * u;
     for (var k = 0; k < 4; k++) {
       var hst = laneHist[k]; hst.push(live.lane[k]); if (hst.length > 200) hst.shift();
@@ -344,7 +327,7 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
     if (touched.k && now - touched.t < 1500) {
       var a = Math.min(1, (1500 - (now - touched.t)) / 400), lab, val;
       if (touched.k === 'guide') { lab = 'GUIDE'; val = (V.gx < 0.33 ? 'DARK' : V.gx < 0.66 ? 'DUSK' : 'LIGHT') + ' · ' + (V.gy < 0.33 ? 'STILL' : V.gy < 0.66 ? 'STIRRING' : 'RESTLESS'); }
-      else if (touched.k === 'atonal') { lab = 'TONAL › ATONAL'; val = big.querySelector('.v').textContent.toUpperCase() + ' ' + pct(V.atonal); }
+      else if (touched.k === 'atonal') { lab = 'HARMONY'; val = harmName(V.atonal).toUpperCase(); }
       else { var d = MACROS.filter(function (m) { return m[0] === touched.k; })[0]; lab = d[1].toUpperCase() + '  ·  ' + d[2]; val = d[3](V[d[0]]).toUpperCase() + '  ' + pct(V[d[0]]); }
       var bw = Math.min(W * 0.8, 440 * u), bh = 64 * u;
       g.fillStyle = 'rgba(2,4,4,' + 0.78 * a + ')'; g.fillRect(W / 2 - bw / 2, H / 2 - bh / 2, bw, bh);
@@ -360,7 +343,7 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
   function frame(now) {
     if (sc.offsetParent !== null) { var want = Math.round(sc.getBoundingClientRect().width * Math.min(2, window.devicePixelRatio || 1)); if (want !== SW) fit(); drawScreen(now); }
     drawGuide(now);
-    if (now - lastEnc > 120) { lastEnc = now; encs.forEach(function (e) { e.redraw(); }); big.redraw(); document.getElementById('keytag').textContent = V.atonal < 0.01 ? 'G MINOR' : 'ATONAL ' + pct(V.atonal); }
+    if (now - lastEnc > 120) { lastEnc = now; encs.forEach(function (e) { e.redraw(); }); big.redraw(); drawStations(); document.getElementById('keytag').textContent = harmName(V.atonal).toUpperCase(); }
     requestAnimationFrame(frame);
   }
   function onEngine(m) {
@@ -376,7 +359,7 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC || !('audioWorklet' in AC.prototype)) { document.querySelector('.start p').textContent = 'This browser cannot run STASIS (no AudioWorklet). Try a recent Chrome, Firefox or Safari.'; return Promise.reject(); }
     ctx = new AC({ latencyHint: 'playback', sampleRate: 48000 });
-    startP = ctx.audioWorklet.addModule('engine.js?v=2').then(function () {
+    startP = ctx.audioWorklet.addModule('engine.js?v=3').then(function () {
       node = new AudioWorkletNode(ctx, 'stasis', { numberOfInputs: 0, outputChannelCount: [2] });
       an = ctx.createAnalyser(); an.fftSize = 4096; an.smoothingTimeConstant = 0.85;
       node.connect(ctx.destination); node.connect(an);
@@ -389,7 +372,7 @@ canvas#guide { display: block; width: 100%; height: 100%; border-radius: 3px; to
   document.getElementById('go').addEventListener('click', function () { start().then(function () { document.getElementById('start').hidden = true; setAwake(true); }); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
   var wl = null; setInterval(function () { if (navigator.wakeLock && awake && !wl) navigator.wakeLock.request('screen').then(function (l) { wl = l; l.addEventListener('release', function () { wl = null; }); }).catch(function () {}); }, 5000);
-  drawKick(); drawScenes(); requestAnimationFrame(frame);
+  drawKick(); requestAnimationFrame(frame);
   if ('serviceWorker' in navigator && location.protocol === 'https:' && !/appassets/.test(location.host)) navigator.serviceWorker.register('sw.js').catch(function () {});
 })();
 </script>
