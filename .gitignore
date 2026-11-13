@@ -6,3 +6,7 @@ android/app/src/main/assets/
 android/app/build/
 android/.gradle/
 android/build/
+android-stasis/app/src/main/assets/
+android-stasis/app/build/
+android-stasis/.gradle/
+android-stasis/build/

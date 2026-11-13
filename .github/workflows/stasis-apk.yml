@@ -1,0 +1,39 @@
+name: STASIS APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['android-stasis/**', 'stasis/**', '.github/workflows/stasis-apk.yml']
+permissions:
+  contents: write
+concurrency: { group: stasis-apk, cancel-in-progress: true }
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: Web app into the APK's assets
+        run: |
+          A=android-stasis/app/src/main/assets
+          rm -rf $A && mkdir -p $A
+          cp -r stasis $A/
+          rm -f $A/stasis/sw.js
+      - name: Build
+        working-directory: android-stasis
+        run: gradle --no-daemon assembleDebug
+      - name: Commit the APK
+        run: |
+          mkdir -p downloads
+          cp android-stasis/app/build/outputs/apk/debug/app-debug.apk downloads/STASIS-v1.0.apk
+          git config user.name "stasis-apk-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add downloads/STASIS-v1.0.apk
+          git commit -m "STASIS APK built by GitHub Actions [skip ci]" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        with: { name: STASIS-apk, path: android-stasis/app/build/outputs/apk/debug/app-debug.apk }
