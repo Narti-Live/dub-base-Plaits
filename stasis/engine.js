@@ -12,21 +12,15 @@
 // Slow random modulation: 4 drift lanes (smooth random walks, 15 s .. 4 min) and a wandering GUIDE point.
 
 var PARAMS = [
-  // CLOUD
-  ['density', 0.45], ['swell', 0.55], ['tail', 0.6], ['octave', 0.45], ['range', 0.5], ['shape', 0.3], ['spread', 0.4], ['cloud', 0.7],
-  // DRONE
-  ['drone', 0.55], ['dOct', 0.5], ['fifth', 0.45], ['beat', 0.35], ['dShape', 0.2], ['movement', 0.5], ['sub', 0.45], ['upper', 0.3],
-  // TEXTURE
-  ['wind', 0.35], ['windTone', 0.35], ['windMove', 0.5], ['crackle', 0.15], ['metal', 0.25], ['metalDecay', 0.6], ['rumble', 0.3], ['texture', 0.6],
-  // FILTER
-  ['fType', 0.0], ['cutoff', 0.68], ['res', 0.25], ['fDrift', 0.5], ['lowcut', 0.2], ['tilt', 0.4], ['drive', 0.25], ['width', 0.6],
-  // SPACE
-  ['size', 0.7], ['decay', 0.6], ['damp', 0.55], ['verb', 0.5], ['dTime', 0.5], ['dFb', 0.45], ['dTone', 0.35], ['delay', 0.25],
-  // MOTION
-  ['depth', 0.5], ['speed', 0.35], ['wow', 0.25], ['evolve', 0.5], ['glide', 0.5], ['repeat', 0.4], ['voices', 0.7], ['level', 0.7],
-  // big knob, guide
-  ['atonal', 0.0], ['gx', 0.35], ['gy', 0.4]
+  // eight macros: each one morphs several settings at once
+  ['timbre', 0.3], ['density', 0.45], ['motion', 0.45], ['texture', 0.35], ['filter', 0.55], ['space', 0.55], ['drone', 0.45], ['register', 0.4],
+  // harmony, guide, kick space (low cut at 120 Hz)
+  ['atonal', 0.0], ['gx', 0.35], ['gy', 0.4], ['kick', 0]
 ];
+var LA = 144, CEIL = 0.708, TARGET = 0.09;   // look-ahead 3 ms, ceiling -3 dBFS, loudness -20 dBFS RMS (above 60 Hz)
+var KB0, KB1, KA1, KA2;
+(function () { var w0 = 2 * Math.PI * 100 / sampleRate, al = Math.sin(w0) / (2 * 0.707), cw = Math.cos(w0), a0 = 1 + al;
+  KB0 = (1 + cw) / 2 / a0; KB1 = -(1 + cw) / a0; KA1 = -2 * cw / a0; KA2 = (1 - al) / a0; })();
 var PIX = {}; PARAMS.forEach(function (p, i) { PIX[p[0]] = i; });
 
 var SCALE = [0, 2, 3, 5, 7, 8, 10];               // G natural minor (from G)
@@ -136,7 +130,8 @@ class Stasis extends AudioWorkletProcessor {
     this.dif = [new Line(1024), new Line(1024), new Line(1024), new Line(1024)]; this.difLen = [142, 107, 379, 277].map(function (x) { return Math.round(x * sr / 44100); });
     this.vmod = 0;
     // master
-    this.lim = 1; this.peak = 0; this.rms = 0;
+    this.lim = 1; this.peak = 0; this.rms = 0; this.agc = 1; this.agMs = 0; this.kw = new Float32Array(4); this.lenv = 0;
+    this.la = new Float32Array(LA * 2); this.lap = 0;
     // modulation
     this.W = [new Walker(1), new Walker(2), new Walker(3), new Walker(4), new Walker(5), new Walker(6), new Walker(7), new Walker(8), new Walker(9)];
     this.lane = new Float32Array(4); this.wx = 0.35; this.wy = 0.4;
@@ -164,7 +159,35 @@ class Stasis extends AudioWorkletProcessor {
       if (G[i] > 0) { var d = T[i] - P[i]; if (Math.abs(d) <= G[i]) { P[i] = T[i]; G[i] = 0; } else P[i] += d > 0 ? G[i] : -G[i]; }
       else P[i] += (T[i] - P[i]) * 0.08;
     }
-    var p = this.p.bind(this), D = this.D;
+    // ---- the macros, unfolded into the voice's settings
+    var M = {}; for (i = 0; i < PARAMS.length; i++) M[PARAMS[i][0]] = P[i];
+    var t = M.timbre, de = M.density, mo = M.motion, tx = M.texture, fi = M.filter, sp = M.space, bal = M.drone, rg = M.register;
+    var q = {
+      gx: M.gx, gy: M.gy, atonal: M.atonal,
+      // TIMBRE: breath > glass > choir > iron, then wider and more metallic
+      shape: Math.min(1, t * 1.12), dShape: clamp(t * 0.85, 0, 1), spread: 0.15 + 0.7 * t, upper: 0.15 + 0.5 * t,
+      // DENSITY: sparse long swells .. many shorter ones (never shorter than ~1.5 s)
+      density: 0.12 + 0.88 * de, swell: 0.85 - 0.5 * de, tail: 0.9 - 0.35 * de, range: 0.2 + 0.8 * de, voices: 0.35 + 0.65 * de, repeat: 0.5 - 0.2 * de,
+      // MOTION: how much and how fast everything drifts
+      depth: 0.15 + 0.85 * mo, speed: 0.08 + 0.55 * mo, wow: 0.05 + 0.45 * mo * mo, evolve: 0.2 + 0.7 * mo, windMove: 0.3 + 0.6 * mo, fDrift: 0.25 + 0.65 * mo,
+      beat: 0.15 + 0.45 * mo, movement: 0.3 + 0.6 * mo,
+      // TEXTURE: air > wind > dust > iron and rumble
+      wind: tx < 0.55 ? tx * 1.2 : 0.66 - (tx - 0.55) * 0.5, windTone: 0.25 + 0.35 * tx, crackle: clamp((tx - 0.3) * 0.7, 0, 0.45),
+      metal: clamp((tx - 0.45) * 1.1, 0, 0.6) + t * t * 0.25, metalDecay: 0.55 + 0.35 * tx, rumble: 0.15 + 0.4 * tx, texture: 0.35 + 0.5 * tx,
+      // FILTER: dark low-pass > open > resonant band > thin high-pass
+      fType: fi < 0.62 ? 0 : fi < 0.82 ? (fi - 0.62) / 0.2 * 0.5 : 0.5 + (fi - 0.82) / 0.18 * 0.5,
+      cutoff: fi < 0.62 ? 0.5 + fi / 0.62 * 0.38 : fi < 0.82 ? 0.88 - (fi - 0.62) * 1.6 : 0.56 + (fi - 0.82) * 1.2,
+      res: fi < 0.62 ? 0.15 + fi * 0.2 : fi < 0.82 ? 0.27 + (fi - 0.62) * 1.8 : 0.63 - (fi - 0.82) * 1.2,
+      // SPACE: close and dry > huge > nearly endless
+      verb: 0.15 + 0.7 * sp, size: 0.35 + 0.65 * sp, decay: 0.3 + 0.62 * sp, damp: 0.7 - 0.3 * sp, delay: 0.05 + 0.33 * sp, dFb: 0.3 + 0.4 * sp, dTime: 0.3 + 0.6 * sp, dTone: 0.25 + 0.2 * sp,
+      // DRONE: cloud <> drone (the drone never quite leaves, so there are no holes in the sound)
+      cloud: Math.min(1, 2 * (1 - bal)) * 0.85, drone: (0.3 + 0.7 * Math.min(1, 2 * bal)) * 0.8, sub: 0.2 + 0.45 * bal, fifth: 0.3 + 0.3 * bal,
+      // REGISTER: deep <> high
+      octave: rg, dOct: rg < 0.34 ? 0 : rg < 0.67 ? 0.5 : 1,
+      // fixed (safe, good-sounding) settings
+      lowcut: M.kick > 0.5 ? 0.66 : 0.12, tilt: 0.45, drive: 0.2, width: 0.65, level: 0.7
+    };
+    var p = function (n) { return q[n]; }, D = this.D;
     // guide wanders around the point the player sets (EVOLVE = how far)
     var gyR = p('gy');
     var period = 240 * Math.pow(0.0625, p('speed')) / (0.6 + gyR);         // 4 min .. 15 s, faster when restless
@@ -283,6 +306,11 @@ class Stasis extends AudioWorkletProcessor {
         this.fade += ((this.awake ? 1 : 0) - this.fade) * (this.awake ? 0.0016 : 0.0009);
         this.fade2 += ((this.awake ? 1 : 0) - this.fade2) * (this.awake ? 0.01 : 0.0006);   // the tails fade too
         this.dlfo += 64 / sr;
+        // loudness control: only while awake and playing, never boosting silence, +-12 dB at most
+        if (this.awake && this.fade > 0.97 && this.agMs > 1e-7) {
+          var gt = clamp(TARGET / Math.sqrt(this.agMs), 0.18, 5.6);   // +-15 dB
+          this.agc += (gt - this.agc) * (gt < this.agc ? 0.006 : 0.0025);
+        }
       }
       // ---- generative clock (free time, Poisson)
       if (this.awake && --this.nextEv <= 0) { this.spawn(); this.nextEv = sr * (-Math.log(1 - Math.random() * 0.98) / D.rate); this.nextEv = Math.max(sr * 0.4, this.nextEv); }
@@ -399,13 +427,24 @@ class Stasis extends AudioWorkletProcessor {
       var h = this.hp1, zL = D.hb0 * oL + h[0]; h[0] = D.hb1 * oL - D.ha1 * zL + h[1]; h[1] = D.hb2 * oL - D.ha2 * zL;
       var h2b = this.hp2, zR = D.hb0 * oR + h2b[0]; h2b[0] = D.hb1 * oR - D.ha1 * zR + h2b[1]; h2b[1] = D.hb2 * oR - D.ha2 * zR;
       var mid = (zL + zR) * 0.5, side = (zL - zR) * 0.5 * D.width;
-      oL = (mid + side) * D.level * this.fade2; oR = (mid - side) * D.level * this.fade2;
+      oL = mid + side; oR = mid - side;
+      // constant loudness: a slow (about 3 s) level follower pulls everything to the same loudness
+      // measured like a loudness meter: 2nd-order high-pass at 100 Hz (the sub does not count), both channels
+      var kh = this.kw, xl2 = oL, xr2 = oR;
+      var yl = KB0 * xl2 + kh[0]; kh[0] = KB1 * xl2 - KA1 * yl + kh[1]; kh[1] = KB0 * xl2 - KA2 * yl;
+      var yr = KB0 * xr2 + kh[2]; kh[2] = KB1 * xr2 - KA1 * yr + kh[3]; kh[3] = KB0 * xr2 - KA2 * yr;
+      this.agMs += ((yl * yl + yr * yr) * 0.5 - this.agMs) * 0.000014;   // ~1.5 s
+      oL *= this.agc * this.fade2; oR *= this.agc * this.fade2;
+      // safety: 3 ms look-ahead limiter at -3 dBFS, then a hard ceiling
+      var la = this.la, lp2 = this.lap; la[lp2 * 2] = oL; la[lp2 * 2 + 1] = oR; this.lap = (lp2 + 1) % LA;
       var pk = Math.max(Math.abs(oL), Math.abs(oR));
-      var want = pk > 0.84 ? 0.84 / pk : 1;
-      this.lim = want < this.lim ? want : this.lim + (1 - this.lim) * 0.00008;
-      oL = th(oL * this.lim * 1.05) / 1.05; oR = th(oR * this.lim * 1.05) / 1.05;
+      this.lenv = pk > this.lenv ? pk : this.lenv * 0.99996;
+      var want = this.lenv > CEIL ? CEIL / this.lenv : 1;
+      this.lim += (want - this.lim) * (want < this.lim ? 0.03 : 0.0004);
+      var rp = this.lap; oL = la[rp * 2] * this.lim; oR = la[rp * 2 + 1] * this.lim;
+      oL = oL > CEIL ? CEIL : oL < -CEIL ? -CEIL : oL; oR = oR > CEIL ? CEIL : oR < -CEIL ? -CEIL : oR;
       L[s] = oL; R[s] = oR;
-      if (pk * this.lim > this.peak) this.peak = pk * this.lim;
+      var ap2 = Math.max(Math.abs(oL), Math.abs(oR)); if (ap2 > this.peak) this.peak = ap2;
       this.rms += (oL * oL - this.rms) * 0.00005;
     }
     // ---- screen data, 20 times a second
